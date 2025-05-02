@@ -1,0 +1,93 @@
+
+/* estilo general */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f5f5f5;
+    color: #333;
+    padding: 20px;
+}
+
+h1, h2, h3 {
+    margin-bottom: 15px;
+    color: #222;
+}
+  
+
+/* estilo para el header y el footer */
+header {
+    background-color: #222;
+    padding: 15px;
+    text-align: center;
+}
+  
+header nav a {
+    color: #fff;
+    text-decoration: none;
+    margin: 0 10px;
+    font-weight: bold;
+}
+  
+header nav a:hover {
+    text-decoration: underline;
+}
+  
+footer {
+    background-color: #222;
+    color: #ccc;
+    text-align: center;
+    padding: 10px;
+    margin-top: 40px;
+}
+  
+/* estilo para los formularios */
+form {
+    background-color: #fff;
+    padding: 20px;
+    max-width: 500px;
+    margin: 20px auto;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+  
+input, textarea, select, button {
+    display: block;
+    width: 100%;
+    margin-bottom: 15px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+  
+button {
+    background-color: #4CAF50;
+    color: white;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+}
+  
+button:hover {
+    background-color: #45a049;
+}
+  
+/* estilo para obra y comentarios */
+.obra, .comentario {
+    background-color: #fff;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-left: 5px solid #4CAF50;
+    border-radius: 6px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.05);
+}
+  
+.obra h3, .comentario strong {
+    color: #333;
+}
+
+/* f */
