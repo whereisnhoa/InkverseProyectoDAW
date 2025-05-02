@@ -35,6 +35,32 @@ if (!$obra)
 <p><?= nl2br(htmlspecialchars($obra['descripcion'])) ?></p>
 <?php if ($obra['es_adulto']) echo "<p style='color:red;'> contenido para adultos</p>"; ?>
 
+<!-- favoritos -->
+<?php
+if (isset($_SESSION['usuario_id'])):
+    // Verificar si la obra ya está en favoritos
+    $ya_favorito = false;
+    $check = $conexion->prepare("SELECT id FROM favoritos WHERE usuario_id = ? AND obra_id = ?");
+    $check->bind_param("ii", $_SESSION['usuario_id'], $obra_id);
+    $check->execute();
+    $check->store_result();
+    $ya_favorito = $check->num_rows > 0;
+?>
+
+<form action="../controllers/procesar-favorito.php" method="POST" style="margin: 15px 0;">
+    <input type="hidden" name="obra_id" value="<?= $obra_id ?>">
+    <?php if ($ya_favorito): ?>
+        <input type="hidden" name="accion" value="quitar">
+        <button type="submit">❌ Quitar de favoritos</button>
+    <?php else: ?>
+        <input type="hidden" name="accion" value="agregar">
+        <button type="submit">❤️ Añadir a favoritos</button>
+    <?php endif; ?>
+</form>
+<!-- --- -->
+
+<?php endif; ?>
+
 <hr>
 
 <h3>Comentarios</h3>
