@@ -1,26 +1,26 @@
+<?php include '../includes/header.php'; ?>
 
-<?php 
-
-    include '../includes/header.php'; 
-
-?>
-
-<h2>Iniciar sesión</h2>
+<h1 class="text-center">Iniciar Sesión</h1>
 
 <form action="/controllers/procesar-login.php" method="POST">
-
-  <label for="usuario">Nombre de usuario o email:</label><br>
-  <input type="text" name="usuario" required><br><br>
-
-  <label for="password">Contraseña:</label><br>
-  <input type="password" name="password" required><br><br>
-
-  <button type="submit">Entrar</button>
-
+  <div class="form-group">
+    <label for="usuario">Nombre de usuario o email:</label>
+    <input type="text" id="usuario" name="usuario" required>
+  </div>
+  
+  <div class="form-group">
+    <label for="password">Contraseña:</label>
+    <input type="password" id="password" name="password" required>
+  </div>
+  
+  <div class="flex flex-between items-center">
+    <a href="#">¿Olvidaste tu contraseña?</a>
+    <button type="submit">Iniciar Sesión</button>
+  </div>
+  
+  <div class="text-center mt-3">
+    <p>¿No tienes una cuenta? <a href="/public/register.php">Regístrate aquí</a></p>
+  </div>
 </form>
 
-<?php 
-
-    include '../includes/footer.php'; 
-    
-?>
+<?php include '../includes/footer.php'; ?>

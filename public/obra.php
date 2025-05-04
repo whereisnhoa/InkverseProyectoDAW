@@ -4,7 +4,7 @@ include '../includes/conexion.php';
 include '../includes/header.php';
 
 if (!isset($_GET['id']) || !isset($_GET['tipo'])) {
-    echo "<p>Obra no especificada correctamente.</p>";
+    echo '<div class="alerta alerta-error">Obra no especificada correctamente.</div>';
     include '../includes/footer.php';
     exit();
 }
@@ -27,53 +27,60 @@ $stmt->execute();
 $obra = $stmt->get_result()->fetch_assoc();
 
 if (!$obra) {
-    echo "<p>Obra no encontrada.</p>";
+    echo '<div class="alerta alerta-error">Obra no encontrada.</div>';
     include '../includes/footer.php';
     exit();
 }
-
-// El resto del código para mostrar la obra
 ?>
 
-<h2><?= htmlspecialchars($obra['titulo']) ?></h2>
-<p><strong>Autor:</strong> <?= htmlspecialchars($obra['autor']) ?></p>
-<?php if ($tipo_contenido === 'libro' && isset($obra['categoria'])): ?>
-    <p><strong>Categoría:</strong> <?= htmlspecialchars($obra['categoria']) ?></p>
-<?php endif; ?>
-<p><?= nl2br(htmlspecialchars($obra['descripcion'])) ?></p>
-<?php if ($obra['publico_adulto']): ?>
-    <p style='color:red;'>Contenido para adultos</p>
-<?php endif; ?>
-
-<!-- Favoritos -->
-<?php
-if (isset($_SESSION['usuario_id'])):
-    // Verificar si la obra ya está en favoritos
-    $ya_favorito = false;
-    $check = $conexion->prepare("SELECT id FROM favoritos WHERE usuario_id = ? AND tipo_contenido = ? AND contenido_id = ?");
-    $check->bind_param("isi", $_SESSION['usuario_id'], $tipo_contenido, $contenido_id);
-    $check->execute();
-    $check->store_result();
-    $ya_favorito = $check->num_rows > 0;
-?>
-
-<form action="../controllers/procesar-favorito.php" method="POST" style="margin: 15px 0;">
-    <input type="hidden" name="contenido_id" value="<?= $contenido_id ?>">
-    <input type="hidden" name="tipo_contenido" value="<?= $tipo_contenido ?>">
-    <?php if ($ya_favorito): ?>
-        <input type="hidden" name="accion" value="quitar">
-        <button type="submit">❌ Quitar de favoritos</button>
-    <?php else: ?>
-        <input type="hidden" name="accion" value="agregar">
-        <button type="submit">❤️ Añadir a favoritos</button>
+<div class="mb-4">
+  <h1><?= htmlspecialchars($obra['titulo']) ?></h1>
+  
+  <div class="flex gap-2 mb-2">
+    <?php if ($tipo_contenido === 'libro' && isset($obra['categoria'])): ?>
+      <span class="badge badge-categoria"><?= htmlspecialchars($obra['categoria']) ?></span>
     <?php endif; ?>
-</form>
+    
+    <?php if ($obra['publico_adulto']): ?>
+      <span class="badge badge-adulto">+18</span>
+    <?php endif; ?>
+  </div>
+  
+  <p class="mb-3"><strong>Autor:</strong> <?= htmlspecialchars($obra['autor']) ?></p>
+  
+  <div class="obra-card mb-4">
+    <div class="obra-card-body">
+      <p><?= nl2br(htmlspecialchars($obra['descripcion'])) ?></p>
+    </div>
+  </div>
+  
+  <!-- Favoritos -->
+  <?php
+  if (isset($_SESSION['usuario_id'])):
+      // Verificar si la obra ya está en favoritos
+      $ya_favorito = false;
+      $check = $conexion->prepare("SELECT id FROM favoritos WHERE usuario_id = ? AND tipo_contenido = ? AND contenido_id = ?");
+      $check->bind_param("isi", $_SESSION['usuario_id'], $tipo_contenido, $contenido_id);
+      $check->execute();
+      $check->store_result();
+      $ya_favorito = $check->num_rows > 0;
+  ?>
+  
+  <form action="../controllers/procesar-favorito.php" method="POST" class="mb-4">
+      <input type="hidden" name="contenido_id" value="<?= $contenido_id ?>">
+      <input type="hidden" name="tipo_contenido" value="<?= $tipo_contenido ?>">
+      <?php if ($ya_favorito): ?>
+          <input type="hidden" name="accion" value="quitar">
+          <button type="submit" class="btn btn-danger"><i class="fas fa-heart-broken"></i> Quitar de favoritos</button>
+      <?php else: ?>
+          <input type="hidden" name="accion" value="agregar">
+          <button type="submit" class="btn"><i class="fas fa-heart"></i> Añadir a favoritos</button>
+      <?php endif; ?>
+  </form>
+  <?php endif; ?>
+</div>
 
-<?php endif; ?>
-
-<hr>
-
-<h3>Comentarios</h3>
+<h2>Comentarios</h2>
 
 <?php
 // Mostrar comentarios
@@ -90,23 +97,33 @@ $resultado_com = $stmt_com->get_result();
 if ($resultado_com->num_rows > 0):
     while ($comentario = $resultado_com->fetch_assoc()):
 ?>
-    <p><strong><?= htmlspecialchars($comentario['usuario']) ?>:</strong> <?= nl2br(htmlspecialchars($comentario['contenido'])) ?> <br>
-    <small><?= $comentario['fecha'] ?></small></p>
-    <hr>
+    <div class="comentario">
+      <div class="comentario-header">
+        <span class="comentario-autor"><?= htmlspecialchars($comentario['usuario']) ?></span>
+        <span class="comentario-fecha"><?= date('d/m/Y H:i', strtotime($comentario['fecha'])) ?></span>
+      </div>
+      <p class="comentario-contenido"><?= nl2br(htmlspecialchars($comentario['contenido'])) ?></p>
+    </div>
 <?php endwhile; else: ?>
-    <p>Aún no hay comentarios.</p>
+    <p class="text-center mb-4">Aún no hay comentarios.</p>
 <?php endif; ?>
 
 <?php if (isset($_SESSION['usuario_id'])): ?>
-    <h4>Deja tu comentario:</h4>
-    <form action="../controllers/procesar-comentario.php" method="POST">
-        <input type="hidden" name="contenido_id" value="<?= $contenido_id ?>">
-        <input type="hidden" name="tipo_contenido" value="<?= $tipo_contenido ?>">
-        <textarea name="contenido" rows="4" cols="50" required></textarea><br>
-        <button type="submit">Comentar</button>
-    </form>
+    <div class="mb-4">
+      <h3>Deja tu comentario</h3>
+      <form action="../controllers/procesar-comentario.php" method="POST">
+          <input type="hidden" name="contenido_id" value="<?= $contenido_id ?>">
+          <input type="hidden" name="tipo_contenido" value="<?= $tipo_contenido ?>">
+          <div class="form-group">
+            <textarea name="contenido" rows="4" required placeholder="Escribe tu comentario aquí..."></textarea>
+          </div>
+          <button type="submit" class="btn"><i class="fas fa-comment"></i> Comentar</button>
+      </form>
+    </div>
 <?php else: ?>
-    <p>Debes iniciar sesión para comentar.</p>
+    <div class="alerta alerta-info">
+      <p>Debes <a href="/public/login.php">iniciar sesión</a> para comentar.</p>
+    </div>
 <?php endif; ?>
 
 <?php include '../includes/footer.php'; ?>
