@@ -2,7 +2,7 @@
 <?php
 
 // conexión a la base de datos
-$conexion = new mysqli("localhost", "root", "", "miproyecto");
+$conexion = new mysqli("localhost", "root", "", "proyecto_db");
 
 // comprobar si hay error en la conexión
 if ($conexion->connect_error) 
