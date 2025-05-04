@@ -1,11 +1,11 @@
 
 <!-- header -->
-<?php include '/includes/header.php'; ?>
+<?php include '../includes/header.php'; ?>
 
 <h2>Registrar nuevo usuario</h2>
 
 <!-- formulario de registro de usuario -->
-<form action="/controllers/procesar-registro.php" method="POST">
+<form action="../controllers/procesar-registro.php" method="POST">
 
   <label for="nombre">Nombre completo:</label><br>
   <input type="text" name="nombre" required><br><br>
@@ -27,4 +27,4 @@
 </form>
 
 <!-- footer -->
-<?php include '/includes/footer.php'; ?>
+<?php include '../includes/footer.php'; ?>
