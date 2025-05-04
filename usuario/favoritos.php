@@ -1,11 +1,11 @@
 
 <?php
 
-include '/includes/funciones.php';
+include '../includes/funciones.php';
 verificarLogin();
 session_start();
-include '/includes/conexion.php';
-include '/includes/header.php';
+include '../includes/conexion.php';
+include '../includes/header.php';
 
 $usuario_id = $_SESSION['usuario_id'];
 
@@ -27,11 +27,11 @@ $resultado = $stmt->get_result();
         <div style="border: 1px solid #ccc; padding: 10px; margin-bottom: 15px;">
             <h3><?= htmlspecialchars($obra['titulo']) ?></h3>
             <p><strong>Tipo:</strong> <?= $obra['tipo'] ?> | <strong>Género:</strong> <?= $obra['genero'] ?></p>
-            <a href="/public/obra.php?id=<?= $obra['id'] ?>">Ver obra</a>
+            <a href="../public/obra.php?id=<?= $obra['id'] ?>">Ver obra</a>
         </div>
     <?php endwhile; ?>
 <?php else: ?>
     <p>No has añadido obras a favoritos aún.</p>
 <?php endif; ?>
 
-<?php include '/includes/footer.php'; ?>
+<?php include '../includes/footer.php'; ?>
