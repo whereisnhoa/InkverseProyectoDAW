@@ -1,11 +1,11 @@
 
 <?php
 
-include '/includes/funciones.php';
+include '../includes/funciones.php';
 verificarLogin();
 session_start();
-include '/includes/conexion.php';
-include '/includes/header.php';
+include '../includes/conexion.php';
+include '../includes/header.php';
 
 $autor_id = $_SESSION['usuario_id'];
 
@@ -47,4 +47,4 @@ $resultado = $stmt->get_result();
 
 <?php endif; ?>
 
-<?php include '/includes/footer.php'; ?>
+<?php include '../includes/footer.php'; ?>
