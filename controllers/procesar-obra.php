@@ -3,7 +3,7 @@
 
 session_start();
 
-include '../includes/conexion.php';
+include '/includes/conexion.php';
 
 $titulo = $_POST['titulo'];
 $descripcion = $_POST['descripcion'];
@@ -21,7 +21,7 @@ $stmt->bind_param("ssssii", $titulo, $descripcion, $tipo, $genero, $es_adulto, $
 if ($stmt->execute()) 
 {
     echo "Obra subida correctamente.";
-    header("Location: ../usuarios/mis-obras.php");
+    header("Location: /usuarios/mis-obras.php");
 
 }else
     {

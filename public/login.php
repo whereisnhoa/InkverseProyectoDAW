@@ -1,13 +1,13 @@
 
 <?php 
 
-    include '../includes/header.php'; 
+    include '/includes/header.php'; 
 
 ?>
 
 <h2>Iniciar sesión</h2>
 
-<form action="../controllers/procesar-login.php" method="POST">
+<form action="/controllers/procesar-login.php" method="POST">
 
   <label for="usuario">Nombre de usuario o email:</label><br>
   <input type="text" name="usuario" required><br><br>
@@ -21,6 +21,6 @@
 
 <?php 
 
-    include '../includes/footer.php'; 
+    include '/includes/footer.php'; 
     
 ?>

@@ -3,7 +3,7 @@
 
 session_start();
 
-include '../includes/conexion.php';
+include '/includes/conexion.php';
 
 $usuario = $_POST['usuario'];
 $password = $_POST['password'];
@@ -29,7 +29,7 @@ if ($result->num_rows === 1)
         $_SESSION['edad'] = date_diff(date_create($fila['fecha_nacimiento']), date_create('today'))->y;
 
         // redirigir al perfil
-        header("Location: ../usuarios/perfil.php");
+        header("Location: /usuarios/perfil.php");
         exit();
 
     }else

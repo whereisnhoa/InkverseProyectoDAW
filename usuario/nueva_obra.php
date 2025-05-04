@@ -1,16 +1,16 @@
 
 <?php
 
-    include '../includes/funciones.php';
+    include '/includes/funciones.php';
     verificarLogin();
     session_start();
-    include '../includes/header.php';
+    include '/includes/header.php';
 
 ?>
 
 <h2>Subir nueva obra</h2>
 
-<form action="../controllers/procesar-obra.php" method="POST">
+<form action="/controllers/procesar-obra.php" method="POST">
 
   <label for="titulo">Título de la obra:</label><br>
   <input type="text" name="titulo" required><br><br>
@@ -38,6 +38,6 @@
 
 <?php 
 
-    include '../includes/footer.php'; 
+    include '/includes/footer.php'; 
 
 ?>

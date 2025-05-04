@@ -1,6 +1,6 @@
 <?php
 
-include '../includes/conexion.php';
+include '/includes/conexion.php';
 
 // variables de datos
 $nombre = $_POST['nombre'];
@@ -31,7 +31,7 @@ if ($result->num_rows > 0)
         $stmt->bind_param("sssss", $nombre, $usuario, $email, $fecha_nacimiento, $passwordHash);
 
         if ($stmt->execute()) {
-            header("Location: ../public/login.php");
+            header("Location: /public/login.php");
         }else 
             {
                 echo "Error al registrar: " . $stmt->error;

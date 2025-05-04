@@ -2,10 +2,11 @@
 <?php
 
 session_start();
-include '../includes/conexion.php';
+include '/includes/conexion.php';
 
-if (!isset($_SESSION['usuario_id']) || !isset($_POST['obra_id']) || !isset($_POST['accion'])) {
-    header("Location: ../public/login.php");
+if (!isset($_SESSION['usuario_id']) || !isset($_POST['obra_id']) || !isset($_POST['accion'])) 
+{
+    header("Location: /public/login.php");
     exit();
 }
 
@@ -25,8 +26,8 @@ $stmt = $conexion->prepare($sql);
 $stmt->bind_param("ii", $usuario_id, $obra_id);
 $stmt->execute();
 
-// Volver a la obra
-header("Location: ../public/obra.php?id=" . $obra_id);
+// volver a la obra
+header("Location: /public/obra.php?id=" . $obra_id);
 exit();
 
 ?>

@@ -2,13 +2,13 @@
 <?php
 
 session_start();
-include '../includes/conexion.php';
-include '../includes/header.php';
+include '/includes/conexion.php';
+include '/includes/header.php';
 
 if (!isset($_GET['id'])) 
 {
     echo "<p>Obra no especificada.</p>";
-    include '../includes/footer.php';
+    include '/includes/footer.php';
     exit();
 }
 
@@ -24,7 +24,7 @@ $obra = $stmt->get_result()->fetch_assoc();
 if (!$obra) 
 {
     echo "<p>Obra no encontrada.</p>";
-    include '../includes/footer.php';
+    include '/includes/footer.php';
     exit();
 }
 
@@ -47,7 +47,7 @@ if (isset($_SESSION['usuario_id'])):
     $ya_favorito = $check->num_rows > 0;
 ?>
 
-<form action="../controllers/procesar-favorito.php" method="POST" style="margin: 15px 0;">
+<form action="/controllers/procesar-favorito.php" method="POST" style="margin: 15px 0;">
     <input type="hidden" name="obra_id" value="<?= $obra_id ?>">
     <?php if ($ya_favorito): ?>
         <input type="hidden" name="accion" value="quitar">
@@ -90,7 +90,7 @@ if ($resultado_com->num_rows > 0):
 <?php if (isset($_SESSION['usuario_id'])): ?>
 
     <h4>Deja tu comentario:</h4>
-    <form action="../controllers/procesar-comentario.php" method="POST">
+    <form action="/controllers/procesar-comentario.php" method="POST">
         <input type="hidden" name="obra_id" value="<?= $obra_id ?>">
         <textarea name="contenido" rows="4" cols="50" required></textarea><br>
         <button type="submit">Comentar</button>
@@ -100,4 +100,4 @@ if ($resultado_com->num_rows > 0):
     <p>Debes iniciar sesión para comentar.</p>
 <?php endif; ?>
 
-<?php include '../includes/footer.php'; ?>
+<?php include '/includes/footer.php'; ?>
