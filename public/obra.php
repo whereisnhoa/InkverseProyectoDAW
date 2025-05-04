@@ -32,6 +32,7 @@ if (!$obra) {
     exit();
 }
 
+// El resto del código para mostrar la obra
 ?>
 
 <h2><?= htmlspecialchars($obra['titulo']) ?></h2>
