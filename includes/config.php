@@ -1,20 +1,24 @@
-
 <?php
-// Configuración general del proyecto
+/**
+ * Configuración global del proyecto
+ * Este archivo define constantes y configuraciones utilizadas en todo el proyecto
+ */
 
-// Rutas
-define('BASE_PATH', $_SERVER['DOCUMENT_ROOT'] . '/proyectosPhp/proyecto');
-define('BASE_URL', '/proyectosPhp/proyecto');
+// Detectar automáticamente la ruta base del proyecto
+$document_root = $_SERVER['DOCUMENT_ROOT'];
+$project_folder = '/proyectosPhp/proyecto'; // Ajustado a la estructura real
 
-// Base de datos
+// Ruta base del proyecto (ruta absoluta en el sistema de archivos)
+define('BASE_PATH', $document_root . $project_folder);
+
+// URL base del proyecto (para enlaces)
+define('BASE_URL', $project_folder);
+
+// Configuración de la base de datos
 define('DB_HOST', 'localhost');
 define('DB_USER', 'root');
-define('DB_PASS', ''); 
+define('DB_PASS', '');
 define('DB_NAME', 'proyecto_db');
 
-// Zona horaria y errores
-date_default_timezone_set('Europe/Madrid');
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+
 ?>
