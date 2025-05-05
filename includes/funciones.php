@@ -1,6 +1,5 @@
 <?php
 /**
- * Funciones útiles para el proyecto
  * Este archivo contiene funciones auxiliares utilizadas en todo el sitio
  */
 
