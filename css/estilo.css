@@ -862,3 +862,158 @@ footer {
     height: 35px;
   }
 }
+
+/* ======================================
+   PÁGINA DE BÚSQUEDA
+====================================== */
+
+.search-form {
+  max-width: 800px;
+}
+
+.search-summary {
+  margin-bottom: 1.5rem;
+  font-size: 1.1rem;
+}
+
+.search-filters {
+  background-color: var(--card-bg);
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.checkbox-inline, .radio-inline {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-right: 1rem;
+}
+
+.checkbox-inline input, .radio-inline input {
+  width: auto;
+  margin: 0;
+}
+
+.btn-sm {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.9rem;
+}
+
+.no-results {
+  text-align: center;
+  padding: 3rem 1rem;
+  background-color: var(--card-bg);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.no-results i {
+  color: var(--text-light);
+  margin-bottom: 1rem;
+}
+
+/* ======================================
+   PÁGINA DE CATEGORÍAS
+====================================== */
+
+.categorias-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 2rem;
+}
+
+.categoria-card {
+  background-color: var(--card-bg);
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.categoria-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.categoria-card h3 {
+  margin-bottom: 0.5rem;
+}
+
+.categoria-card p {
+  color: var(--text-light);
+  margin-bottom: 1.5rem;
+}
+
+.categoria-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.categoria-header .badge-count {
+  position: static;
+  width: auto;
+  height: auto;
+  padding: 0.25rem 0.75rem;
+  border-radius: 50px;
+}
+
+.obra-portada {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+
+.obra-autor {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.obra-descripcion {
+  color: var(--text-light);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.obra-fecha {
+  color: var(--text-light);
+  font-size: 0.85rem;
+}
+
+.badge-tipo {
+  background-color: var(--primary);
+  color: white;
+}
+
+@media (max-width: 768px) {
+  .categorias-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+  
+  .search-filters form {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .filter-group {
+    margin-bottom: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .categorias-grid {
+    grid-template-columns: 1fr;
+  }
+}
