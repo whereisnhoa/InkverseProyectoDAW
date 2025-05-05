@@ -1017,3 +1017,158 @@ footer {
     grid-template-columns: 1fr;
   }
 }
+
+/* ======================================
+   SECCIÓN DE COMUNIDAD
+====================================== */
+
+/* Foros */
+.foros-preview {
+  margin: 2rem 0;
+}
+
+.foro-card {
+  display: flex;
+  align-items: center;
+  background-color: var(--card-bg);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease;
+}
+
+.foro-card:hover {
+  transform: translateY(-3px);
+}
+
+.foro-icon {
+  width: 60px;
+  height: 60px;
+  background-color: var(--primary);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  margin-right: 1.5rem;
+}
+
+.foro-content {
+  flex: 1;
+}
+
+.foro-content h3 {
+  margin-bottom: 0.5rem;
+}
+
+.foro-content p {
+  color: var(--text-light);
+  margin-bottom: 0;
+}
+
+.foro-stats {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+.foro-stats span {
+  color: var(--text-light);
+  font-size: 0.9rem;
+}
+
+.foro-stats i {
+  margin-right: 0.3rem;
+}
+
+/* Galería de Arte */
+.arte-upload-section {
+  background-color: var(--card-bg);
+  border-radius: 8px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  text-align: center;
+}
+
+.arte-upload-placeholder {
+  border: 2px dashed var(--border);
+  border-radius: 8px;
+  padding: 2rem;
+  margin-top: 1.5rem;
+  color: var(--text-light);
+}
+
+.arte-upload-placeholder i {
+  margin-bottom: 1rem;
+}
+
+.arte-categorias-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.arte-categoria-card {
+  background-color: var(--card-bg);
+  border-radius: 8px;
+  padding: 1.5rem;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease;
+}
+
+.arte-categoria-card:hover {
+  transform: translateY(-5px);
+}
+
+.arte-categoria-icon {
+  width: 60px;
+  height: 60px;
+  background-color: var(--secondary);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  margin: 0 auto 1rem;
+}
+
+.arte-categoria-card h3 {
+  margin-bottom: 0.5rem;
+}
+
+.arte-categoria-card p {
+  color: var(--text-light);
+  font-size: 0.9rem;
+  margin-bottom: 0;
+}
+
+@media (max-width: 768px) {
+  .foro-card {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .foro-icon {
+    margin-right: 0;
+    margin-bottom: 1rem;
+  }
+  
+  .foro-stats {
+    flex-direction: row;
+    justify-content: center;
+    margin-top: 1rem;
+    gap: 1rem;
+  }
+  
+  .arte-categorias-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+}
+

@@ -1,13 +1,23 @@
 
-<!-- HEADER DE LA PÁGINA WEB -->
-
 <?php
-// Iniciar sesión si no está iniciada
+/**
+ * Header de la página
+ * Este archivo contiene la cabecera HTML y la navegación principal
+ */
+
+// Iniciar sesión si aún no está iniciada
 if (session_status() === PHP_SESSION_NONE) 
 {
     session_start();
 }
 
+// Incluir archivos de configuración y funciones
+if (!defined('BASE_PATH')) 
+{
+    require_once(__DIR__ . '/config.php');
+}
+require_once(__DIR__ . '/conexion.php');
+require_once(__DIR__ . '/funciones.php');
 ?>
 
 <!DOCTYPE html>
@@ -30,7 +40,7 @@ if (session_status() === PHP_SESSION_NONE)
   
   <!-- Script para el header -->
   <script src="/js/header.js" defer></script>
-  
+
 </head>
 
 <body>
