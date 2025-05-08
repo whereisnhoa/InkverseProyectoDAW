@@ -1,12 +1,12 @@
+
 <?php
 /**
  * Configuración global del proyecto
- * Este archivo define constantes y configuraciones utilizadas en todo el proyecto
  */
 
 // Detectar automáticamente la ruta base del proyecto
 $document_root = $_SERVER['DOCUMENT_ROOT'];
-$project_folder = '/proyectosPhp/proyecto'; // Ajustado a la estructura real
+$project_folder = '/cozitas/proyecto';
 
 // Ruta base del proyecto (ruta absoluta en el sistema de archivos)
 define('BASE_PATH', $document_root . $project_folder);
