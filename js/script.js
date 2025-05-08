@@ -59,27 +59,31 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 5000)
   })
 
-  // Mejorar interacción con los menús desplegables en móvil
+  // Manejar los menús desplegables
   const dropdownToggles = document.querySelectorAll(".dropdown-toggle")
 
-  if (window.innerWidth <= 768) {
-    dropdownToggles.forEach((toggle) => {
-      toggle.addEventListener("click", function (e) {
-        if (window.innerWidth <= 768) {
-          e.preventDefault()
-          const parent = this.parentElement
-          parent.classList.toggle("active")
+  dropdownToggles.forEach((toggle) => {
+    toggle.addEventListener("click", function (e) {
+      e.preventDefault()
+      e.stopPropagation()
 
-          // Cerrar todos los otros menús desplegables
-          document.querySelectorAll(".dropdown").forEach((dropdown) => {
-            if (dropdown !== parent) {
-              dropdown.classList.remove("active")
-            }
-          })
-        }
+      const parent = this.parentElement
+
+      // Si ya está activo, cerrarlo
+      if (parent.classList.contains("active")) {
+        parent.classList.remove("active")
+        return
+      }
+
+      // Cerrar todos los otros menús desplegables
+      document.querySelectorAll(".dropdown").forEach((dropdown) => {
+        dropdown.classList.remove("active")
       })
+
+      // Abrir este menú
+      parent.classList.add("active")
     })
-  }
+  })
 
   // Cerrar menús al hacer clic fuera de ellos
   document.addEventListener("click", (e) => {
