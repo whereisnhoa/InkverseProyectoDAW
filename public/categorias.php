@@ -1,7 +1,7 @@
 
 <?php
-include '../includes/header.php';
-include '../includes/conexion.php';
+require_once(__DIR__ . '/../includes/header.php');
+include_once(__DIR__ . '/../includes/conexion.php');
 
 // Obtener todas las categorías
 $sql = "SELECT c.id, c.nombre, COUNT(l.id) as total_libros
@@ -22,7 +22,7 @@ $result = $conexion->query($sql);
                 <div class="categoria-card">
                     <h3><?php echo htmlspecialchars($categoria['nombre']); ?></h3>
                     <p><?php echo $categoria['total_libros']; ?> obras</p>
-                    <a href="/public/categoria.php?nombre=<?php echo urlencode($categoria['nombre']); ?>" class="btn btn-outline">Explorar</a>
+                    <a href="<?php echo BASE_URL; ?>/public/categoria.php?id=<?php echo $categoria['id']; ?>" class="btn btn-outline">Explorar</a>
                 </div>
             <?php endwhile; ?>
         <?php else: ?>
@@ -31,4 +31,4 @@ $result = $conexion->query($sql);
     </div>
 </div>
 
-<?php include '../includes/footer.php'; ?>
+<?php include_once(__DIR__ . '/../includes/footer.php'); ?>
