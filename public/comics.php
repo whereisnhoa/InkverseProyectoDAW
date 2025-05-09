@@ -1,0 +1,281 @@
+
+<?php
+/**
+ * Página de Cómics y Manga
+ * Muestra todas las obras de tipo cómic/manga con recomendaciones y secciones específicas
+ */
+
+require_once(__DIR__ . '/../includes/header.php');
+include_once(__DIR__ . '/../includes/conexion.php');
+
+// Determinar qué sección mostrar
+$mostrar_destacados = isset($_GET['destacados']) && $_GET['destacados'] == 1;
+$mostrar_recientes = isset($_GET['recientes']) && $_GET['recientes'] == 1;
+$mostrar_populares = isset($_GET['populares']) && $_GET['populares'] == 1;
+
+// Título de la página según la sección
+$titulo_pagina = "Cómics y Manga";
+if ($mostrar_destacados) {
+    $titulo_pagina .= " - Destacados";
+} elseif ($mostrar_recientes) {
+    $titulo_pagina .= " - Recientes";
+} elseif ($mostrar_populares) {
+    $titulo_pagina .= " - Populares";
+}
+
+// Obtener categorías de cómics
+$sql_categorias = "SELECT id, nombre FROM categorias WHERE tipo = 'comic' ORDER BY nombre";
+$result_categorias = $conexion->query($sql_categorias);
+$categorias = [];
+if ($result_categorias && $result_categorias->num_rows > 0) {
+    while ($row = $result_categorias->fetch_assoc()) {
+        $categorias[] = $row;
+    }
+}
+
+// Consulta base para cómics
+$sql_base = "SELECT c.id, c.titulo, c.autor, c.descripcion, c.portada, c.publico_adulto, 
+             cat.nombre as categoria, c.fecha_subida
+             FROM comics c
+             LEFT JOIN categorias cat ON c.categoria_id = cat.id
+             WHERE 1=1";
+
+// Modificar consulta según la sección
+if ($mostrar_destacados) {
+    $sql_base .= " AND c.destacado = 1";
+    $orden = "c.fecha_destacado DESC";
+} elseif ($mostrar_recientes) {
+    $orden = "c.fecha_subida DESC";
+} elseif ($mostrar_populares) {
+    $orden = "c.visitas DESC, c.favoritos DESC";
+} else {
+    $orden = "c.fecha_subida DESC";
+}
+
+$sql_base .= " ORDER BY " . $orden;
+
+// Limitar resultados para la página principal
+$sql_principal = $sql_base . " LIMIT 12";
+$result_principal = $conexion->query($sql_principal);
+
+// Obtener recomendaciones (cómics mejor valorados)
+$sql_recomendaciones = "SELECT c.id, c.titulo, c.autor, c.descripcion, c.portada, c.publico_adulto, 
+                        cat.nombre as categoria, c.fecha_subida
+                        FROM comics c
+                        LEFT JOIN categorias cat ON c.categoria_id = cat.id
+                        ORDER BY c.valoracion DESC
+                        LIMIT 6";
+$result_recomendaciones = $conexion->query($sql_recomendaciones);
+
+// Obtener cómics por categoría (para mostrar secciones por género)
+$comics_por_categoria = [];
+foreach (array_slice($categorias, 0, 4) as $categoria) {
+    $sql_categoria = "SELECT c.id, c.titulo, c.autor, c.descripcion, c.portada, c.publico_adulto, 
+                     c.fecha_subida
+                     FROM comics c
+                     WHERE c.categoria_id = ?
+                     ORDER BY c.fecha_subida DESC
+                     LIMIT 4";
+    $stmt = $conexion->prepare($sql_categoria);
+    $stmt->bind_param("i", $categoria['id']);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    $comics = [];
+    while ($comic = $result->fetch_assoc()) {
+        $comics[] = $comic;
+    }
+    
+    $comics_por_categoria[$categoria['id']] = [
+        'nombre' => $categoria['nombre'],
+        'comics' => $comics
+    ];
+}
+?>
+
+<div class="container">
+    <div class="comics-header">
+        <h1><?php echo $titulo_pagina; ?></h1>
+        
+        <!-- Navegación de secciones -->
+        <div class="section-nav">
+            <a href="<?php echo BASE_URL; ?>/public/comics.php" class="<?php echo (!$mostrar_destacados && !$mostrar_recientes && !$mostrar_populares) ? 'active' : ''; ?>">
+                <i class="fas fa-th-large"></i> Todos
+            </a>
+            <a href="<?php echo BASE_URL; ?>/public/comics.php?destacados=1" class="<?php echo $mostrar_destacados ? 'active' : ''; ?>">
+                <i class="fas fa-star"></i> Destacados
+            </a>
+            <a href="<?php echo BASE_URL; ?>/public/comics.php?recientes=1" class="<?php echo $mostrar_recientes ? 'active' : ''; ?>">
+                <i class="fas fa-clock"></i> Recientes
+            </a>
+            <a href="<?php echo BASE_URL; ?>/public/comics.php?populares=1" class="<?php echo $mostrar_populares ? 'active' : ''; ?>">
+                <i class="fas fa-fire"></i> Populares
+            </a>
+        </div>
+    </div>
+    
+    <!-- Categorías populares -->
+    <div class="categorias-strip">
+        <div class="categorias-strip-inner">
+            <?php foreach ($categorias as $categoria): ?>
+                <a href="<?php echo BASE_URL; ?>/public/categoria.php?id=<?php echo $categoria['id']; ?>&tipo=comic" class="categoria-pill">
+                    <?php echo htmlspecialchars($categoria['nombre']); ?>
+                </a>
+            <?php endforeach; ?>
+        </div>
+    </div>
+    
+    <?php if (!$mostrar_destacados && !$mostrar_recientes && !$mostrar_populares): ?>
+        <!-- Sección de recomendaciones (solo en la página principal) -->
+        <section class="comics-section">
+            <div class="section-header">
+                <h2>Recomendados para ti</h2>
+                <a href="<?php echo BASE_URL; ?>/public/comics.php?populares=1" class="btn btn-sm btn-outline">Ver más</a>
+            </div>
+            
+            <div class="obra-grid">
+                <?php if ($result_recomendaciones && $result_recomendaciones->num_rows > 0): ?>
+                    <?php while ($comic = $result_recomendaciones->fetch_assoc()): ?>
+                        <div class="obra-card">
+                            <div class="obra-card-header">
+                                <h3><?php echo htmlspecialchars($comic['titulo']); ?></h3>
+                                <div class="flex gap-1 mt-1">
+                                    <?php if (!empty($comic['categoria'])): ?>
+                                        <span class="badge badge-categoria"><?php echo htmlspecialchars($comic['categoria']); ?></span>
+                                    <?php endif; ?>
+                                    <?php if ($comic['publico_adulto']): ?>
+                                        <span class="badge badge-adulto">+18</span>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                            <div class="obra-card-body">
+                                <?php if (!empty($comic['portada'])): ?>
+                                    <img src="<?php echo htmlspecialchars($comic['portada']); ?>" alt="Portada" class="obra-portada">
+                                <?php else: ?>
+                                    <div class="obra-portada-placeholder">
+                                        <i class="fas fa-book-open fa-3x"></i>
+                                    </div>
+                                <?php endif; ?>
+                                <p class="obra-autor">Por: <?php echo htmlspecialchars($comic['autor']); ?></p>
+                                <p class="obra-descripcion"><?php echo substr(htmlspecialchars($comic['descripcion']), 0, 150) . '...'; ?></p>
+                            </div>
+                            <div class="obra-card-footer">
+                                <span class="obra-fecha"><?php echo date('d/m/Y', strtotime($comic['fecha_subida'])); ?></span>
+                                <a href="<?php echo BASE_URL; ?>/public/obra.php?id=<?php echo $comic['id']; ?>&tipo=comic" class="btn btn-outline">Ver más</a>
+                            </div>
+                        </div>
+                    <?php endwhile; ?>
+                <?php else: ?>
+                    <p>No hay recomendaciones disponibles.</p>
+                <?php endif; ?>
+            </div>
+        </section>
+    <?php endif; ?>
+    
+    <!-- Sección principal de cómics -->
+    <section class="comics-section">
+        <div class="section-header">
+            <h2>
+                <?php 
+                if ($mostrar_destacados) {
+                    echo "Obras Destacadas";
+                } elseif ($mostrar_recientes) {
+                    echo "Obras Recientes";
+                } elseif ($mostrar_populares) {
+                    echo "Obras Populares";
+                } else {
+                    echo "Todas las Obras";
+                }
+                ?>
+            </h2>
+        </div>
+        
+        <div class="obra-grid">
+            <?php if ($result_principal && $result_principal->num_rows > 0): ?>
+                <?php while ($comic = $result_principal->fetch_assoc()): ?>
+                    <div class="obra-card">
+                        <div class="obra-card-header">
+                            <h3><?php echo htmlspecialchars($comic['titulo']); ?></h3>
+                            <div class="flex gap-1 mt-1">
+                                <?php if (!empty($comic['categoria'])): ?>
+                                    <span class="badge badge-categoria"><?php echo htmlspecialchars($comic['categoria']); ?></span>
+                                <?php endif; ?>
+                                <?php if ($comic['publico_adulto']): ?>
+                                    <span class="badge badge-adulto">+18</span>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                        <div class="obra-card-body">
+                            <?php if (!empty($comic['portada'])): ?>
+                                <img src="<?php echo htmlspecialchars($comic['portada']); ?>" alt="Portada" class="obra-portada">
+                            <?php else: ?>
+                                <div class="obra-portada-placeholder">
+                                    <i class="fas fa-book-open fa-3x"></i>
+                                </div>
+                            <?php endif; ?>
+                            <p class="obra-autor">Por: <?php echo htmlspecialchars($comic['autor']); ?></p>
+                            <p class="obra-descripcion"><?php echo substr(htmlspecialchars($comic['descripcion']), 0, 150) . '...'; ?></p>
+                        </div>
+                        <div class="obra-card-footer">
+                            <span class="obra-fecha"><?php echo date('d/m/Y', strtotime($comic['fecha_subida'])); ?></span>
+                            <a href="<?php echo BASE_URL; ?>/public/obra.php?id=<?php echo $comic['id']; ?>&tipo=comic" class="btn btn-outline">Ver más</a>
+                        </div>
+                    </div>
+                <?php endwhile; ?>
+            <?php else: ?>
+                <div class="no-results">
+                    <i class="fas fa-book-open fa-3x"></i>
+                    <h2>No hay obras disponibles</h2>
+                    <p>No se encontraron obras que coincidan con los criterios seleccionados.</p>
+                </div>
+            <?php endif; ?>
+        </div>
+    </section>
+    
+    <?php if (!$mostrar_destacados && !$mostrar_recientes && !$mostrar_populares): ?>
+        <!-- Secciones por categoría (solo en la página principal) -->
+        <?php foreach ($comics_por_categoria as $id => $categoria): ?>
+            <?php if (count($categoria['comics']) > 0): ?>
+                <section class="comics-section">
+                    <div class="section-header">
+                        <h2><?php echo htmlspecialchars($categoria['nombre']); ?></h2>
+                        <a href="<?php echo BASE_URL; ?>/public/categoria.php?id=<?php echo $id; ?>&tipo=comic" class="btn btn-sm btn-outline">Ver más</a>
+                    </div>
+                    
+                    <div class="obra-grid">
+                        <?php foreach ($categoria['comics'] as $comic): ?>
+                            <div class="obra-card">
+                                <div class="obra-card-header">
+                                    <h3><?php echo htmlspecialchars($comic['titulo']); ?></h3>
+                                    <div class="flex gap-1 mt-1">
+                                        <span class="badge badge-categoria"><?php echo htmlspecialchars($categoria['nombre']); ?></span>
+                                        <?php if ($comic['publico_adulto']): ?>
+                                            <span class="badge badge-adulto">+18</span>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                                <div class="obra-card-body">
+                                    <?php if (!empty($comic['portada'])): ?>
+                                        <img src="<?php echo htmlspecialchars($comic['portada']); ?>" alt="Portada" class="obra-portada">
+                                    <?php else: ?>
+                                        <div class="obra-portada-placeholder">
+                                            <i class="fas fa-book-open fa-3x"></i>
+                                        </div>
+                                    <?php endif; ?>
+                                    <p class="obra-autor">Por: <?php echo htmlspecialchars($comic['autor']); ?></p>
+                                    <p class="obra-descripcion"><?php echo substr(htmlspecialchars($comic['descripcion']), 0, 150) . '...'; ?></p>
+                                </div>
+                                <div class="obra-card-footer">
+                                    <span class="obra-fecha"><?php echo date('d/m/Y', strtotime($comic['fecha_subida'])); ?></span>
+                                    <a href="<?php echo BASE_URL; ?>/public/obra.php?id=<?php echo $comic['id']; ?>&tipo=comic" class="btn btn-outline">Ver más</a>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                </section>
+            <?php endif; ?>
+        <?php endforeach; ?>
+    <?php endif; ?>
+</div>
+
+<?php include_once(__DIR__ . '/../includes/footer.php'); ?>

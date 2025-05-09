@@ -31,13 +31,22 @@ if (file_exists(__DIR__ . '/funciones.php')) {
     require_once(__DIR__ . '/funciones.php');
 }
 
-// Obtener categorías para el menú desplegable
-$sql_categorias = "SELECT id, nombre FROM categorias ORDER BY nombre";
-$result_categorias = $conexion->query($sql_categorias);
-$categorias = [];
-if ($result_categorias && $result_categorias->num_rows > 0) {
-    while ($row = $result_categorias->fetch_assoc()) {
-        $categorias[] = $row;
+// Obtener categorías para los menús desplegables
+$sql_categorias_libros = "SELECT id, nombre FROM categorias WHERE tipo = 'libro' ORDER BY nombre";
+$result_categorias_libros = $conexion->query($sql_categorias_libros);
+$categorias_libros = [];
+if ($result_categorias_libros && $result_categorias_libros->num_rows > 0) {
+    while ($row = $result_categorias_libros->fetch_assoc()) {
+        $categorias_libros[] = $row;
+    }
+}
+
+$sql_categorias_comics = "SELECT id, nombre FROM categorias WHERE tipo = 'comic' ORDER BY nombre";
+$result_categorias_comics = $conexion->query($sql_categorias_comics);
+$categorias_comics = [];
+if ($result_categorias_comics && $result_categorias_comics->num_rows > 0) {
+    while ($row = $result_categorias_comics->fetch_assoc()) {
+        $categorias_comics[] = $row;
     }
 }
 ?>
@@ -70,36 +79,81 @@ if ($result_categorias && $result_categorias->num_rows > 0) {
                         <i class="fas fa-compass"></i> Explorar
                     </a>
                     
-                    <!-- Menú desplegable de categorías -->
+                    <!-- Menú de Literatura -->
                     <div class="dropdown">
                         <button class="dropdown-toggle">
-                            <i class="fas fa-tags"></i> Categorías <i class="fas fa-chevron-down"></i>
+                            <i class="fas fa-book"></i> Literatura <i class="fas fa-chevron-down"></i>
                         </button>
                         <div class="dropdown-content">
                             <div class="dropdown-inner">
                                 <div class="dropdown-section">
-                                    <h4>Libros</h4>
+                                    <h4>Géneros Populares</h4>
                                     <div class="dropdown-links">
-                                        <?php foreach (array_slice($categorias, 0, 5) as $categoria): ?>
+                                        <?php foreach (array_slice($categorias_libros, 0, 6) as $categoria): ?>
                                             <a href="<?php echo BASE_URL; ?>/public/categoria.php?id=<?php echo $categoria['id']; ?>&tipo=libro">
                                                 <?php echo htmlspecialchars($categoria['nombre']); ?>
                                             </a>
                                         <?php endforeach; ?>
-                                        <a href="<?php echo BASE_URL; ?>/public/categoria.php?tipo=libro" class="ver-todas">
-                                            <i class="fas fa-ellipsis-h"></i> Ver todas
-                                        </a>
                                     </div>
                                 </div>
                                 <div class="dropdown-section">
-                                    <h4>Cómics</h4>
+                                    <h4>Explorar</h4>
                                     <div class="dropdown-links">
-                                        <?php foreach (array_slice($categorias, 0, 5) as $categoria): ?>
+                                        <a href="<?php echo BASE_URL; ?>/public/literatura.php">
+                                            <i class="fas fa-th-large"></i> Todas las obras
+                                        </a>
+                                        <a href="<?php echo BASE_URL; ?>/public/literatura.php?destacados=1">
+                                            <i class="fas fa-star"></i> Destacados
+                                        </a>
+                                        <a href="<?php echo BASE_URL; ?>/public/literatura.php?recientes=1">
+                                            <i class="fas fa-clock"></i> Recientes
+                                        </a>
+                                        <a href="<?php echo BASE_URL; ?>/public/literatura.php?populares=1">
+                                            <i class="fas fa-fire"></i> Populares
+                                        </a>
+                                        <a href="<?php echo BASE_URL; ?>/public/categorias.php?tipo=libro" class="ver-todas">
+                                            <i class="fas fa-list"></i> Ver todas las categorías
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Menú de Cómics/Manga -->
+                    <div class="dropdown">
+                        <button class="dropdown-toggle">
+                            <i class="fas fa-book-open"></i> Cómic/Manga <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="dropdown-content">
+                            <div class="dropdown-inner">
+                                <div class="dropdown-section">
+                                    <h4>Géneros Populares</h4>
+                                    <div class="dropdown-links">
+                                        <?php foreach (array_slice($categorias_comics, 0, 6) as $categoria): ?>
                                             <a href="<?php echo BASE_URL; ?>/public/categoria.php?id=<?php echo $categoria['id']; ?>&tipo=comic">
                                                 <?php echo htmlspecialchars($categoria['nombre']); ?>
                                             </a>
                                         <?php endforeach; ?>
-                                        <a href="<?php echo BASE_URL; ?>/public/categoria.php?tipo=comic" class="ver-todas">
-                                            <i class="fas fa-ellipsis-h"></i> Ver todas
+                                    </div>
+                                </div>
+                                <div class="dropdown-section">
+                                    <h4>Explorar</h4>
+                                    <div class="dropdown-links">
+                                        <a href="<?php echo BASE_URL; ?>/public/comics.php">
+                                            <i class="fas fa-th-large"></i> Todas las obras
+                                        </a>
+                                        <a href="<?php echo BASE_URL; ?>/public/comics.php?destacados=1">
+                                            <i class="fas fa-star"></i> Destacados
+                                        </a>
+                                        <a href="<?php echo BASE_URL; ?>/public/comics.php?recientes=1">
+                                            <i class="fas fa-clock"></i> Recientes
+                                        </a>
+                                        <a href="<?php echo BASE_URL; ?>/public/comics.php?populares=1">
+                                            <i class="fas fa-fire"></i> Populares
+                                        </a>
+                                        <a href="<?php echo BASE_URL; ?>/public/categorias.php?tipo=comic" class="ver-todas">
+                                            <i class="fas fa-list"></i> Ver todas las categorías
                                         </a>
                                     </div>
                                 </div>
@@ -177,9 +231,7 @@ if ($result_categorias && $result_categorias->num_rows > 0) {
                         <button class="dropdown-toggle icon-btn">
                             <i class="fas fa-user-circle"></i>
                         </button>
-
                         <div class="dropdown-content user-dropdown-content">
-
                             <?php if (isset($_SESSION['usuario_id'])): ?>
                                 <div class="user-info">
                                     <span class="user-name"><?php echo htmlspecialchars($_SESSION['usuario']); ?></span>
@@ -200,7 +252,6 @@ if ($result_categorias && $result_categorias->num_rows > 0) {
                                 <a href="<?php echo BASE_URL; ?>/public/logout.php" class="logout-link">
                                     <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
                                 </a>
-
                             <?php else: ?>
                                 <a href="<?php echo BASE_URL; ?>/public/login.php">
                                     <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
@@ -208,36 +259,26 @@ if ($result_categorias && $result_categorias->num_rows > 0) {
                                 <a href="<?php echo BASE_URL; ?>/public/register.php">
                                     <i class="fas fa-user-plus"></i> Registrarse
                                 </a>
-
                             <?php endif; ?>
-
                         </div>
-
                     </div>
                     
                     <!-- Botón de menú móvil -->
                     <button class="mobile-menu-toggle icon-btn">
                         <i class="fas fa-bars"></i>
                     </button>
-
                 </div>
-
             </div>
-
         </div>
-
     </header>
     
     <main>
-
         <?php 
         // Mostrar mensajes de éxito o error si existen
-        if (isset($_SESSION['mensaje'])) 
-        {
+        if (isset($_SESSION['mensaje'])) {
             $tipo = isset($_SESSION['tipo_mensaje']) ? $_SESSION['tipo_mensaje'] : 'info';
             echo '<div class="alerta alerta-' . $tipo . '">' . $_SESSION['mensaje'] . '</div>';
             unset($_SESSION['mensaje']);
             unset($_SESSION['tipo_mensaje']);
         }
-
         ?>
