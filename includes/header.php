@@ -32,7 +32,7 @@ if (file_exists(__DIR__ . '/funciones.php')) {
 }
 
 // Obtener categorías para los menús desplegables
-$sql_categorias_libros = "SELECT id, nombre FROM categorias WHERE tipo = 'libro' ORDER BY nombre";
+$sql_categorias_libros = "SELECT id, nombre FROM categorias WHERE tipo = 'libro' ORDER BY nombre LIMIT 6";
 $result_categorias_libros = $conexion->query($sql_categorias_libros);
 $categorias_libros = [];
 if ($result_categorias_libros && $result_categorias_libros->num_rows > 0) {
@@ -41,7 +41,7 @@ if ($result_categorias_libros && $result_categorias_libros->num_rows > 0) {
     }
 }
 
-$sql_categorias_comics = "SELECT id, nombre FROM categorias WHERE tipo = 'comic' ORDER BY nombre";
+$sql_categorias_comics = "SELECT id, nombre FROM categorias WHERE tipo = 'comic' ORDER BY nombre LIMIT 6";
 $result_categorias_comics = $conexion->query($sql_categorias_comics);
 $categorias_comics = [];
 if ($result_categorias_comics && $result_categorias_comics->num_rows > 0) {
@@ -79,78 +79,42 @@ if ($result_categorias_comics && $result_categorias_comics->num_rows > 0) {
                         <i class="fas fa-compass"></i> Explorar
                     </a>
                     
-                    <!-- Menú de Literatura -->
+                    <!-- Menú desplegable de categorías unificado -->
                     <div class="dropdown">
                         <button class="dropdown-toggle">
-                            <i class="fas fa-book"></i> Literatura <i class="fas fa-chevron-down"></i>
+                            <i class="fas fa-tags"></i> Categorías <i class="fas fa-chevron-down"></i>
                         </button>
                         <div class="dropdown-content">
-                            <div class="dropdown-inner">
+                            <div class="dropdown-inner categorias-dropdown">
+                                <!-- Sección de Literatura -->
                                 <div class="dropdown-section">
-                                    <h4>Géneros Populares</h4>
+                                    <h4><i class="fas fa-book"></i> Literatura</h4>
                                     <div class="dropdown-links">
-                                        <?php foreach (array_slice($categorias_libros, 0, 6) as $categoria): ?>
+                                        <?php foreach ($categorias_libros as $categoria): ?>
                                             <a href="<?php echo BASE_URL; ?>/public/categoria.php?id=<?php echo $categoria['id']; ?>&tipo=libro">
                                                 <?php echo htmlspecialchars($categoria['nombre']); ?>
                                             </a>
                                         <?php endforeach; ?>
-                                    </div>
-                                </div>
-                                <div class="dropdown-section">
-                                    <h4>Explorar</h4>
-                                    <div class="dropdown-links">
-                                        <a href="<?php echo BASE_URL; ?>/public/literatura.php">
-                                            <i class="fas fa-th-large"></i> Todas las obras
-                                        </a>
-                                        <a href="<?php echo BASE_URL; ?>/public/literatura.php?destacados=1">
-                                            <i class="fas fa-star"></i> Destacados
-                                        </a>
-                                        <a href="<?php echo BASE_URL; ?>/public/literatura.php?recientes=1">
-                                            <i class="fas fa-clock"></i> Recientes
-                                        </a>
-                                        <a href="<?php echo BASE_URL; ?>/public/literatura.php?populares=1">
-                                            <i class="fas fa-fire"></i> Populares
+                                        <a href="<?php echo BASE_URL; ?>/public/literatura.php" class="ver-todas">
+                                            <i class="fas fa-th-large"></i> Ver todas las obras
                                         </a>
                                         <a href="<?php echo BASE_URL; ?>/public/categorias.php?tipo=libro" class="ver-todas">
                                             <i class="fas fa-list"></i> Ver todas las categorías
                                         </a>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Menú de Cómics/Manga -->
-                    <div class="dropdown">
-                        <button class="dropdown-toggle">
-                            <i class="fas fa-book-open"></i> Cómic/Manga <i class="fas fa-chevron-down"></i>
-                        </button>
-                        <div class="dropdown-content">
-                            <div class="dropdown-inner">
+                                
+                                <!-- Sección de Cómics/Manga -->
                                 <div class="dropdown-section">
-                                    <h4>Géneros Populares</h4>
+                                    <h4><i class="fas fa-book-open"></i> Cómic/Manga</h4>
                                     <div class="dropdown-links">
-                                        <?php foreach (array_slice($categorias_comics, 0, 6) as $categoria): ?>
+                                        <?php foreach ($categorias_comics as $categoria): ?>
                                             <a href="<?php echo BASE_URL; ?>/public/categoria.php?id=<?php echo $categoria['id']; ?>&tipo=comic">
                                                 <?php echo htmlspecialchars($categoria['nombre']); ?>
                                             </a>
                                         <?php endforeach; ?>
-                                    </div>
-                                </div>
-                                <div class="dropdown-section">
-                                    <h4>Explorar</h4>
-                                    <div class="dropdown-links">
-                                        <a href="<?php echo BASE_URL; ?>/public/comics.php">
-                                            <i class="fas fa-th-large"></i> Todas las obras
-                                        </a>
-                                        <a href="<?php echo BASE_URL; ?>/public/comics.php?destacados=1">
-                                            <i class="fas fa-star"></i> Destacados
-                                        </a>
-                                        <a href="<?php echo BASE_URL; ?>/public/comics.php?recientes=1">
-                                            <i class="fas fa-clock"></i> Recientes
-                                        </a>
-                                        <a href="<?php echo BASE_URL; ?>/public/comics.php?populares=1">
-                                            <i class="fas fa-fire"></i> Populares
+                                        <a href="<?php echo BASE_URL; ?>/public/comics.php" class="ver-todas">
+                                            <i class="fas fa-th-large"></i> Ver todas las obras
                                         </a>
                                         <a href="<?php echo BASE_URL; ?>/public/categorias.php?tipo=comic" class="ver-todas">
                                             <i class="fas fa-list"></i> Ver todas las categorías
