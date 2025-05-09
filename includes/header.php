@@ -2,7 +2,6 @@
 <?php
 /**
  * Header del sitio
- * Este archivo contiene la cabecera HTML y la navegación principal
  */
 
 // Iniciar sesión si aún no está iniciada
@@ -107,6 +106,45 @@ if ($result_categorias && $result_categorias->num_rows > 0) {
                             </div>
                         </div>
                     </div>
+                    
+                    <!-- Menú desplegable de comunidad -->
+                    <div class="dropdown">
+                        <button class="dropdown-toggle">
+                            <i class="fas fa-users"></i> Comunidad <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="dropdown-content">
+                            <div class="dropdown-inner comunidad-dropdown">
+                                <div class="dropdown-section">
+                                    <h4>Participar</h4>
+                                    <div class="dropdown-links">
+                                        <a href="<?php echo BASE_URL; ?>/comunidad/foros.php">
+                                            <i class="fas fa-comments"></i> Foros de discusión
+                                        </a>
+                                        <a href="<?php echo BASE_URL; ?>/comunidad/grupos.php">
+                                            <i class="fas fa-user-friends"></i> Grupos de lectura
+                                        </a>
+                                        <a href="<?php echo BASE_URL; ?>/comunidad/eventos.php">
+                                            <i class="fas fa-calendar-alt"></i> Eventos
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="dropdown-section">
+                                    <h4>Contenido</h4>
+                                    <div class="dropdown-links">
+                                        <a href="<?php echo BASE_URL; ?>/comunidad/arte.php">
+                                            <i class="fas fa-palette"></i> Galería de arte
+                                        </a>
+                                        <a href="<?php echo BASE_URL; ?>/comunidad/recomendaciones.php">
+                                            <i class="fas fa-thumbs-up"></i> Recomendaciones
+                                        </a>
+                                        <a href="<?php echo BASE_URL; ?>/comunidad/noticias.php">
+                                            <i class="fas fa-newspaper"></i> Noticias y novedades
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </nav>
             </div>
             
@@ -139,7 +177,9 @@ if ($result_categorias && $result_categorias->num_rows > 0) {
                         <button class="dropdown-toggle icon-btn">
                             <i class="fas fa-user-circle"></i>
                         </button>
+
                         <div class="dropdown-content user-dropdown-content">
+
                             <?php if (isset($_SESSION['usuario_id'])): ?>
                                 <div class="user-info">
                                     <span class="user-name"><?php echo htmlspecialchars($_SESSION['usuario']); ?></span>
@@ -160,6 +200,7 @@ if ($result_categorias && $result_categorias->num_rows > 0) {
                                 <a href="<?php echo BASE_URL; ?>/public/logout.php" class="logout-link">
                                     <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
                                 </a>
+
                             <?php else: ?>
                                 <a href="<?php echo BASE_URL; ?>/public/login.php">
                                     <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
@@ -167,26 +208,36 @@ if ($result_categorias && $result_categorias->num_rows > 0) {
                                 <a href="<?php echo BASE_URL; ?>/public/register.php">
                                     <i class="fas fa-user-plus"></i> Registrarse
                                 </a>
+
                             <?php endif; ?>
+
                         </div>
+
                     </div>
                     
                     <!-- Botón de menú móvil -->
                     <button class="mobile-menu-toggle icon-btn">
                         <i class="fas fa-bars"></i>
                     </button>
+
                 </div>
+
             </div>
+
         </div>
+
     </header>
     
     <main>
+
         <?php 
         // Mostrar mensajes de éxito o error si existen
-        if (isset($_SESSION['mensaje'])) {
+        if (isset($_SESSION['mensaje'])) 
+        {
             $tipo = isset($_SESSION['tipo_mensaje']) ? $_SESSION['tipo_mensaje'] : 'info';
             echo '<div class="alerta alerta-' . $tipo . '">' . $_SESSION['mensaje'] . '</div>';
             unset($_SESSION['mensaje']);
             unset($_SESSION['tipo_mensaje']);
         }
+
         ?>

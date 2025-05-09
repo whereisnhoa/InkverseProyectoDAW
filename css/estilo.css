@@ -33,7 +33,7 @@
   --warning: #ffcd17;
   --danger: #ec4555;
   --light: #2c3035;
-  --dark: #f8f9fa;
+  --dark: #1a1a1a; /* Cambiado para que el footer sea oscuro en modo oscuro */
   --text: #f0f0f0;
   --text-light: #adb5bd;
   --border: #495057;
@@ -362,7 +362,9 @@ nav a:hover,
   font-size: 1.25rem;
   padding: 0;
   width: 40px;
+  height: 40px;
   display: flex;
+  align-items: center;
   justify-content: center;
 }
 
@@ -748,6 +750,23 @@ select:focus {
   background-color: var(--primary-light);
 }
 
+/* Estilos para el menú de comunidad */
+.comunidad-dropdown {
+  width: 450px;
+}
+
+.comunidad-dropdown .dropdown-links a {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.comunidad-dropdown .dropdown-links a i {
+  width: 16px;
+  text-align: center;
+  color: var(--accent);
+}
+
 /* Media queries */
 @media (max-width: 992px) {
   .dropdown-inner {
@@ -756,6 +775,10 @@ select:focus {
 
   .search-bar {
     width: 200px;
+  }
+
+  .comunidad-dropdown {
+    width: 400px;
   }
 }
 
@@ -826,6 +849,10 @@ select:focus {
 
   .obra-grid {
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  }
+
+  .comunidad-dropdown {
+    width: 100%;
   }
 }
 
