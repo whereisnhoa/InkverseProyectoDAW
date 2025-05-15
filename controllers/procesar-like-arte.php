@@ -28,7 +28,10 @@ if (empty($arte_id) || !in_array($accion, ['dar', 'quitar'])) {
 }
 
 // Verificar que la obra exista
-$sql_check = "SELECT id FROM galeria_arte WHERE id = ?";
+$sql_check = "SELECT ga.id, ga.titulo, u.id as autor_id, u.usuario as autor_nombre 
+              FROM galeria_arte ga
+              JOIN usuarios u ON ga.usuario_id = u.id
+              WHERE ga.id = ?";
 $stmt_check = $conexion->prepare($sql_check);
 $stmt_check->bind_param("i", $arte_id);
 $stmt_check->execute();
@@ -38,6 +41,8 @@ if ($result_check->num_rows == 0) {
     redirigirConMensaje(BASE_URL . '/comunidad/arte.php', 'La obra no existe.', 'error');
     exit();
 }
+
+$arte = $result_check->fetch_assoc();
 
 // Iniciar transacción
 $conexion->begin_transaction();
@@ -63,6 +68,14 @@ try {
             $stmt_update = $conexion->prepare($sql_update);
             $stmt_update->bind_param("i", $arte_id);
             $stmt_update->execute();
+            
+            // Enviar notificación al autor (si no es el mismo usuario)
+            if ($arte['autor_id'] != $usuario_id) {
+                $mensaje = $_SESSION['usuario'] . " le ha dado me gusta a tu obra: " . $arte['titulo'];
+                $url = BASE_URL . '/comunidad/ver_arte.php?id=' . $arte_id;
+                
+                crearNotificacion($arte['autor_id'], 'like', $mensaje, $url, $arte_id, 'arte');
+            }
         }
     } else {
         // Quitar me gusta

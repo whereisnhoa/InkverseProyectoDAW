@@ -35,7 +35,7 @@ if (empty($contenido) || empty($contenido_id) || !in_array($tipo_contenido, ['li
 
 // Verificar que la obra exista
 $tabla = ($tipo_contenido === 'libro') ? 'libros' : 'comics';
-$sql_check = "SELECT id FROM $tabla WHERE id = ?";
+$sql_check = "SELECT id, autor, titulo FROM $tabla WHERE id = ?";
 $stmt_check = $conexion->prepare($sql_check);
 $stmt_check->bind_param("i", $contenido_id);
 $stmt_check->execute();
@@ -46,12 +46,34 @@ if ($result_check->num_rows == 0) {
     exit();
 }
 
+$obra = $result_check->fetch_assoc();
+
 // Insertar comentario en la base de datos
 $sql = "INSERT INTO comentarios (usuario_id, contenido, tipo_contenido, contenido_id) VALUES (?, ?, ?, ?)";
 $stmt = $conexion->prepare($sql);
 $stmt->bind_param("issi", $usuario_id, $contenido, $tipo_contenido, $contenido_id);
 
 if ($stmt->execute()) {
+    // Obtener el autor de la obra para enviarle una notificación
+    $sql_autor = "SELECT id FROM usuarios WHERE usuario = ?";
+    $stmt_autor = $conexion->prepare($sql_autor);
+    $stmt_autor->bind_param("s", $obra['autor']);
+    $stmt_autor->execute();
+    $result_autor = $stmt_autor->get_result();
+    
+    if ($result_autor->num_rows > 0) {
+        $autor_id = $result_autor->fetch_assoc()['id'];
+        
+        // No enviar notificación si el autor es quien comenta
+        if ($autor_id != $usuario_id) {
+            $tipo_obra = ($tipo_contenido === 'libro') ? 'libro' : 'cómic';
+            $mensaje = $_SESSION['usuario'] . " ha comentado en tu " . $tipo_obra . ": " . $obra['titulo'];
+            $url = BASE_URL . '/public/obra.php?id=' . $contenido_id . '&tipo=' . $tipo_contenido;
+            
+            crearNotificacion($autor_id, 'comentario', $mensaje, $url, $contenido_id, $tipo_contenido);
+        }
+    }
+    
     redirigirConMensaje(BASE_URL . '/public/obra.php?id=' . $contenido_id . '&tipo=' . $tipo_contenido, 'Tu comentario ha sido publicado correctamente.', 'exito');
 } else {
     redirigirConMensaje(BASE_URL . '/public/obra.php?id=' . $contenido_id . '&tipo=' . $tipo_contenido, 'Error al publicar el comentario: ' . $stmt->error, 'error');

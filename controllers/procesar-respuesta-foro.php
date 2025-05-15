@@ -28,7 +28,10 @@ if (empty($contenido) || empty($tema_id)) {
 }
 
 // Verificar que el tema exista y no esté cerrado
-$sql_check = "SELECT id, estado FROM temas_foro WHERE id = ?";
+$sql_check = "SELECT tf.id, tf.estado, tf.titulo, tf.usuario_id, u.usuario as autor_nombre 
+              FROM temas_foro tf
+              JOIN usuarios u ON tf.usuario_id = u.id
+              WHERE tf.id = ?";
 $stmt_check = $conexion->prepare($sql_check);
 $stmt_check->bind_param("i", $tema_id);
 $stmt_check->execute();
@@ -56,6 +59,29 @@ if ($stmt->execute()) {
     $stmt_update = $conexion->prepare($sql_update);
     $stmt_update->bind_param("i", $tema_id);
     $stmt_update->execute();
+    
+    // Enviar notificación al autor del tema (si no es el mismo usuario)
+    if ($tema['usuario_id'] != $usuario_id) {
+        $mensaje = $_SESSION['usuario'] . " ha respondido a tu tema: " . $tema['titulo'];
+        $url = BASE_URL . '/comunidad/tema.php?id=' . $tema_id;
+        
+        crearNotificacion($tema['usuario_id'], 'respuesta_foro', $mensaje, $url, $tema_id, 'tema_foro');
+    }
+    
+    // También notificar a otros participantes únicos del tema (excepto el autor y el usuario actual)
+    $sql_participantes = "SELECT DISTINCT usuario_id FROM respuestas_foro 
+                         WHERE tema_id = ? AND usuario_id != ? AND usuario_id != ?";
+    $stmt_participantes = $conexion->prepare($sql_participantes);
+    $stmt_participantes->bind_param("iii", $tema_id, $usuario_id, $tema['usuario_id']);
+    $stmt_participantes->execute();
+    $result_participantes = $stmt_participantes->get_result();
+    
+    while ($participante = $result_participantes->fetch_assoc()) {
+        $mensaje = "Hay una nueva respuesta en el tema: " . $tema['titulo'];
+        $url = BASE_URL . '/comunidad/tema.php?id=' . $tema_id;
+        
+        crearNotificacion($participante['usuario_id'], 'respuesta_foro', $mensaje, $url, $tema_id, 'tema_foro');
+    }
     
     redirigirConMensaje(BASE_URL . '/comunidad/tema.php?id=' . $tema_id, 'Tu respuesta ha sido publicada correctamente.', 'exito');
 } else {

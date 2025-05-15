@@ -80,4 +80,100 @@ function verificarTokenCSRF($token)
     }
 }
 
-?>
+// Función para crear una notificación
+function crearNotificacion($usuario_id, $tipo, $mensaje, $url = '', $contenido_id = null, $tipo_contenido = null) {
+    global $conexion;
+    
+    $sql = "INSERT INTO notificaciones (usuario_id, tipo, mensaje, url, contenido_id, tipo_contenido) 
+            VALUES (?, ?, ?, ?, ?, ?)";
+    $stmt = $conexion->prepare($sql);
+    $stmt->bind_param("isssss", $usuario_id, $tipo, $mensaje, $url, $contenido_id, $tipo_contenido);
+    return $stmt->execute();
+}
+
+// Función para obtener notificaciones de un usuario
+function obtenerNotificaciones($usuario_id, $limit = 10, $solo_no_leidas = false) {
+    global $conexion;
+    
+    $sql = "SELECT * FROM notificaciones WHERE usuario_id = ?";
+    
+    if ($solo_no_leidas) {
+        $sql .= " AND leida = 0";
+    }
+    
+    $sql .= " ORDER BY fecha_creacion DESC LIMIT ?";
+    
+    $stmt = $conexion->prepare($sql);
+    $stmt->bind_param("ii", $usuario_id, $limit);
+    $stmt->execute();
+    
+    return $stmt->get_result();
+}
+
+// Función para marcar notificación como leída
+function marcarNotificacionLeida($notificacion_id, $usuario_id) {
+    global $conexion;
+    
+    $sql = "UPDATE notificaciones SET leida = 1 
+            WHERE id = ? AND usuario_id = ?";
+    $stmt = $conexion->prepare($sql);
+    $stmt->bind_param("ii", $notificacion_id, $usuario_id);
+    return $stmt->execute();
+}
+
+// Función para marcar todas las notificaciones como leídas
+function marcarTodasNotificacionesLeidas($usuario_id) {
+    global $conexion;
+    
+    $sql = "UPDATE notificaciones SET leida = 1 
+            WHERE usuario_id = ?";
+    $stmt = $conexion->prepare($sql);
+    $stmt->bind_param("i", $usuario_id);
+    return $stmt->execute();
+}
+
+// Función para contar notificaciones no leídas
+function contarNotificacionesNoLeidas($usuario_id) {
+    global $conexion;
+    
+    $sql = "SELECT COUNT(*) as total FROM notificaciones 
+            WHERE usuario_id = ? AND leida = 0";
+    $stmt = $conexion->prepare($sql);
+    $stmt->bind_param("i", $usuario_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    
+    return $row['total'];
+}
+
+// Función para mostrar tiempo transcurrido de forma amigable
+function time_elapsed_string($datetime, $full = false) {
+    $now = new DateTime;
+    $ago = new DateTime($datetime);
+    $diff = $now->diff($ago);
+
+    $diff->w = floor($diff->d / 7);
+    $diff->d -= $diff->w * 7;
+
+    $string = array(
+        'y' => 'año',
+        'm' => 'mes',
+        'w' => 'semana',
+        'd' => 'día',
+        'h' => 'hora',
+        'i' => 'minuto',
+        's' => 'segundo',
+    );
+    
+    foreach ($string as $k => &$v) {
+        if ($diff->$k) {
+            $v = $diff->$k . ' ' . $v . ($diff->$k > 1 ? 's' : '');
+        } else {
+            unset($string[$k]);
+        }
+    }
+
+    if (!$full) $string = array_slice($string, 0, 1);
+    return $string ? 'hace ' . implode(', ', $string) : 'justo ahora';
+}

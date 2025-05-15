@@ -183,6 +183,80 @@ if ($result_categorias_comics && $result_categorias_comics->num_rows > 0) {
                         <a href="<?php echo BASE_URL; ?>/usuario/favoritos.php" title="Mis favoritos" class="icon-btn">
                             <i class="fas fa-heart"></i>
                         </a>
+                        
+                        <!-- Notificaciones -->
+                        <div class="dropdown notification-dropdown">
+                            <button class="dropdown-toggle icon-btn" title="Notificaciones">
+                                <i class="fas fa-bell"></i>
+                                <?php 
+                                $notificaciones_no_leidas = contarNotificacionesNoLeidas($_SESSION['usuario_id']);
+                                if ($notificaciones_no_leidas > 0): 
+                                ?>
+                                <span class="notification-badge"><?php echo $notificaciones_no_leidas; ?></span>
+                                <?php endif; ?>
+                            </button>
+                            <div class="dropdown-content notification-dropdown-content">
+                                <div class="notification-header">
+                                    <h4>Notificaciones</h4>
+                                    <?php if ($notificaciones_no_leidas > 0): ?>
+                                        <a href="<?php echo BASE_URL; ?>/controllers/procesar-notificaciones.php?accion=marcar_todas_leidas" class="notification-mark-all">
+                                            Marcar todas como leídas
+                                        </a>
+                                    <?php endif; ?>
+                                </div>
+                                
+                                <div class="notification-list">
+                                    <?php
+                                    $notificaciones = obtenerNotificaciones($_SESSION['usuario_id'], 5);
+                                    if ($notificaciones && $notificaciones->num_rows > 0):
+                                        while ($notificacion = $notificaciones->fetch_assoc()):
+                                    ?>
+                                        <a href="<?php echo $notificacion['url']; ?>" class="notification-item <?php echo $notificacion['leida'] ? '' : 'unread'; ?>">
+                                            <div class="notification-icon">
+                                                <?php
+                                                $icon = 'bell';
+                                                switch ($notificacion['tipo']) {
+                                                    case 'comentario':
+                                                        $icon = 'comment';
+                                                        break;
+                                                    case 'like':
+                                                        $icon = 'heart';
+                                                        break;
+                                                    case 'respuesta_foro':
+                                                        $icon = 'reply';
+                                                        break;
+                                                    case 'nueva_obra':
+                                                        $icon = 'book';
+                                                        break;
+                                                    case 'sistema':
+                                                        $icon = 'info-circle';
+                                                        break;
+                                                }
+                                                ?>
+                                                <i class="fas fa-<?php echo $icon; ?>"></i>
+                                            </div>
+                                            <div class="notification-content">
+                                                <p><?php echo htmlspecialchars($notificacion['mensaje']); ?></p>
+                                                <span class="notification-time">
+                                                    <?php echo time_elapsed_string($notificacion['fecha_creacion']); ?>
+                                                </span>
+                                            </div>
+                                        </a>
+                                    <?php
+                                        endwhile;
+                                    else:
+                                    ?>
+                                        <div class="notification-empty">
+                                            <p>No tienes notificaciones</p>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                                
+                                <div class="notification-footer">
+                                    <a href="<?php echo BASE_URL; ?>/usuario/notificaciones.php">Ver todas</a>
+                                </div>
+                            </div>
+                        </div>
                     <?php endif; ?>
                     
                     <!-- Toggle de modo oscuro -->
@@ -208,6 +282,12 @@ if ($result_categorias_comics && $result_categorias_comics->num_rows > 0) {
                                 </a>
                                 <a href="<?php echo BASE_URL; ?>/usuario/favoritos.php">
                                     <i class="fas fa-heart"></i> Favoritos
+                                </a>
+                                <a href="<?php echo BASE_URL; ?>/usuario/notificaciones.php">
+                                    <i class="fas fa-bell"></i> Notificaciones
+                                    <?php if ($notificaciones_no_leidas > 0): ?>
+                                        <span class="badge"><?php echo $notificaciones_no_leidas; ?></span>
+                                    <?php endif; ?>
                                 </a>
                                 <a href="<?php echo BASE_URL; ?>/usuario/nueva_obra.php">
                                     <i class="fas fa-plus-circle"></i> Nueva Obra
