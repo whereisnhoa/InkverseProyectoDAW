@@ -1,3 +1,4 @@
+
 <?php
 session_start();
 include '../includes/conexion.php';
@@ -111,9 +112,10 @@ if ($resultado_com->num_rows > 0):
 <?php if (isset($_SESSION['usuario_id'])): ?>
     <div class="mb-4">
       <h3>Deja tu comentario</h3>
-      <form action="../controllers/procesar-comentario.php" method="POST">
-          <input type="hidden" name="contenido_id" value="<?= $contenido_id ?>">
-          <input type="hidden" name="tipo_contenido" value="<?= $tipo_contenido ?>">
+      <form action="<?php echo BASE_URL; ?>/controllers/procesar-comentario.php" method="POST">
+          <input type="hidden" name="csrf_token" value="<?php echo generarTokenCSRF(); ?>">
+          <input type="hidden" name="contenido_id" value="<?php echo $contenido_id ?>">
+          <input type="hidden" name="tipo_contenido" value="<?php echo $tipo_contenido ?>">
           <div class="form-group">
             <textarea name="contenido" rows="4" required placeholder="Escribe tu comentario aquí..."></textarea>
           </div>
@@ -122,7 +124,7 @@ if ($resultado_com->num_rows > 0):
     </div>
 <?php else: ?>
     <div class="alerta alerta-info">
-      <p>Debes <a href="/public/login.php">iniciar sesión</a> para comentar.</p>
+      <p>Debes <a href="<?php echo BASE_URL; ?>/public/login.php">iniciar sesión</a> para comentar.</p>
     </div>
 <?php endif; ?>
 

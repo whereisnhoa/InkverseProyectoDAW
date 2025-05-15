@@ -287,15 +287,15 @@ $puede_editar = $es_autor || $es_admin;
     <?php if ($usuario_logueado && $tema['estado'] != 'cerrado'): ?>
         <div class="responder-seccion">
             <h3>Responder al tema</h3>
-            
-            <form action="<?php echo BASE_URL; ?>/controllers/procesar-respuesta.php" method="POST">
+        
+            <form action="<?php echo BASE_URL; ?>/controllers/procesar-respuesta-foro.php" method="POST">
                 <input type="hidden" name="csrf_token" value="<?php echo generarTokenCSRF(); ?>">
                 <input type="hidden" name="tema_id" value="<?php echo $tema_id; ?>">
-                
+            
                 <div class="form-group">
                     <textarea name="contenido" rows="5" placeholder="Escribe tu respuesta..." required></textarea>
                 </div>
-                
+            
                 <button type="submit" class="btn">
                     <i class="fas fa-reply"></i> Responder
                 </button>
