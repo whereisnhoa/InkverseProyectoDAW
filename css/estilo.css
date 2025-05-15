@@ -1175,6 +1175,631 @@ select:focus {
   color: var(--text-light);
 }
 
+/* Añadir estos estilos al final del archivo estilo.css */
+
+/* Importar estilos para foros y galería de arte */
+@import url("foros-arte.css");
+
+/* Estilos adicionales para la sección de comunidad */
+.comunidad-section {
+  margin-bottom: 3rem;
+}
+
+.comunidad-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.comunidad-features {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.comunidad-feature-card {
+  background-color: var(--card-bg);
+  border-radius: 8px;
+  padding: 2rem;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease;
+}
+
+.comunidad-feature-card:hover {
+  transform: translateY(-5px);
+}
+
+.comunidad-feature-icon {
+  width: 80px;
+  height: 80px;
+  background-color: var(--accent);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  margin: 0 auto 1.5rem;
+}
+
+.comunidad-feature-card h3 {
+  margin-bottom: 1rem;
+}
+
+.comunidad-feature-card p {
+  color: var(--text-light);
+  margin-bottom: 1.5rem;
+}
+
+/* Estilos para las páginas de Literatura y Cómics */
+.literatura-header,
+.comics-header {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.literatura-header h1,
+.comics-header h1 {
+  margin-bottom: 1rem;
+}
+
+.section-nav {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.section-nav a {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 50px;
+  background-color: var(--card-bg);
+  color: var(--text);
+  font-weight: 500;
+  transition: all 0.2s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.section-nav a:hover {
+  background-color: var(--light);
+  transform: translateY(-2px);
+  text-decoration: none;
+}
+
+.section-nav a.active {
+  background-color: var(--accent);
+  color: white;
+}
+
+.categorias-strip {
+  margin-bottom: 2rem;
+  overflow-x: auto;
+  padding: 0.5rem 0;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+.categorias-strip::-webkit-scrollbar {
+  height: 4px;
+}
+
+.categorias-strip::-webkit-scrollbar-thumb {
+  background-color: var(--border);
+  border-radius: 4px;
+}
+
+.categorias-strip-inner {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0 0.5rem;
+}
+
+.categoria-pill {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border-radius: 50px;
+  background-color: var(--card-bg);
+  color: var(--text);
+  font-size: 0.9rem;
+  white-space: nowrap;
+  transition: all 0.2s;
+  border: 1px solid var(--border);
+}
+
+.categoria-pill:hover {
+  background-color: var(--light);
+  border-color: var(--accent);
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.literatura-section,
+.comics-section {
+  margin-bottom: 4rem;
+}
+
+.obra-portada-placeholder {
+  width: 100%;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--light);
+  color: var(--text-light);
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+
+/* Estilos específicos para Literatura */
+.literatura-header {
+  background-color: rgba(67, 97, 238, 0.05);
+  padding: 2rem 0;
+  border-radius: 8px;
+}
+
+/* Estilos específicos para Cómics */
+.comics-header {
+  background-color: rgba(255, 107, 107, 0.05);
+  padding: 2rem 0;
+  border-radius: 8px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .section-nav {
+    gap: 0.5rem;
+  }
+
+  .section-nav a {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* Estilos para el menú de categorías unificado */
+.categorias-dropdown {
+  width: 550px;
+}
+
+.categorias-dropdown .dropdown-section {
+  flex: 1;
+  padding: 0 1rem;
+}
+
+.categorias-dropdown .dropdown-section:first-child {
+  border-right: 1px solid var(--border);
+}
+
+.categorias-dropdown h4 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.categorias-dropdown h4 i {
+  color: var(--accent);
+}
+
+.categorias-dropdown .dropdown-links {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+}
+
+.categorias-dropdown .ver-todas {
+  grid-column: span 2;
+  margin-top: 0.5rem;
+}
+
+/* Ajustes responsivos para el menú de categorías */
+@media (max-width: 992px) {
+  .categorias-dropdown {
+    width: 450px;
+  }
+}
+
+@media (max-width: 768px) {
+  .categorias-dropdown {
+    width: 100%;
+  }
+
+  .categorias-dropdown .dropdown-section:first-child {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .categorias-dropdown .dropdown-section {
+    padding: 0;
+  }
+
+  .categorias-dropdown .dropdown-links {
+    grid-template-columns: 1fr;
+  }
+
+  .categorias-dropdown .ver-todas {
+    grid-column: span 1;
+  }
+}
+
+/* Estilos para páginas legales */
+.legal-page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 20px;
+}
+
+.legal-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.legal-updated {
+  color: var(--text-light);
+  font-style: italic;
+  margin-top: 0.5rem;
+}
+
+.legal-section {
+  margin-bottom: 2.5rem;
+}
+
+.legal-section h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: var(--primary);
+}
+
+.legal-section h3 {
+  font-size: 1.2rem;
+  margin: 1.5rem 0 0.75rem;
+}
+
+.legal-list {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.legal-list li {
+  margin-bottom: 0.5rem;
+}
+
+.legal-contact {
+  list-style: none;
+  padding: 0;
+  margin: 1.5rem 0;
+}
+
+.legal-contact li {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.legal-contact i {
+  color: var(--accent);
+  width: 20px;
+  text-align: center;
+}
+
+.legal-footer {
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+  text-align: center;
+  font-style: italic;
+}
+
+/* Responsive para el footer mejorado */
+@media (max-width: 1200px) {
+  .footer-container {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .footer-about {
+    grid-column: span 3;
+    margin-bottom: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .footer-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .footer-about {
+    grid-column: span 2;
+  }
+
+  .footer-bottom-container {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+
+  .footer-legal {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 576px) {
+  .footer-container {
+    grid-template-columns: 1fr;
+  }
+
+  .footer-about {
+    grid-column: span 1;
+  }
+
+  .social-icons {
+    justify-content: center;
+  }
+}
+
+/* Estilos para notificaciones */
+.notification-dropdown {
+  position: relative;
+}
+
+.notification-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background-color: var(--danger);
+  color: white;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 0.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notification-dropdown-content {
+  width: 350px;
+  padding: 0;
+  right: -100px;
+  left: auto;
+}
+
+.notification-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.notification-header h4 {
+  margin: 0;
+}
+
+.notification-mark-all {
+  font-size: 0.8rem;
+  color: var(--accent);
+}
+
+.notification-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.notification-item {
+  display: flex;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border);
+  transition: background-color 0.2s;
+  text-decoration: none;
+  color: var(--text);
+}
+
+.notification-item:hover {
+  background-color: var(--light);
+  text-decoration: none;
+  color: var(--text);
+}
+
+.notification-item.unread {
+  background-color: rgba(67, 97, 238, 0.05);
+}
+
+.notification-icon {
+  width: 40px;
+  height: 40px;
+  background-color: var(--light);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1rem;
+  color: var(--accent);
+}
+
+.notification-content {
+  flex: 1;
+}
+
+.notification-content p {
+  margin: 0 0 0.25rem;
+  line-height: 1.4;
+}
+
+.notification-time {
+  font-size: 0.8rem;
+  color: var(--text-light);
+}
+
+.notification-footer {
+  padding: 0.75rem 1rem;
+  text-align: center;
+  border-top: 1px solid var(--border);
+}
+
+.notification-empty {
+  padding: 2rem 1rem;
+  text-align: center;
+  color: var(--text-light);
+}
+
+.notification-empty i {
+  margin-bottom: 1rem;
+}
+
+/* Estilos para la página de notificaciones */
+.notification-list-full .notification-item {
+  margin-bottom: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.notification-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+
+.notification-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+@media (max-width: 768px) {
+  .notification-dropdown-content {
+    width: 300px;
+    right: -50px;
+  }
+
+  .notification-meta {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .notification-actions {
+    margin-top: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .notification-dropdown-content {
+    width: 100%;
+    left: 0;
+    right: 0;
+  }
+}
+
+/* Estilos para la validación de contraseñas */
+.password-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-light);
+  padding: 0;
+  font-size: 1rem;
+}
+
+.password-strength-meter {
+  margin-top: 0.5rem;
+}
+
+.strength-meter-bar {
+  height: 8px;
+  background-color: var(--light);
+  border-radius: 4px;
+  margin-bottom: 0.25rem;
+  overflow: hidden;
+}
+
+.strength-meter-fill {
+  height: 100%;
+  width: 0;
+  background-color: var(--danger);
+  border-radius: 4px;
+  transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+.strength-meter-label {
+  font-size: 0.8rem;
+  color: var(--text-light);
+}
+
+.password-requirements {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: var(--light);
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.password-requirements h4 {
+  font-size: 0.95rem;
+  margin-bottom: 0.5rem;
+}
+
+.password-requirements ul {
+  list-style: none;
+  padding-left: 0.5rem;
+}
+
+.password-requirements li {
+  margin-bottom: 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.password-requirements li i {
+  width: 16px;
+  text-align: center;
+}
+
+.password-requirements li .fa-times-circle {
+  color: var(--danger);
+}
+
+.password-requirements li .fa-check-circle {
+  color: var(--success);
+}
+
+.requirement-met {
+  color: var(--success);
+}
+
+#password-match-message {
+  margin-top: 0.25rem;
+  font-size: 0.85rem;
+}
+
+.password-match-success {
+  color: var(--success);
+}
+
+.password-match-error {
+  color: var(--danger);
+}
+
 /* Estilos para Foros y Galería de Arte */
 
 /* Estilos comunes */
@@ -1800,528 +2425,5 @@ select:focus {
   .foro-acciones .btn {
     width: 100%;
     text-align: center;
-  }
-}
-
-
-/* Estilos adicionales para la sección de comunidad */
-.comunidad-section {
-  margin-bottom: 3rem;
-}
-
-.comunidad-header {
-  text-align: center;
-  margin-bottom: 2rem;
-}
-
-.comunidad-features {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 2rem;
-  margin-bottom: 3rem;
-}
-
-.comunidad-feature-card {
-  background-color: var(--card-bg);
-  border-radius: 8px;
-  padding: 2rem;
-  text-align: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  transition: transform 0.3s ease;
-}
-
-.comunidad-feature-card:hover {
-  transform: translateY(-5px);
-}
-
-.comunidad-feature-icon {
-  width: 80px;
-  height: 80px;
-  background-color: var(--accent);
-  color: white;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 2rem;
-  margin: 0 auto 1.5rem;
-}
-
-.comunidad-feature-card h3 {
-  margin-bottom: 1rem;
-}
-
-.comunidad-feature-card p {
-  color: var(--text-light);
-  margin-bottom: 1.5rem;
-}
-
-/* Estilos para las páginas de Literatura y Cómics */
-.literatura-header,
-.comics-header {
-  margin-bottom: 2rem;
-  text-align: center;
-}
-
-.literatura-header h1,
-.comics-header h1 {
-  margin-bottom: 1rem;
-}
-
-.section-nav {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  margin-top: 1.5rem;
-  flex-wrap: wrap;
-}
-
-.section-nav a {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  border-radius: 50px;
-  background-color: var(--card-bg);
-  color: var(--text);
-  font-weight: 500;
-  transition: all 0.2s;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.section-nav a:hover {
-  background-color: var(--light);
-  transform: translateY(-2px);
-  text-decoration: none;
-}
-
-.section-nav a.active {
-  background-color: var(--accent);
-  color: white;
-}
-
-.categorias-strip {
-  margin-bottom: 2rem;
-  overflow-x: auto;
-  padding: 0.5rem 0;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
-}
-
-.categorias-strip::-webkit-scrollbar {
-  height: 4px;
-}
-
-.categorias-strip::-webkit-scrollbar-thumb {
-  background-color: var(--border);
-  border-radius: 4px;
-}
-
-.categorias-strip-inner {
-  display: flex;
-  gap: 0.5rem;
-  padding: 0 0.5rem;
-}
-
-.categoria-pill {
-  display: inline-block;
-  padding: 0.5rem 1rem;
-  border-radius: 50px;
-  background-color: var(--card-bg);
-  color: var(--text);
-  font-size: 0.9rem;
-  white-space: nowrap;
-  transition: all 0.2s;
-  border: 1px solid var(--border);
-}
-
-.categoria-pill:hover {
-  background-color: var(--light);
-  border-color: var(--accent);
-  color: var(--accent);
-  text-decoration: none;
-}
-
-.literatura-section,
-.comics-section {
-  margin-bottom: 4rem;
-}
-
-.obra-portada-placeholder {
-  width: 100%;
-  height: 200px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: var(--light);
-  color: var(--text-light);
-  border-radius: 4px;
-  margin-bottom: 1rem;
-}
-
-/* Estilos específicos para Literatura */
-.literatura-header {
-  background-color: rgba(67, 97, 238, 0.05);
-  padding: 2rem 0;
-  border-radius: 8px;
-}
-
-/* Estilos específicos para Cómics */
-.comics-header {
-  background-color: rgba(255, 107, 107, 0.05);
-  padding: 2rem 0;
-  border-radius: 8px;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .section-nav {
-    gap: 0.5rem;
-  }
-
-  .section-nav a {
-    padding: 0.5rem 0.75rem;
-    font-size: 0.9rem;
-  }
-}
-
-/* Estilos para el menú de categorías unificado */
-.categorias-dropdown {
-  width: 550px;
-}
-
-.categorias-dropdown .dropdown-section {
-  flex: 1;
-  padding: 0 1rem;
-}
-
-.categorias-dropdown .dropdown-section:first-child {
-  border-right: 1px solid var(--border);
-}
-
-.categorias-dropdown h4 {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-}
-
-.categorias-dropdown h4 i {
-  color: var(--accent);
-}
-
-.categorias-dropdown .dropdown-links {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 0.5rem;
-}
-
-.categorias-dropdown .ver-todas {
-  grid-column: span 2;
-  margin-top: 0.5rem;
-}
-
-/* Ajustes responsivos para el menú de categorías */
-@media (max-width: 992px) {
-  .categorias-dropdown {
-    width: 450px;
-  }
-}
-
-@media (max-width: 768px) {
-  .categorias-dropdown {
-    width: 100%;
-  }
-
-  .categorias-dropdown .dropdown-section:first-child {
-    border-right: none;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 1rem;
-    margin-bottom: 1rem;
-  }
-
-  .categorias-dropdown .dropdown-section {
-    padding: 0;
-  }
-
-  .categorias-dropdown .dropdown-links {
-    grid-template-columns: 1fr;
-  }
-
-  .categorias-dropdown .ver-todas {
-    grid-column: span 1;
-  }
-}
-
-/* Estilos para páginas legales */
-.legal-page {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 2rem 20px;
-}
-
-.legal-header {
-  text-align: center;
-  margin-bottom: 3rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 1px solid var(--border);
-}
-
-.legal-updated {
-  color: var(--text-light);
-  font-style: italic;
-  margin-top: 0.5rem;
-}
-
-.legal-section {
-  margin-bottom: 2.5rem;
-}
-
-.legal-section h2 {
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
-  color: var(--primary);
-}
-
-.legal-section h3 {
-  font-size: 1.2rem;
-  margin: 1.5rem 0 0.75rem;
-}
-
-.legal-list {
-  list-style-type: disc;
-  padding-left: 1.5rem;
-  margin-bottom: 1.5rem;
-}
-
-.legal-list li {
-  margin-bottom: 0.5rem;
-}
-
-.legal-contact {
-  list-style: none;
-  padding: 0;
-  margin: 1.5rem 0;
-}
-
-.legal-contact li {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
-}
-
-.legal-contact i {
-  color: var(--accent);
-  width: 20px;
-  text-align: center;
-}
-
-.legal-footer {
-  margin-top: 3rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid var(--border);
-  text-align: center;
-  font-style: italic;
-}
-
-/* Responsive para el footer mejorado */
-@media (max-width: 1200px) {
-  .footer-container {
-    grid-template-columns: repeat(3, 1fr);
-  }
-
-  .footer-about {
-    grid-column: span 3;
-    margin-bottom: 1rem;
-  }
-}
-
-@media (max-width: 768px) {
-  .footer-container {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .footer-about {
-    grid-column: span 2;
-  }
-
-  .footer-bottom-container {
-    flex-direction: column;
-    gap: 1rem;
-    text-align: center;
-  }
-
-  .footer-legal {
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-}
-
-@media (max-width: 576px) {
-  .footer-container {
-    grid-template-columns: 1fr;
-  }
-
-  .footer-about {
-    grid-column: span 1;
-  }
-
-  .social-icons {
-    justify-content: center;
-  }
-}
-
-/* Estilos para notificaciones */
-.notification-dropdown {
-  position: relative;
-}
-
-.notification-badge {
-  position: absolute;
-  top: -5px;
-  right: -5px;
-  background-color: var(--danger);
-  color: white;
-  border-radius: 50%;
-  width: 18px;
-  height: 18px;
-  font-size: 0.7rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.notification-dropdown-content {
-  width: 350px;
-  padding: 0;
-  right: -100px;
-  left: auto;
-}
-
-.notification-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.75rem 1rem;
-  border-bottom: 1px solid var(--border);
-}
-
-.notification-header h4 {
-  margin: 0;
-}
-
-.notification-mark-all {
-  font-size: 0.8rem;
-  color: var(--accent);
-}
-
-.notification-list {
-  max-height: 400px;
-  overflow-y: auto;
-}
-
-.notification-item {
-  display: flex;
-  padding: 0.75rem 1rem;
-  border-bottom: 1px solid var(--border);
-  transition: background-color 0.2s;
-  text-decoration: none;
-  color: var(--text);
-}
-
-.notification-item:hover {
-  background-color: var(--light);
-  text-decoration: none;
-  color: var(--text);
-}
-
-.notification-item.unread {
-  background-color: rgba(67, 97, 238, 0.05);
-}
-
-.notification-icon {
-  width: 40px;
-  height: 40px;
-  background-color: var(--light);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-right: 1rem;
-  color: var(--accent);
-}
-
-.notification-content {
-  flex: 1;
-}
-
-.notification-content p {
-  margin: 0 0 0.25rem;
-  line-height: 1.4;
-}
-
-.notification-time {
-  font-size: 0.8rem;
-  color: var(--text-light);
-}
-
-.notification-footer {
-  padding: 0.75rem 1rem;
-  text-align: center;
-  border-top: 1px solid var(--border);
-}
-
-.notification-empty {
-  padding: 2rem 1rem;
-  text-align: center;
-  color: var(--text-light);
-}
-
-.notification-empty i {
-  margin-bottom: 1rem;
-}
-
-/* Estilos para la página de notificaciones */
-.notification-list-full .notification-item {
-  margin-bottom: 1rem;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-}
-
-.notification-meta {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 0.5rem;
-}
-
-.notification-actions {
-  display: flex;
-  gap: 0.5rem;
-  margin: 1rem 0;
-}
-
-@media (max-width: 768px) {
-  .notification-dropdown-content {
-    width: 300px;
-    right: -50px;
-  }
-
-  .notification-meta {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .notification-actions {
-    margin-top: 0.5rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .notification-dropdown-content {
-    width: 100%;
-    left: 0;
-    right: 0;
   }
 }

@@ -27,7 +27,12 @@ if (isset($_SESSION['usuario_id'])) {
         
         <div class="form-group">
             <label for="password">Contraseña:</label>
-            <input type="password" id="password" name="password" required>
+            <div class="password-input-container">
+                <input type="password" id="password" name="password" required>
+                <button type="button" class="toggle-password" aria-label="Mostrar contraseña">
+                    <i class="fas fa-eye"></i>
+                </button>
+            </div>
         </div>
         
         <button type="submit" class="btn">Entrar</button>
@@ -37,6 +42,27 @@ if (isset($_SESSION['usuario_id'])) {
         ¿No tienes cuenta? <a href="<?php echo BASE_URL; ?>/public/register.php">Regístrate aquí</a>
     </p>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const togglePasswordButton = document.querySelector('.toggle-password');
+    const passwordInput = document.getElementById('password');
+    
+    togglePasswordButton.addEventListener('click', function() {
+        const icon = this.querySelector('i');
+        
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            passwordInput.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    });
+});
+</script>
 
 <?php
 // Incluir el footer
