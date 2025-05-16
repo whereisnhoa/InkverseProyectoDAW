@@ -1058,6 +1058,107 @@ select:focus {
   margin-bottom: 1rem;
 }
 
+/* Banners específicos para literatura y cómics */
+.literatura-banner,
+.comics-banner {
+  color: white;
+  text-align: center;
+  padding: 3rem 0;
+  margin-top: -20px;
+  margin-bottom: 2rem;
+}
+
+.literatura-banner-content,
+.comics-banner-content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.literatura-icon,
+.comics-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  margin: 0 auto 1.5rem;
+}
+
+.literatura-description,
+.comics-description {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+  opacity: 0.9;
+}
+
+/* Estilos específicos para Literatura */
+.literatura-banner {
+  background: linear-gradient(rgba(58, 90, 120, 0.9), rgba(58, 90, 120, 0.8)), url("../img/literatura-bg.jpg");
+  background-size: cover;
+  background-position: center;
+}
+
+.literatura-icon {
+  background-color: #fff;
+  color: #3a5a78;
+}
+
+.literatura-nav a.active {
+  background-color: #3a5a78;
+}
+
+.literatura-nav a:hover:not(.active) {
+  background-color: rgba(58, 90, 120, 0.1);
+}
+
+.literatura-pill:hover {
+  background-color: #3a5a78;
+  border-color: #3a5a78;
+  color: white;
+}
+
+.literatura-section h2 {
+  color: #3a5a78;
+  border-bottom: 2px solid #3a5a78;
+  padding-bottom: 0.5rem;
+  display: inline-block;
+}
+
+/* Estilos específicos para Cómics */
+.comics-banner {
+  background: linear-gradient(rgba(230, 57, 70, 0.9), rgba(230, 57, 70, 0.8)), url("../img/comics-bg.jpg");
+  background-size: cover;
+  background-position: center;
+}
+
+.comics-icon {
+  background-color: #fff;
+  color: #e63946;
+}
+
+.comics-nav a.active {
+  background-color: #e63946;
+}
+
+.comics-nav a:hover:not(.active) {
+  background-color: rgba(230, 57, 70, 0.1);
+}
+
+.comics-pill:hover {
+  background-color: #e63946;
+  border-color: #e63946;
+  color: white;
+}
+
+.comics-section h2 {
+  color: #e63946;
+  border-bottom: 2px solid #e63946;
+  padding-bottom: 0.5rem;
+  display: inline-block;
+}
+
 .section-nav {
   display: flex;
   justify-content: center;
@@ -1072,15 +1173,15 @@ select:focus {
   gap: 0.5rem;
   padding: 0.5rem 1rem;
   border-radius: 50px;
-  background-color: var(--card-bg);
-  color: var(--text);
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
   font-weight: 500;
   transition: all 0.2s;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .section-nav a:hover {
-  background-color: var(--light);
+  background-color: rgba(255, 255, 255, 0.3);
   transform: translateY(-2px);
   text-decoration: none;
 }
@@ -1137,111 +1238,34 @@ select:focus {
   margin-bottom: 4rem;
 }
 
-/* Estilos específicos para Literatura */
-.literatura-header {
-  background-color: rgba(67, 97, 238, 0.05);
-  padding: 2rem 0;
-  border-radius: 8px;
+/* Estilos para tarjetas de obras específicas por tipo */
+.obra-card.literatura-card {
+  border-top: 4px solid #3a5a78;
 }
 
-/* Estilos específicos para Cómics */
-.comics-header {
-  background-color: rgba(255, 107, 107, 0.05);
-  padding: 2rem 0;
-  border-radius: 8px;
+.obra-card.comics-card {
+  border-top: 4px solid #e63946;
 }
 
-/* Estilos para la página de explorar */
-.explorar-header {
-  text-align: center;
-  margin-bottom: 3rem;
-}
+@media (max-width: 768px) {
+  .literatura-banner,
+  .comics-banner {
+    padding: 2rem 1rem;
+  }
 
-.explorar-section {
-  margin-bottom: 4rem;
-}
+  .literatura-icon,
+  .comics-icon {
+    width: 60px;
+    height: 60px;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
 
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-}
-
-.section-header h2 {
-  margin-bottom: 0;
-}
-
-.comunidad-preview {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
-  gap: 2rem;
-}
-
-.comunidad-card {
-  background-color: var(--card-bg);
-  border-radius: 8px;
-  padding: 1.5rem;
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  transition: transform 0.3s ease;
-}
-
-.comunidad-card:hover {
-  transform: translateY(-5px);
-}
-
-.comunidad-icon {
-  width: 70px;
-  height: 70px;
-  background-color: var(--accent);
-  color: white;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.8rem;
-}
-
-.comunidad-content {
-  flex: 1;
-}
-
-.comunidad-content h3 {
-  margin-bottom: 0.5rem;
-}
-
-.comunidad-content p {
-  margin-bottom: 1rem;
-  color: var(--text-light);
-}
-
-/* Estilos para la página de búsqueda */
-.search-form {
-  max-width: 800px;
-  margin-bottom: 2rem;
-}
-
-.search-summary {
-  margin-bottom: 1.5rem;
-  font-size: 1.1rem;
-}
-
-.search-filters {
-  background-color: var(--card-bg);
-  padding: 1rem;
-  border-radius: 8px;
-  margin-bottom: 2rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-}
-
-.filter-group {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
+  .literatura-description,
+  .comics-description {
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+  }
 }
 
 /*==================================
@@ -2106,6 +2130,337 @@ footer {
 }
 
 /*==================================
+  ESTILOS DE LA PÁGINA DE INICIO
+==================================*/
+/* Hero Section */
+.hero-section {
+  background: linear-gradient(rgba(26, 31, 54, 0.8), rgba(26, 31, 54, 0.9)), url("../img/hero-bg.png");
+  background-size: cover;
+  background-position: center;
+  color: white;
+  text-align: center;
+  padding: 5rem 1rem;
+  margin-top: -20px;
+  margin-bottom: 3rem;
+}
+
+.hero-content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.hero-section h1 {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  font-weight: 700;
+}
+
+.hero-subtitle {
+  font-size: 1.25rem;
+  margin-bottom: 2rem;
+  opacity: 0.9;
+}
+
+.hero-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+/* Sección de exploración de contenido */
+.explore-content-section {
+  margin-bottom: 4rem;
+}
+
+.content-type-cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.content-type-card {
+  position: relative;
+  height: 400px;
+  border-radius: 12px;
+  overflow: hidden;
+  color: white;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.content-type-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+}
+
+.content-type-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.7));
+  z-index: 1;
+}
+
+.content-type-content {
+  position: relative;
+  z-index: 2;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  height: 100%;
+}
+
+.content-type-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.content-type-card h3 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: white;
+}
+
+.content-type-card p {
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+  max-width: 80%;
+}
+
+/* Estilos específicos para literatura */
+.literature-card {
+  background: url("../img/literature-bg.jpg") center / cover no-repeat;
+}
+
+.literature-card .content-type-icon {
+  background-color: #3a5a78;
+}
+
+.literature-card .btn {
+  background-color: #3a5a78;
+  border-color: #3a5a78;
+}
+
+.literature-card .btn:hover {
+  background-color: #2c4a68;
+  border-color: #2c4a68;
+}
+
+/* Estilos específicos para cómics */
+.comics-card {
+  background: url("../img/comics-bg.jpg") center / cover no-repeat;
+}
+
+.comics-card .content-type-icon {
+  background-color: #e63946;
+}
+
+.comics-card .btn {
+  background-color: #e63946;
+  border-color: #e63946;
+}
+
+.comics-card .btn:hover {
+  background-color: #d62b39;
+  border-color: #d62b39;
+}
+
+/* Secciones de la página de inicio */
+.home-section {
+  margin-bottom: 4rem;
+}
+
+.home-section h2 {
+  margin-bottom: 1.5rem;
+}
+
+/* Categorías en la página de inicio */
+.categorias-home {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.categoria-home-item {
+  background-color: var(--card-bg);
+  padding: 0.75rem 1.5rem;
+  border-radius: 50px;
+  color: var(--text);
+  font-weight: 500;
+  transition: all 0.2s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border);
+}
+
+.categoria-home-item:hover {
+  background-color: var(--accent);
+  color: white;
+  border-color: var(--accent);
+  transform: translateY(-2px);
+  text-decoration: none;
+}
+
+/* Características */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.feature-card {
+  background-color: var(--card-bg);
+  padding: 2rem;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+}
+
+.feature-icon {
+  width: 70px;
+  height: 70px;
+  background-color: var(--accent);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  margin: 0 auto 1.5rem;
+}
+
+.feature-card h3 {
+  margin-bottom: 1rem;
+}
+
+.feature-card p {
+  color: var(--text-light);
+}
+
+/* CTA Section */
+.cta-section {
+  background-color: var(--primary-light);
+  color: white;
+  padding: 3rem;
+  border-radius: 8px;
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.cta-content {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.cta-content h2 {
+  margin-bottom: 1rem;
+  color: white;
+}
+
+.cta-content p {
+  margin-bottom: 2rem;
+  opacity: 0.9;
+}
+
+.cta-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.cta-buttons .btn-outline {
+  border-color: white;
+  color: white;
+}
+
+.cta-buttons .btn-outline:hover {
+  background-color: white;
+  color: var(--primary);
+}
+
+/* Responsive para la página de inicio */
+@media (max-width: 992px) {
+  .content-type-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .content-type-card {
+    height: 350px;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-section h1 {
+    font-size: 2.5rem;
+  }
+
+  .hero-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .hero-buttons .btn {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .cta-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .cta-buttons .btn {
+    width: 100%;
+    max-width: 300px;
+  }
+}
+
+@media (max-width: 576px) {
+  .hero-section h1 {
+    font-size: 2rem;
+  }
+
+  .hero-subtitle {
+    font-size: 1.1rem;
+  }
+
+  .cta-section {
+    padding: 2rem 1rem;
+  }
+
+  .content-type-card {
+    height: 300px;
+  }
+
+  .content-type-card h3 {
+    font-size: 1.75rem;
+  }
+
+  .content-type-card p {
+    font-size: 1rem;
+    max-width: 100%;
+  }
+}
+
+/*==================================
   14. MEDIA QUERIES Y RESPONSIVE
 ==================================*/
 /* Pantallas grandes */
@@ -2386,4 +2741,65 @@ footer {
   .comunidad-preview {
     grid-template-columns: 1fr;
   }
+}
+
+/* Estilos para la página de categorías */
+.categorias-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.categorias-description {
+  font-size: 1.1rem;
+  color: var(--text-light);
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.categorias-section {
+  margin-bottom: 4rem;
+}
+
+.categorias-section h2 {
+  position: relative;
+  display: inline-block;
+  padding-bottom: 0.5rem;
+}
+
+.literatura-categoria {
+  border-top: 4px solid #3a5a78;
+}
+
+.literatura-categoria .btn-outline {
+  border-color: #3a5a78;
+  color: #3a5a78;
+}
+
+.literatura-categoria .btn-outline:hover {
+  background-color: #3a5a78;
+  color: white;
+}
+
+.comics-categoria {
+  border-top: 4px solid #e63946;
+}
+
+.comics-categoria .btn-outline {
+  border-color: #e63946;
+  color: #e63946;
+}
+
+.comics-categoria .btn-outline:hover {
+  background-color: #e63946;
+  color: white;
+}
+
+.categorias-section:first-of-type h2 {
+  color: #3a5a78;
+  border-bottom: 2px solid #3a5a78;
+}
+
+.categorias-section:last-of-type h2 {
+  color: #e63946;
+  border-bottom: 2px solid #e63946;
 }

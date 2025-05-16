@@ -93,32 +93,41 @@ foreach (array_slice($categorias, 0, 4) as $categoria) {
 }
 ?>
 
-<div class="container">
-    <div class="comics-header">
-        <h1><?php echo $titulo_pagina; ?></h1>
-        
-        <!-- Navegación de secciones -->
-        <div class="section-nav">
-            <a href="<?php echo BASE_URL; ?>/public/comics.php" class="<?php echo (!$mostrar_destacados && !$mostrar_recientes && !$mostrar_populares) ? 'active' : ''; ?>">
-                <i class="fas fa-th-large"></i> Todos
-            </a>
-            <a href="<?php echo BASE_URL; ?>/public/comics.php?destacados=1" class="<?php echo $mostrar_destacados ? 'active' : ''; ?>">
-                <i class="fas fa-star"></i> Destacados
-            </a>
-            <a href="<?php echo BASE_URL; ?>/public/comics.php?recientes=1" class="<?php echo $mostrar_recientes ? 'active' : ''; ?>">
-                <i class="fas fa-clock"></i> Recientes
-            </a>
-            <a href="<?php echo BASE_URL; ?>/public/comics.php?populares=1" class="<?php echo $mostrar_populares ? 'active' : ''; ?>">
-                <i class="fas fa-fire"></i> Populares
-            </a>
+<!-- Cabecera de Cómics -->
+<div class="comics-banner">
+    <div class="container">
+        <div class="comics-banner-content">
+            <div class="comics-icon">
+                <i class="fas fa-book-open"></i>
+            </div>
+            <h1><?php echo $titulo_pagina; ?></h1>
+            <p class="comics-description">Sumérgete en el mundo visual de cómics, manga y novelas gráficas</p>
+            
+            <!-- Navegación de secciones -->
+            <div class="section-nav comics-nav">
+                <a href="<?php echo BASE_URL; ?>/public/comics.php" class="<?php echo (!$mostrar_destacados && !$mostrar_recientes && !$mostrar_populares) ? 'active' : ''; ?>">
+                    <i class="fas fa-th-large"></i> Todos
+                </a>
+                <a href="<?php echo BASE_URL; ?>/public/comics.php?destacados=1" class="<?php echo $mostrar_destacados ? 'active' : ''; ?>">
+                    <i class="fas fa-star"></i> Destacados
+                </a>
+                <a href="<?php echo BASE_URL; ?>/public/comics.php?recientes=1" class="<?php echo $mostrar_recientes ? 'active' : ''; ?>">
+                    <i class="fas fa-clock"></i> Recientes
+                </a>
+                <a href="<?php echo BASE_URL; ?>/public/comics.php?populares=1" class="<?php echo $mostrar_populares ? 'active' : ''; ?>">
+                    <i class="fas fa-fire"></i> Populares
+                </a>
+            </div>
         </div>
     </div>
-    
+</div>
+
+<div class="container">
     <!-- Categorías populares -->
     <div class="categorias-strip">
         <div class="categorias-strip-inner">
             <?php foreach ($categorias as $categoria): ?>
-                <a href="<?php echo BASE_URL; ?>/public/categoria.php?id=<?php echo $categoria['id']; ?>&tipo=comic" class="categoria-pill">
+                <a href="<?php echo BASE_URL; ?>/public/categoria.php?id=<?php echo $categoria['id']; ?>&tipo=comic" class="categoria-pill comics-pill">
                     <?php echo htmlspecialchars($categoria['nombre']); ?>
                 </a>
             <?php endforeach; ?>

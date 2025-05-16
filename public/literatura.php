@@ -93,32 +93,41 @@ foreach (array_slice($categorias, 0, 4) as $categoria) {
 }
 ?>
 
-<div class="container">
-    <div class="literatura-header">
-        <h1><?php echo $titulo_pagina; ?></h1>
-        
-        <!-- Navegación de secciones -->
-        <div class="section-nav">
-            <a href="<?php echo BASE_URL; ?>/public/literatura.php" class="<?php echo (!$mostrar_destacados && !$mostrar_recientes && !$mostrar_populares) ? 'active' : ''; ?>">
-                <i class="fas fa-th-large"></i> Todas
-            </a>
-            <a href="<?php echo BASE_URL; ?>/public/literatura.php?destacados=1" class="<?php echo $mostrar_destacados ? 'active' : ''; ?>">
-                <i class="fas fa-star"></i> Destacados
-            </a>
-            <a href="<?php echo BASE_URL; ?>/public/literatura.php?recientes=1" class="<?php echo $mostrar_recientes ? 'active' : ''; ?>">
-                <i class="fas fa-clock"></i> Recientes
-            </a>
-            <a href="<?php echo BASE_URL; ?>/public/literatura.php?populares=1" class="<?php echo $mostrar_populares ? 'active' : ''; ?>">
-                <i class="fas fa-fire"></i> Populares
-            </a>
+<!-- Cabecera de Literatura -->
+<div class="literatura-banner">
+    <div class="container">
+        <div class="literatura-banner-content">
+            <div class="literatura-icon">
+                <i class="fas fa-book"></i>
+            </div>
+            <h1><?php echo $titulo_pagina; ?></h1>
+            <p class="literatura-description">Explora novelas, poesía, ensayos y todo tipo de obras literarias</p>
+            
+            <!-- Navegación de secciones -->
+            <div class="section-nav literatura-nav">
+                <a href="<?php echo BASE_URL; ?>/public/literatura.php" class="<?php echo (!$mostrar_destacados && !$mostrar_recientes && !$mostrar_populares) ? 'active' : ''; ?>">
+                    <i class="fas fa-th-large"></i> Todas
+                </a>
+                <a href="<?php echo BASE_URL; ?>/public/literatura.php?destacados=1" class="<?php echo $mostrar_destacados ? 'active' : ''; ?>">
+                    <i class="fas fa-star"></i> Destacados
+                </a>
+                <a href="<?php echo BASE_URL; ?>/public/literatura.php?recientes=1" class="<?php echo $mostrar_recientes ? 'active' : ''; ?>">
+                    <i class="fas fa-clock"></i> Recientes
+                </a>
+                <a href="<?php echo BASE_URL; ?>/public/literatura.php?populares=1" class="<?php echo $mostrar_populares ? 'active' : ''; ?>">
+                    <i class="fas fa-fire"></i> Populares
+                </a>
+            </div>
         </div>
     </div>
-    
+</div>
+
+<div class="container">
     <!-- Categorías populares -->
     <div class="categorias-strip">
         <div class="categorias-strip-inner">
             <?php foreach ($categorias as $categoria): ?>
-                <a href="<?php echo BASE_URL; ?>/public/categoria.php?id=<?php echo $categoria['id']; ?>&tipo=libro" class="categoria-pill">
+                <a href="<?php echo BASE_URL; ?>/public/categoria.php?id=<?php echo $categoria['id']; ?>&tipo=libro" class="categoria-pill literatura-pill">
                     <?php echo htmlspecialchars($categoria['nombre']); ?>
                 </a>
             <?php endforeach; ?>
