@@ -50,24 +50,35 @@ if ($result_categorias_comics && $result_categorias_comics->num_rows > 0) {
     }
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Proyecto</title>
+
+    <title>Inkverse</title>
+
+    <!-- css -->
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>/css/estilo.css">
-    <!-- Font Awesome para iconos -->
+    <!-- Font Awesome para los iconos -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
 </head>
+
 <body>
+
     <header>
+
         <div class="header-container">
-            <!-- Logo y navegación principal -->
+
+            <!-- Logo y navegación -->
             <div class="nav-left">
                 <a href="<?php echo BASE_URL; ?>/public/index.php" class="logo">
-                    <img src="<?php echo BASE_URL; ?>/img/logo.png" alt="Logo">
-                    <span>Proyecto</span>
+                    <img src="<?php echo BASE_URL; ?>/img/inkverse3.jpg" alt="Logo">
+                    <span>InkVerse</span>
                 </a>
                 
                 <nav>

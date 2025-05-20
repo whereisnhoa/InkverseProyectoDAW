@@ -4,9 +4,9 @@
     <footer>
         <div class="footer-container">
             <div class="footer-section footer-about">
-                <h3>Proyecto</h3>
+                <h3>Inkverse</h3>
                 <div class="footer-logo">
-                    <img src="<?php echo BASE_URL; ?>/img/logo.png" alt="Logo">
+                    <img src="<?php echo BASE_URL; ?>/img/inkverse3.jpg" alt="Logo">
                 </div>
                 <p>Plataforma para compartir y descubrir obras literarias, cómics y manga. Un espacio para lectores y creadores.</p>
                 <div class="social-icons">
