@@ -1,6 +1,29 @@
 
 // Esperar a que el DOM esté completamente cargado
 document.addEventListener("DOMContentLoaded", () => {
+
+  // idiomas
+  const languageSwitcher = document.getElementById('language-switcher');
+
+  if (languageSwitcher) 
+    {
+      languageSwitcher.addEventListener('change', (event) => {
+          const selectedLang = event.target.value;
+
+          // Obtiene la URL actual
+          let currentUrl = window.location.href;
+
+          // Construye un nuevo objeto URL para manipular los parámetros
+          const url = new URL(currentUrl);
+
+          // Establece el parámetro 'lang' con el idioma seleccionado
+          url.searchParams.set('lang', selectedLang);
+
+          // Redirige a la nueva URL
+          window.location.href = url.toString();
+      });
+  }
+
   // Toggle del menú móvil
   const mobileMenuToggle = document.querySelector(".mobile-menu-toggle")
   const nav = document.querySelector("nav")
@@ -94,3 +117,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   })
 })
+
+
+    
