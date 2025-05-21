@@ -34,8 +34,8 @@ $result_categorias = $conexion->query($sql_categorias);
 <!-- Hero Section -->
 <section class="hero-section">
     <div class="hero-content">
-        <h1>Descubre, Lee y Comparte</h1>
-        <p class="hero-subtitle">Tu comunidad para explorar y compartir literatura, cómics y manga</p>
+        <h1>Explora mundos, crea historias</h1>
+        <p class="hero-subtitle">Tu plataforma para descubrir y compartir obras literarias y cómics.</p>
         
         <?php if (!isset($_SESSION['usuario_id'])): ?>
             <div class="hero-buttons">

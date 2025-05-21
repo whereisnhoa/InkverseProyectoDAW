@@ -1,198 +1,312 @@
-
 /*
 ====================================
+
   1. VARIABLES Y CONFIGURACIÓN
-  2. ESTILOS BASE
-  3. UTILIDADES
-  4. HEADER Y NAVEGACIÓN
-  5. BOTONES Y FORMULARIOS
-  6. TARJETAS Y GRIDS
-  7. ALERTAS Y NOTIFICACIONES
-  8. SECCIÓN DE LITERATURA Y CÓMICS
-  9. FOROS Y DISCUSIONES
-  10. GALERÍA DE ARTE
-  11. PÁGINAS LEGALES
-  12. FOOTER
-  13. VALIDACIÓN DE CONTRASEÑAS
-  14. MEDIA QUERIES Y RESPONSIVE
-==================================
+  2. ESTILOS BASE (Reset, tipografía, contenedores)
+  3. UTILIDADES (Clases de ayuda: márgenes, padding, flexbox, etc.)
+  3.5. HERO SECTION (Estilos para la sección principal de bienvenida)
+  4. HEADER Y NAVEGACIÓN (Barra superior, menú, dropdowns, toggle móvil)
+  5. BOTONES Y FORMULARIOS (Estilos generales para botones e inputs)
+  6. TARJETAS Y GRIDS (Estilos para la visualización de contenido en cuadrículas, como obras y categorías)
+  7. ALERTAS Y NOTIFICACIONES (Mensajes de éxito, error, info, etc.)
+  8. PÁGINAS ESPECÍFICAS (Estilos que aplican a secciones completas o plantillas, si son complejas)
+    8.1. Sección de Literatura y Cómics (Si tienen estilos específicos más allá de las tarjetas generales)
+    8.2. Foros y Discusiones (Estilos para la estructura de foros)
+    8.3. Galería de Arte (Estilos para la galería de imágenes)
+    8.4. Páginas Legales (Política de privacidad, términos, etc.)
+  9. FOOTER (Pie de página)
+  10. VALIDACIÓN DE CONTRASEÑAS (Indicadores visuales para requisitos de contraseña)
+  11. MEDIA QUERIES Y RESPONSIVE (Adaptación a diferentes tamaños de pantalla)
+
+====================================
 */
 
 /*==================================
   1. VARIABLES Y CONFIGURACIÓN
 ==================================*/
 :root {
-  --primary: #1a1f36;
-  --primary-light: #2c3352;
-  --primary-dark: #141829;
-  --secondary: #6c757d;
-  --accent: #4361ee;
-  --accent-hover: #3a56d4;
-  --success: #28a745;
-  --info: #17a2b8;
-  --warning: #ffc107;
-  --danger: #dc3545;
-  --light: #f8f9fa;
-  --dark: #343a40;
-  --text: #333;
-  --text-light: #666;
-  --border-color: #ddd;
-  --background: #f4f7f6; /* Fondo general de la página */
-  --card-background: #ffffff; /* Fondo de las tarjetas y contenedores */
-  --shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Sombra suave */
-  --border-radius: 8px;
-  --border-radius-small: 4px;
+  --primary: #1a1f36; /* Color principal oscuro para fondo de elementos clave */
+  --primary-light: #2c3352; /* Variante más clara del color principal */
+  --primary-dark: #0f121f; /* Variante más oscura del color principal (para fondos muy oscuros) */
+  --secondary: #6c757d; /* Color secundario (grisáceo, para texto auxiliar o bordes) */
+  --accent: #4361ee; /* Color de acento (azul brillante, para botones, enlaces activos, iconos) */
+  --accent-hover: #3a56d4; /* Color de acento al pasar el ratón */
+  --success: #28a745; /* Verde para mensajes de éxito */
+  --info: #17a2b8; /* Azul claro para mensajes informativos */
+  --warning: #ffc107; /* Amarillo para advertencias */
+  --danger: #dc3545; /* Rojo para errores */
+  --light: #f8f9fa; /* Color muy claro (blanco roto, para texto en fondos oscuros) */
+  --dark: #343a40; /* Color oscuro (gris oscuro, para texto en fondos claros) */
+  --text: #333; /* Color de texto principal (oscuro para fondos claros) */
+  --text-light: #bbb; /* Color de texto secundario (claro, para fondos oscuros) */
+  --bg: #f4f7f6; /* Fondo general claro de la página */
+  --bg-dark: #0f121f; /* Fondo general oscuro de la página (para modo oscuro) */
+  --card-bg: #fff; /* Fondo de tarjetas claro */
+  --card-bg-dark: #1a1f36; /* Fondo de tarjetas para tema oscuro */
+  --border-color: #e0e0e0; /* Color general de los bordes */
+  --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Sombra para elementos claros */
+  --box-shadow-dark: 0 4px 15px rgba(0, 0, 0, 0.4); /* Sombra para elementos oscuros */
+  --border-radius: 8px; /* Radio de borde global */
+  --font-family-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; /* Fuente sans-serif principal */
+  --font-family-serif: "Merriweather", serif; /* Fuente serif para títulos y elementos literarios */
+  --transition-speed: 0.3s; /* Velocidad de transición para efectos hover y cambios de tema */
+  --header-height: 70px; /* Altura predeterminada del header para escritorio */
 }
 
-/* Modo oscuro */
-body.dark-mode {
-  --primary: #212529;
-  --primary-light: #343a40;
-  --primary-dark: #1a1d20;
+/* Modo oscuro: sobrescribe las variables predeterminadas */
+[data-theme="dark"] {
+  --primary: #0f121f;
+  --primary-light: #1a1f36;
+  --primary-dark: #0a0d17;
   --secondary: #adb5bd;
-  --accent: #5e7bff;
-  --accent-hover: #4e6be0;
-  --success: #28a745;
-  --info: #17a2b8;
-  --warning: #ffc107;
-  --danger: #dc3545;
-  --light: #343a40;
-  --dark: #f8f9fa;
+  --accent: #6d8af7;
+  --accent-hover: #5a77e4;
+  --success: #2ecc71;
+  --info: #3498db;
+  --warning: #f1c40f;
+  --danger: #e74c3c;
+  --light: #f8f9fa;
+  --dark: #ced4da;
   --text: #f8f9fa;
-  --text-light: #adb5bd;
-  --border-color: #495057;
-  --background: #2b3035;
-  --card-background: #343a40;
-  --shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --text-light: #bbb;
+  --bg: #0f121f;
+  --bg-dark: #0a0d17;
+  --card-bg: #1a1f36;
+  --card-bg-dark: #2c3352;
+  --border-color: #343a40;
+  --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --box-shadow-dark: 0 4px 15px rgba(0, 0, 0, 0.6);
 }
 
 /*==================================
   2. ESTILOS BASE
 ==================================*/
+/* Reset básico para eliminar márgenes y paddings predeterminados */
 * {
-  box-sizing: border-box;
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
 }
 
+/* Comportamiento de desplazamiento suave para anclas */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Estilos generales para el cuerpo del documento */
 body {
-  font-family: 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  font-family: var(--font-family-sans);
   line-height: 1.6;
   color: var(--text);
-  background-color: var(--background);
-  transition: background-color 0.3s ease, color 0.3s ease;
+  background-color: var(--bg);
+  transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
+  min-height: 100vh; /* Asegura que el body ocupe al menos toda la altura de la ventana */
+  display: flex;
+  flex-direction: column;
 }
 
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 1rem;
-}
-
+/* Estilos para enlaces */
 a {
   color: var(--accent);
   text-decoration: none;
-  transition: color 0.2s ease;
+  transition: color var(--transition-speed) ease;
 }
 
 a:hover {
   color: var(--accent-hover);
 }
 
+/* Elimina el estilo de lista para ul */
 ul {
   list-style: none;
 }
 
+/* Estilos generales para encabezados */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-family-serif);
+  color: var(--text);
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+
+/* Tamaños de fuente para encabezados */
+h1 { font-size: 3rem; }
+h2 { font-size: 2.5rem; }
+h3 { font-size: 2rem; }
+h4 { font-size: 1.5rem; }
+
+/* Estilos para párrafos */
+p {
+  margin-bottom: 1rem;
+}
+
+/* Estilos para imágenes */
 img {
   max-width: 100%;
   height: auto;
+  display: block; /* Elimina espacio extra debajo de las imágenes */
+}
+
+/* Contenedor central para el contenido principal */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+/* Contenido principal de la página, con padding para el header fijo */
+main {
+  padding-top: var(--header-height);
+  flex-grow: 1; /* Permite que el main ocupe el espacio restante, empujando el footer hacia abajo */
 }
 
 /*==================================
   3. UTILIDADES
 ==================================*/
-.text-center {
-  text-align: center;
-}
-
-.mb-1 { margin-bottom: 0.5rem; }
-.mb-2 { margin-bottom: 1rem; }
-.mb-3 { margin-bottom: 1.5rem; }
-.mb-4 { margin-bottom: 2rem; }
-.mb-5 { margin-bottom: 2.5rem; }
-
-.p-1 { padding: 0.5rem; }
-.p-2 { padding: 1rem; }
-.p-3 { padding: 1.5rem; }
-.p-4 { padding: 2rem; }
-.p-5 { padding: 2.5rem; }
-
-/* Flex utilities */
+.text-center { text-align: center; }
 .d-flex { display: flex; }
 .justify-content-center { justify-content: center; }
 .align-items-center { align-items: center; }
-.flex-column { flex-direction: column; }
-.gap-1 { gap: 0.5rem; }
-.gap-2 { gap: 1rem; }
-.gap-3 { gap: 1.5rem; }
 
-/* Sombras */
-.shadow-sm { box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); }
-.shadow-md { box-shadow: var(--shadow); }
-.shadow-lg { box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1); }
+/* Clases para márgenes */
+.mb-1 { margin-bottom: 1rem; }
+.mb-2 { margin-bottom: 2rem; }
+.mb-3 { margin-bottom: 3rem; }
+.mb-4 { margin-bottom: 4rem; }
+
+.mt-1 { margin-top: 1rem; }
+.mt-2 { margin-top: 2rem; }
+.mt-3 { margin-top: 3rem; }
+.mt-4 { margin-top: 4rem; }
+
+/* Clases para padding vertical */
+.py-1 { padding-top: 1rem; padding-bottom: 1rem; }
+.py-2 { padding-top: 2rem; padding-bottom: 2rem; }
+.py-3 { padding-top: 3rem; padding-bottom: 3rem; }
+.py-4 { padding-top: 4rem; padding-bottom: 4rem; }
+
+/*==================================
+  3.5. HERO SECTION
+==================================*/
+.hero-section {
+    position: relative; /* Esencial para que el overlay se posicione correctamente */
+    height: 600px; /* Altura de la sección hero, ajusta según necesidad */
+    display: flex;
+    align-items: center; /* Centra el contenido verticalmente */
+    justify-content: center; /* Centra el contenido horizontalmente */
+    text-align: center;
+    color: var(--light); /* Texto claro para contrastar con el fondo oscuro */
+    overflow: hidden; /* Asegura que nada se desborde fuera de la sección */
+
+    /* PROPIEDADES PARA LA IMAGEN DE FONDO */
+    background-image: url('../../includes/img/hero-background.jpg'); /* ruta de la imagen de fondo */
+    background-size: cover; /* La imagen cubrirá toda la sección */
+    background-position: center; /* Centra la imagen */
+    background-repeat: no-repeat; /* Evita que la imagen se repita */
+    background-attachment: fixed; /* Efecto parallax: la imagen se queda fija al hacer scroll */
+}
+
+/* Overlay oscuro para mejorar la legibilidad del texto sobre la imagen */
+.hero-section::before {
+    content: ''; /* Propiedad necesaria para pseudo-elementos */
+    position: absolute; /* Posiciona el overlay sobre toda la sección */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6); /* Color negro con 60% de opacidad */
+    z-index: 1; /* Coloca el overlay entre la imagen de fondo y el contenido del hero */
+}
+
+/* Asegura que el contenido (texto, botones) esté por encima del overlay */
+.hero-content {
+    position: relative; /* Necesario para que el z-index funcione */
+    z-index: 2; /* Mayor que el z-index del overlay */
+    max-width: 800px; /* Limita el ancho del texto para mejor lectura */
+    padding: 0 1.5rem; /* Pequeño padding a los lados para evitar que el texto toque los bordes */
+}
+
+/* Estilos específicos para el título principal del hero */
+.hero-content h1 {
+    font-family: var(--font-family-serif); /* Fuente serif para el título */
+    font-size: 3.5rem; /* Tamaño de fuente grande para el título */
+    margin-bottom: 1rem;
+    color: var(--light); /* Color del título */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); /* Sombra para mejorar el contraste */
+}
+
+/* Estilos específicos para el subtítulo del hero */
+.hero-subtitle {
+    font-size: 1.5rem; /* Tamaño de fuente para el subtítulo */
+    margin-bottom: 2rem;
+    color: var(--text-light); /* Color del subtítulo */
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6); /* Sombra para mejorar el contraste */
+}
+
+/* Estilos para los botones dentro de la sección hero */
+.hero-buttons .btn {
+    margin: 0.5rem; /* Margen entre botones */
+    min-width: 150px; /* Ancho mínimo para que los botones sean legibles */
+}
+
 
 /*==================================
   4. HEADER Y NAVEGACIÓN
 ==================================*/
-.main-header {
-  background-color: var(--primary);
+.header {
+  background-color: var(--primary-dark);
   color: var(--light);
   padding: 1rem 0;
-  box-shadow: var(--shadow);
+  position: fixed; /* Header fijo en la parte superior */
+  width: 100%;
+  top: 0;
+  left: 0;
+  z-index: 1000; /* Asegura que el header esté siempre encima de otros elementos */
+  box-shadow: var(--box-shadow-dark);
+  height: var(--header-height); /* Usa la variable de altura definida */
+  display: flex;
+  align-items: center;
 }
 
-.header-content {
+.header .container {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap; /* Permite que los elementos salten de línea en pantallas pequeñas */
 }
 
-.nav-left {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem; /* Espacio entre el logo y la navegación */
-}
-
+/* Estilos del logo */
 .logo {
-  display: flex;
-  align-items: center;
-  font-size: 1.5rem;
+  font-family: var(--font-family-serif);
+  font-size: 1.8rem;
   font-weight: bold;
-  color: var(--light);
+  color: var(--accent);
+  transition: color var(--transition-speed) ease;
 }
 
-.logo img {
-  height: 60px; /* Tamaño del logo AUMENTADO */
-  width: auto;
-  margin-right: 0.5rem;
-  border-radius: var(--border-radius);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+.logo:hover {
+  color: var(--accent-hover);
 }
 
-.main-header nav ul {
+/* Estilos para los enlaces de navegación */
+.nav-links {
   display: flex;
-  gap: 1.5rem;
+  gap: 1.5rem; /* Espacio entre los elementos del menú */
 }
 
-.main-header nav a {
+.nav-links li a {
   color: var(--light);
   font-weight: 500;
   padding: 0.5rem 0;
   position: relative;
+  transition: color var(--transition-speed) ease;
 }
 
-.main-header nav a::after {
+.nav-links li a:hover {
+  color: var(--accent);
+}
+
+/* Efecto de subrayado para enlaces de navegación */
+.nav-links li a::after {
   content: '';
   position: absolute;
   left: 0;
@@ -200,293 +314,176 @@ img {
   width: 0;
   height: 2px;
   background-color: var(--accent);
-  transition: width 0.3s ease;
+  transition: width var(--transition-speed) ease;
 }
 
-.main-header nav a:hover::after,
-.main-header nav a.active::after {
+.nav-links li a:hover::after {
   width: 100%;
 }
 
-.nav-right {
+/* Contenedor de botones de acción (login, registro, etc.) */
+.action-buttons {
   display: flex;
   align-items: center;
   gap: 1rem;
 }
 
-.action-icons {
-  display: flex;
-  align-items: center;
-  gap: 0.8rem; /* Espacio entre los iconos de acción */
-}
-
-.icon-btn {
-  background: none;
-  border: none;
-  color: var(--light); /* Color de los iconos en el header */
-  font-size: 1.2rem;
-  cursor: pointer;
-  padding: 0.5rem;
-  border-radius: var(--border-radius);
-  transition: background-color 0.2s ease;
-  display: flex; /* Para centrar el icono */
-  align-items: center;
-  justify-content: center;
-  width: 40px; /* Tamaño fijo del botón */
-  height: 40px; /* Tamaño fijo del botón */
-}
-
-.icon-btn:hover {
-  background-color: var(--primary-light);
-}
-
-/* Estilos para dropdowns genéricos (literatura, cómics, notificaciones, usuario) */
+/* Dropdowns (menús desplegables) */
 .dropdown {
   position: relative;
+  display: inline-block;
+}
+
+.dropdown-toggle {
+  color: var(--light);
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0.5rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: color var(--transition-speed) ease;
+}
+
+.dropdown-toggle:hover {
+  color: var(--accent);
 }
 
 .dropdown-content {
-  display: none;
+  display: none; /* Oculto por defecto */
   position: absolute;
-  background-color: var(--card-background);
-  min-width: 220px;
-  box-shadow: var(--shadow);
-  z-index: 100;
+  background-color: var(--card-bg-dark);
+  min-width: 160px;
+  box-shadow: var(--box-shadow-dark);
+  z-index: 10;
   border-radius: var(--border-radius);
-  padding: 1rem;
-  top: calc(100% + 10px); /* Posiciona debajo del toggle */
-  right: 0; /* Alinea a la derecha del toggle */
+  padding: 0.5rem 0;
+  top: 100%; /* Se posiciona justo debajo del toggle */
+  left: 0;
   opacity: 0;
-  transform: translateY(-10px);
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  transform: translateY(10px); /* Ligero desplazamiento inicial */
+  transition: opacity var(--transition-speed) ease, transform var(--transition-speed) ease;
 }
 
 .dropdown.active .dropdown-content {
-  display: block;
+  display: block; /* Muestra el contenido cuando el dropdown está activo */
   opacity: 1;
-  transform: translateY(0);
+  transform: translateY(0); /* Vuelve a su posición original */
 }
 
-.dropdown-content .dropdown-title {
-  font-size: 1rem;
+.dropdown-content a {
   color: var(--text-light);
-  margin-bottom: 0.8rem;
-  border-bottom: 1px solid var(--border-color);
-  padding-bottom: 0.5rem;
-  font-weight: 600;
+  padding: 0.75rem 1rem;
+  text-decoration: none;
+  display: block;
+  transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
+  white-space: nowrap; /* Evita que el texto se rompa en varias líneas */
 }
 
-.dropdown-content ul {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.dropdown-content ul li a {
-  color: var(--text);
-  padding: 0.5rem 0.8rem;
-  border-radius: var(--border-radius-small);
-  display: block; /* Para que ocupe todo el ancho del li */
-  transition: background-color 0.2s ease;
-}
-
-.dropdown-content ul li a:hover {
+.dropdown-content a:hover {
   background-color: var(--primary-light);
   color: var(--light);
 }
 
-/* Estilos específicos para el dropdown de Literatura/Cómics */
-.dropdown-inner {
-  display: flex;
-  gap: 2rem;
-  padding: 1rem;
+/* Dropdown de usuario (alineado a la derecha) */
+.user-dropdown-content {
+  right: 0;
+  left: auto; /* Desactiva el left:0 predeterminado */
+  min-width: 200px;
 }
 
-.dropdown-section {
-  flex: 1;
-  min-width: 150px;
+.user-dropdown-header {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 0.5rem;
+  color: var(--light);
+  font-weight: bold;
 }
 
-.dropdown-section h3 {
-  font-size: 1.1rem;
-  color: var(--accent);
-  margin-bottom: 0.8rem;
-}
-
-.dropdown-section ul li a {
-  padding: 0.3rem 0;
-  font-size: 0.95rem;
+.user-dropdown-header span {
+  font-size: 0.9em;
   color: var(--text-light);
 }
 
-.dropdown-section ul li a:hover {
-  color: var(--accent-hover);
-  background: none; /* No queremos fondo en estos enlaces */
+/* Dropdown de notificaciones (alineado a la derecha, con scroll) */
+.notification-dropdown-content {
+  right: 0;
+  left: auto;
+  min-width: 280px;
+  max-height: 300px; /* Altura máxima para el scroll */
+  overflow-y: auto; /* Habilita el scroll vertical */
 }
 
-/* Estilos para el Dropdown de Idiomas */
-.language-dropdown {
-    position: relative;
+.notification-item {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--primary-light);
+  color: var(--text-light);
+  font-size: 0.9rem;
 }
 
-.language-dropdown .dropdown-toggle {
-    background: none;
-    border: none;
-    padding: 0.5rem;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: var(--border-radius);
-    transition: background-color 0.2s ease;
-    width: 40px; /* Asegura un tamaño fijo para el botón */
-    height: 40px;
+.notification-item:last-child {
+  border-bottom: none; /* No hay borde en el último ítem */
 }
 
-.language-dropdown .dropdown-toggle:hover {
-    background-color: var(--primary-light);
+.notification-item strong {
+  color: var(--accent); /* Resalta el nombre de usuario o evento */
 }
 
-.language-dropdown .flag-icon-main {
-    width: 30px; /* Tamaño del icono principal de la bandera */
-    height: 20px;
-    object-fit: cover;
-    border-radius: 3px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+.notification-item.unread {
+  background-color: var(--primary-light); /* Fondo para notificaciones no leídas */
 }
 
+/* Dropdown de idioma */
 .language-dropdown-content {
-    display: none; /* Oculto por defecto */
-    position: absolute;
-    background-color: var(--card-background); /* Usamos --card-background para consistencia */
-    min-width: 180px;
-    box-shadow: var(--shadow);
-    z-index: 100;
-    border-radius: var(--border-radius);
-    padding: 1rem;
-    right: 0; /* Alinea el dropdown a la derecha del botón */
-    top: calc(100% + 10px); /* Posiciona debajo del botón con un pequeño espacio */
-    opacity: 0;
-    transform: translateY(-10px);
-    transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
-.language-dropdown.active .language-dropdown-content {
-    display: block; /* Muestra el contenido cuando el dropdown está activo */
-    opacity: 1;
-    transform: translateY(0);
-}
-
-.language-dropdown-content .dropdown-title {
-    font-size: 0.9rem;
-    color: var(--text-light);
-    margin-bottom: 0.8rem;
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 0.5rem;
-    font-weight: 500;
-}
-
-.language-dropdown-content .flags-dropdown-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.6rem;
+  min-width: 120px;
 }
 
 .language-dropdown-content .flag-item {
-    display: flex;
-    align-items: center;
-    text-decoration: none;
-    color: var(--text);
-    font-size: 0.9rem;
-    padding: 0.4rem 0.6rem;
-    border-radius: var(--border-radius-small);
-    transition: background-color 0.2s ease, color 0.2s ease;
-}
-
-.language-dropdown-content .flag-item:hover {
-    background-color: var(--primary-light); /* Hover que contrasta bien */
-    color: var(--light);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  color: var(--text-light);
 }
 
 .language-dropdown-content .flag-item img {
-    width: 24px; /* Tamaño de las banderas en el desplegable */
-    height: 16px;
-    object-fit: cover;
-    border-radius: 2px;
-    margin-right: 0.6rem;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+  width: 24px;
+  height: auto;
+  border-radius: 3px;
 }
 
-.language-dropdown-content .flag-item.active {
-    background-color: var(--accent); /* Color de fondo para el idioma seleccionado */
-    color: var(--light);
-    font-weight: bold;
+.language-dropdown-content .flag-item:hover {
+  background-color: var(--primary-light);
+  color: var(--light);
 }
 
-.language-dropdown-content .flag-item.active img {
-    box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
-}
-
-/* Estilos para el dropdown de notificaciones */
-.notification-list {
-    margin-bottom: 1rem;
-}
-
-.notification-list li a {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.notification-dropdown-content .view-all {
-    display: block;
-    text-align: center;
-    padding: 0.5rem;
-    border-top: 1px solid var(--border-color);
-    margin-top: 0.5rem;
-    font-size: 0.9rem;
-}
-
-/* Estilos para el dropdown de usuario */
-.user-menu-list li a {
-    display: flex; /* Asegura que el icono y el texto estén alineados */
-    align-items: center;
-    gap: 0.5rem; /* Espacio entre el icono y el texto */
-}
-
-.user-actions {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.user-actions .btn {
-    padding: 0.5rem 1rem;
-}
-
-/* menú desplegable para móviles */
+/* Botón de toggle para menú móvil */
 .mobile-menu-toggle {
-    display: none; /* Oculto por defecto en escritorio */
-    font-size: 1.5rem;
+  display: none; /* Oculto por defecto en escritorio */
+  color: var(--light);
+  font-size: 1.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
 }
 
 
 /*==================================
   5. BOTONES Y FORMULARIOS
 ==================================*/
+/* Estilos generales de los botones */
 .btn {
+  display: inline-block;
   padding: 0.75rem 1.5rem;
   border-radius: var(--border-radius);
-  border: none;
+  font-weight: bold;
   cursor: pointer;
-  font-size: 1rem;
-  font-weight: 600;
-  transition: all 0.2s ease;
-  display: inline-flex; /* Para alinear iconos y texto */
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
+  text-align: center;
+  transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease, border-color var(--transition-speed) ease;
+  border: 2px solid transparent; /* Para los botones outline */
 }
 
+/* Botón principal */
 .btn-primary {
   background-color: var(--accent);
   color: var(--light);
@@ -496,687 +493,490 @@ img {
   background-color: var(--accent-hover);
 }
 
-.btn-secondary {
-  background-color: var(--secondary);
+/* Botón con contorno */
+.btn-outline {
+  background-color: transparent;
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.btn-outline:hover {
+  background-color: var(--accent);
   color: var(--light);
 }
 
-.btn-secondary:hover {
-  background-color: darken(var(--secondary), 10%); /* Usar una función si tu preprocesador lo permite o valor fijo */
-  filter: brightness(0.9); /* Alternativa CSS pura para oscurecer */
-}
-
-.btn-danger {
-    background-color: var(--danger);
-    color: var(--light);
-}
-
-.btn-danger:hover {
-    background-color: darken(var(--danger), 10%);
-    filter: brightness(0.9);
-}
-
-.btn-success {
-    background-color: var(--success);
-    color: var(--light);
-}
-
-.btn-success:hover {
-    background-color: darken(var(--success), 10%);
-    filter: brightness(0.9);
-}
-
+/* Tamaños de botones */
 .btn-sm {
-  padding: 0.4rem 0.8rem;
+  padding: 0.5rem 1rem;
   font-size: 0.9rem;
 }
 
+.btn-lg {
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+}
+
+/* Botones solo con icono */
+.icon-btn {
+  background: none;
+  border: none;
+  color: var(--light);
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: background-color 0.3s ease;
+}
+
+.icon-btn:hover {
+  background-color: var(--primary-light);
+}
+
+/* Grupos de formulario */
 .form-group {
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .form-group label {
   display: block;
   margin-bottom: 0.5rem;
-  font-weight: 500;
+  font-weight: bold;
   color: var(--text);
 }
 
+/* Estilos para inputs de texto, email, password, number, date, textareas y selects */
 .form-group input[type="text"],
 .form-group input[type="email"],
 .form-group input[type="password"],
+.form-group input[type="number"],
+.form-group input[type="date"],
 .form-group textarea,
 .form-group select {
   width: 100%;
-  padding: 0.8rem;
+  padding: 0.8rem 1rem;
   border: 1px solid var(--border-color);
-  border-radius: var(--border-radius-small);
-  background-color: var(--light);
+  border-radius: var(--border-radius);
+  background-color: var(--card-bg); /* Fondo del input */
   color: var(--text);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.form-group input:focus,
-.form-group textarea:focus,
-.form-group select:focus {
-  outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.2);
+  font-size: 1rem;
+  transition: border-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
 }
 
 .form-group textarea {
-  resize: vertical;
   min-height: 100px;
+  resize: vertical; /* Permite redimensionar verticalmente */
 }
 
-.form-container {
-    background-color: var(--card-background);
-    padding: 2.5rem;
-    border-radius: var(--border-radius);
-    box-shadow: var(--shadow);
-    max-width: 500px;
-    margin: 3rem auto;
+/* Estilos para inputs al estar en foco */
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  outline: none; /* Elimina el contorno de foco predeterminado del navegador */
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2); /* Sombra de foco */
 }
 
-.form-container h2 {
-    text-align: center;
-    margin-bottom: 2rem;
-    color: var(--primary-dark);
-}
-
+/* Contenedor para botones de acción en formularios (e.g., enviar, cancelar) */
 .form-actions {
-    text-align: center;
-    margin-top: 2rem;
+  display: flex;
+  justify-content: flex-end; /* Alinea los botones a la derecha */
+  gap: 1rem;
+  margin-top: 2rem;
 }
 
 /*==================================
   6. TARJETAS Y GRIDS
 ==================================*/
-.card {
-  background-color: var(--card-background);
-  border-radius: var(--border-radius);
-  box-shadow: var(--shadow);
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+/* Sección general para contenido destacado o cuadrículas */
+.highlight-section {
+  padding: 4rem 0; /* Padding vertical para la sección */
 }
 
-.card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem;
-}
-
-/*==================================
-  7. ALERTAS Y NOTIFICACIONES
-==================================*/
-.alerta {
-  padding: 1rem 1.5rem;
-  margin: 1.5rem auto;
-  border-radius: var(--border-radius-small);
-  font-weight: 500;
-  max-width: 800px;
-  text-align: center;
-  opacity: 1;
-  transition: opacity 0.5s ease-out;
-}
-
-.alerta-success {
-  background-color: rgba(40, 167, 69, 0.1);
-  color: var(--success);
-  border: 1px solid var(--success);
-}
-
-.alerta-error {
-  background-color: rgba(220, 53, 69, 0.1);
-  color: var(--danger);
-  border: 1px solid var(--danger);
-}
-
-.alerta-info {
-  background-color: rgba(23, 162, 184, 0.1);
-  color: var(--info);
-  border: 1px solid var(--info);
-}
-
-.alerta-warning {
-    background-color: rgba(255, 193, 7, 0.1);
-    color: var(--warning);
-    border: 1px solid var(--warning);
-}
-
-/*==================================
-  8. SECCIÓN DE LITERATURA Y CÓMICS
-==================================*/
-.categorias-header {
+/* Estilos comunes para títulos de sección */
+.highlight-section h2,
+.categorias-section h2,
+.comunidad-section h2,
+.cta-section h2 {
   text-align: center;
   margin-bottom: 3rem;
+  position: relative;
+  display: inline-block; /* Para que la línea debajo se centre con el texto */
+  padding-bottom: 0.5rem; /* Espacio para la línea */
+}
+
+/* Línea decorativa debajo de los títulos de sección */
+.highlight-section h2::after,
+.categorias-section h2::after,
+.comunidad-section h2::after,
+.cta-section h2::after {
+  content: '';
+  position: absolute;
+  left: 50%; /* Centra la línea */
+  transform: translateX(-50%); /* Ajuste fino para centrar */
+  bottom: 0;
+  width: 80px; /* Ancho de la línea */
+  height: 3px;
+  background-color: var(--accent);
+  border-radius: 2px;
+}
+
+/* Grid para mostrar obras literarias o cómics */
+.literatura-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Columnas responsivas */
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+/* Tarjeta individual de literatura o cómic */
+.literatura-card {
+  background-color: var(--card-bg-dark); /* Fondo oscuro para tarjetas */
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column; /* Apila el contenido verticalmente */
+  transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+}
+
+.literatura-card:hover {
+  transform: translateY(-5px); /* Efecto flotante al pasar el ratón */
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+}
+
+.literatura-card-img-container {
+  width: 100%;
+  height: 250px; /* Altura fija para la imagen de portada */
+  overflow: hidden;
+  position: relative;
+}
+
+.literatura-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Recorta la imagen para que llene el espacio sin distorsionarse */
+  display: block;
+}
+
+.literatura-card-content {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1; /* Permite que el contenido se estire para llenar el espacio vertical */
+}
+
+.literatura-card h3 {
+  font-family: var(--font-family-serif);
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: var(--light); /* Título de la tarjeta claro */
+}
+
+.literatura-card .autor,
+.literatura-card .categoria {
+  font-size: 0.9rem;
+  color: var(--text-light); /* Texto auxiliar claro */
+  margin-bottom: 0.5rem;
+}
+
+.literatura-card .descripcion {
+  font-size: 0.95rem;
+  color: var(--text-light);
+  line-height: 1.5;
+  margin-bottom: 1rem;
+  flex-grow: 1; /* Permite que la descripción ocupe el espacio disponible */
+}
+
+.literatura-card .btn {
+  margin-top: auto; /* Empuja el botón al final de la tarjeta */
+  width: fit-content; /* El botón solo ocupa el ancho de su contenido */
+}
+
+/* Grid y estilos para la sección de categorías */
+.categorias-section {
+  padding: 4rem 0;
+  margin-bottom: 4rem;
+  background-image: url('../includes/img/categories-bg.jpg'); /* Ejemplo: ruta de la imagen de fondo para categorías */
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed; /* Opcional: para efecto parallax */
+  color: var(--light); /* Texto claro para contrastar con el fondo */
+  position: relative; /* Necesario para el overlay */
+  z-index: 1; /* Asegura que el contenido esté por encima del overlay */
+}
+
+/* Overlay para la sección de categorías */
+.categorias-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4); /* Overlay semitransparente negro */
+    z-index: -1; /* Coloca el overlay detrás del contenido */
+}
+
+.categorias-section h2 {
+  color: var(--light); /* Asegura que el título sea claro */
+}
+
+.categorias-section h2::after {
+  background-color: var(--accent); /* Color de la línea de acento */
 }
 
 .categorias-description {
   font-size: 1.1rem;
   color: var(--text-light);
   max-width: 700px;
-  margin: 0 auto;
-}
-
-.categorias-section {
-  margin-bottom: 4rem;
-}
-
-.categorias-section h2 {
+  margin: 0 auto 3rem auto; /* Añadido margen inferior */
   position: relative;
-  display: inline-block;
-  padding-bottom: 0.5rem;
+  z-index: 2;
 }
 
-.categorias-section h2::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 100%;
-  height: 2px;
-  background-color: var(--accent);
+.categorias-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* Ajustado para más columnas si cabe */
+  gap: 1.5rem;
+  position: relative;
+  z-index: 2;
 }
 
+/* Tarjeta individual de categoría */
 .categoria-card {
+  background-color: var(--card-bg-dark);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  overflow: hidden;
   text-align: center;
+  transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease, background-color var(--transition-speed) ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Centra el contenido verticalmente */
+  align-items: center; /* Centra el contenido horizontalmente */
+  padding: 1.5rem;
+  height: 150px; /* Altura fija para las tarjetas de categoría */
 }
 
-.categoria-card img {
-  width: 100%;
-  height: 200px; /* Altura fija para las imágenes de categoría */
-  object-fit: cover;
-  border-radius: var(--border-radius-small);
-  margin-bottom: 1rem;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+.categoria-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+  background-color: var(--primary-light); /* Cambio de color al pasar el ratón */
 }
 
-.categoria-card h3 {
-  font-size: 1.3rem;
+.categoria-card-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.categoria-card-content .fas {
+  font-size: 3rem;
+  color: var(--accent);
   margin-bottom: 0.5rem;
 }
 
-.categoria-card p {
+.categoria-card-content h3 {
+  font-size: 1.2rem;
+  color: var(--light);
+  margin-bottom: 0;
+}
+
+/* Sección de Comunidad (vista previa) */
+.comunidad-section {
+  padding: 4rem 0;
+}
+
+.comunidad-preview {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+/* Tarjeta individual de característica de comunidad */
+.comunidad-card {
+  background-color: var(--card-bg); /* Fondo claro para tarjetas de comunidad */
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  padding: 2rem;
+  display: flex;
+  align-items: flex-start; /* Alinea los ítems al inicio para que el icono no centre el texto */
+  gap: 1.5rem;
+  text-align: left;
+  transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+}
+
+.comunidad-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.comunidad-icon {
+  font-size: 3.5rem;
+  color: var(--accent);
+  flex-shrink: 0; /* Evita que el icono se encoja si hay mucho texto */
+}
+
+.comunidad-content h3 {
+  font-size: 1.7rem;
+  margin-bottom: 0.5rem;
+  color: var(--text);
+}
+
+.comunidad-content p {
+  font-size: 1rem;
   color: var(--text-light);
-  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
 }
 
-.categoria-card .btn {
-  margin-top: 1rem;
+.comunidad-content .btn {
+  width: auto;
 }
 
-/* Pagina de Categorias */
-.filter-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
-    background-color: var(--card-background);
-    padding: 1rem 1.5rem;
-    border-radius: var(--border-radius);
-    box-shadow: var(--shadow);
+/* Sección de Llamada a la Acción */
+.cta-section {
+  background-color: var(--primary-dark);
+  color: var(--light);
+  padding: 5rem 0;
+  text-align: center;
 }
 
-.filter-bar .sort-options label {
-    margin-right: 0.5rem;
-    color: var(--text-light);
+.cta-content {
+  max-width: 800px;
+  margin: 0 auto;
 }
 
-.filter-bar .sort-options select {
-    padding: 0.5rem 0.8rem;
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius-small);
-    background-color: var(--light);
-    color: var(--text);
+.cta-content h2 {
+  color: var(--light);
+  margin-bottom: 1.5rem;
 }
 
-.filter-bar .search-box {
-    position: relative;
+.cta-content p {
+  font-size: 1.2rem;
+  margin-bottom: 3rem;
+  color: var(--text-light);
 }
 
-.filter-bar .search-box input {
-    padding: 0.5rem 0.8rem 0.5rem 2.5rem; /* Espacio para el icono */
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius-small);
-    background-color: var(--light);
-    color: var(--text);
+.cta-buttons .btn {
+  margin: 0 1rem;
 }
 
-.filter-bar .search-box .fas.fa-search {
-    position: absolute;
-    left: 0.8rem;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--text-light);
-}
-
-/* Listado de items (libros, cómics) */
-.item-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 2rem;
-}
-
-.item-card {
-    background-color: var(--card-background);
-    border-radius: var(--border-radius);
-    box-shadow: var(--shadow);
-    padding: 1rem;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    transition: transform 0.2s ease;
-}
-
-.item-card:hover {
-    transform: translateY(-5px);
-}
-
-.item-card img {
-    max-width: 100%;
-    height: 250px; /* Altura fija para las portadas */
-    object-fit: cover;
-    border-radius: var(--border-radius-small);
-    margin-bottom: 1rem;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.item-card h3 {
-    font-size: 1.1rem;
-    margin-bottom: 0.5rem;
-    color: var(--primary-dark);
-}
-
-.item-card p.author {
-    font-size: 0.9rem;
-    color: var(--text-light);
-    margin-bottom: 1rem;
-}
-
-.item-card .btn {
-    width: 100%;
-    font-size: 0.9rem;
-}
-
-/* Paginacion */
-.pagination {
-    display: flex;
-    justify-content: center;
-    margin-top: 3rem;
-    gap: 0.5rem;
-}
-
-.pagination a, .pagination span {
-    display: inline-block;
-    padding: 0.6rem 1rem;
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius-small);
-    color: var(--text);
-    background-color: var(--card-background);
-    transition: background-color 0.2s ease, color 0.2s ease;
-}
-
-.pagination a:hover {
-    background-color: var(--primary-light);
-    color: var(--light);
-}
-
-.pagination span.current {
-    background-color: var(--accent);
-    color: var(--light);
-    border-color: var(--accent);
-    font-weight: bold;
-}
-
-/* Detalle del Producto/Item */
-.item-detail-container {
-    display: flex;
-    gap: 3rem;
-    margin-top: 3rem;
-    background-color: var(--card-background);
-    padding: 2rem;
-    border-radius: var(--border-radius);
-    box-shadow: var(--shadow);
-}
-
-.item-detail-image {
-    flex-shrink: 0;
-    width: 300px;
-    height: 450px;
-    border-radius: var(--border-radius);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    object-fit: cover;
-}
-
-.item-detail-info {
-    flex-grow: 1;
-}
-
-.item-detail-info h1 {
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
-    color: var(--primary-dark);
-}
-
-.item-detail-info p {
-    margin-bottom: 0.8rem;
-    line-height: 1.8;
-}
-
-.item-detail-info p strong {
-    color: var(--text);
-}
-
-.item-detail-info .item-meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem 2rem;
-    margin-bottom: 1.5rem;
-    font-size: 0.95rem;
-    color: var(--text-light);
-}
-
-.item-detail-info .item-meta div span {
-    font-weight: bold;
-    color: var(--text);
-}
-
-.item-detail-actions {
-    margin-top: 2rem;
-    display: flex;
-    gap: 1rem;
-}
 
 /*==================================
-  9. FOROS Y DISCUSIONES
+  7. ALERTAS Y NOTIFICACIONES
 ==================================*/
-.foro-container {
-    background-color: var(--card-background);
-    padding: 2rem;
-    border-radius: var(--border-radius);
-    box-shadow: var(--shadow);
-    margin-top: 3rem;
+.alerta {
+  padding: 1rem;
+  border-radius: var(--border-radius);
+  margin-bottom: 1.5rem;
+  text-align: center;
+  font-weight: bold;
+  transition: opacity 0.5s ease-out, display 0.5s ease-out; /* Transición para ocultar suavemente */
+  opacity: 1; /* Por defecto visible */
 }
 
-.foro-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 1rem;
-}
+.alerta-success { background-color: var(--success); color: var(--light); }
+.alerta-danger { background-color: var(--danger); color: var(--light); }
+.alerta-info { background-color: var(--info); color: var(--light); }
+.alerta-warning { background-color: var(--warning); color: var(--dark); }
 
-.foro-header h1 {
-    font-size: 2rem;
-    color: var(--primary-dark);
-}
-
-.thread-list .thread-item {
-    padding: 1rem 0;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.thread-list .thread-item:last-child {
-    border-bottom: none;
-}
-
-.thread-item h3 {
-    font-size: 1.3rem;
-    margin-bottom: 0.5rem;
-}
-
-.thread-item h3 a {
-    color: var(--text);
-}
-
-.thread-item h3 a:hover {
-    color: var(--accent);
-}
-
-.thread-meta {
-    font-size: 0.9rem;
-    color: var(--text-light);
-    margin-bottom: 0.5rem;
-}
-
-.thread-meta span {
-    margin-right: 1rem;
-}
-
-.thread-meta .author {
-    font-weight: bold;
-    color: var(--text);
-}
-
-.thread-actions {
-    margin-top: 0.8rem;
-}
-
-.thread-actions a {
-    font-size: 0.9rem;
-    margin-right: 1rem;
-    color: var(--secondary);
-}
-
-.thread-actions a:hover {
-    color: var(--accent);
-}
-
-/* Detalle del Hilo */
-.thread-detail-container {
-    background-color: var(--card-background);
-    padding: 2rem;
-    border-radius: var(--border-radius);
-    box-shadow: var(--shadow);
-    margin-top: 3rem;
-}
-
-.thread-title {
-    font-size: 2.2rem;
-    margin-bottom: 1.5rem;
-    color: var(--primary-dark);
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 1rem;
-}
-
-.post-list .post-item {
-    background-color: var(--background); /* Fondo ligeramente diferente para posts */
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius);
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-    display: flex;
-    gap: 1.5rem;
-}
-
-.post-author-info {
-    flex-shrink: 0;
-    text-align: center;
-    width: 120px;
-}
-
-.post-author-info img {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin-bottom: 0.5rem;
-    border: 2px solid var(--accent);
-}
-
-.post-author-info .username {
-    font-weight: bold;
-    color: var(--text);
-    margin-bottom: 0.2rem;
-}
-
-.post-author-info .role {
-    font-size: 0.85rem;
-    color: var(--text-light);
-}
-
-.post-content-area {
-    flex-grow: 1;
-}
-
-.post-meta {
-    font-size: 0.85rem;
-    color: var(--text-light);
-    margin-bottom: 1rem;
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 0.5rem;
-}
-
-.post-body {
-    line-height: 1.7;
-    color: var(--text);
-    margin-bottom: 1.5rem;
-}
-
-.post-actions {
-    text-align: right;
-}
-
-.post-actions .btn-sm {
-    margin-left: 0.5rem;
-}
-
-.reply-form-container {
-    background-color: var(--card-background);
-    padding: 2rem;
-    border-radius: var(--border-radius);
-    box-shadow: var(--shadow);
-    margin-top: 2rem;
-}
-
-.reply-form-container h3 {
-    margin-bottom: 1.5rem;
-    color: var(--primary-dark);
-}
 
 /*==================================
-  10. GALERÍA DE ARTE (Ejemplo)
+  8. PÁGINAS ESPECÍFICAS
 ==================================*/
-.gallery-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1.5rem;
-    margin-top: 3rem;
+
+/* 8.1. Sección de Literatura y Cómics */
+/* Los estilos generales para las tarjetas de literatura y el grid ya están definidos
+   en la sección 6 (TARJETAS Y GRIDS) bajo las clases .literatura-grid y .literatura-card.
+   Añade aquí estilos específicos si hay elementos únicos de esta página. */
+
+
+/* 8.2. Foros y Discusiones */
+/* Los estilos para las tarjetas de comunidad (que pueden usarse para previsualizar foros)
+   ya están definidos en la sección 6 (TARJETAS Y GRIDS) bajo la clase .comunidad-card.
+   Añade aquí estilos específicos para la estructura de foros si es necesario. */
+
+
+/* 8.3. Galería de Arte */
+/* Similar a los foros, los elementos generales pueden usar .comunidad-card o .literatura-card
+   si son aplicables. Añade aquí estilos específicos para la galería de arte. */
+
+
+/* 8.4. Páginas Legales (Política de privacidad, términos de servicio, etc.) */
+.legal-content {
+  padding: 4rem 0;
 }
 
-.gallery-item {
-    background-color: var(--card-background);
-    border-radius: var(--border-radius);
-    box-shadow: var(--shadow);
-    overflow: hidden;
-    transition: transform 0.2s ease;
+.legal-content h1,
+.legal-content h2 {
+  color: var(--primary-dark);
+  margin-bottom: 1.5rem;
 }
 
-.gallery-item:hover {
-    transform: translateY(-5px);
+.legal-content p {
+  margin-bottom: 1rem;
 }
 
-.gallery-item img {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
-    display: block;
+.legal-content ul {
+  list-style-type: disc;
+  margin-left: 1.5rem;
+  margin-bottom: 1.5rem;
 }
 
-.gallery-info {
-    padding: 1rem;
+.legal-content ul li {
+  margin-bottom: 0.5rem;
 }
 
-.gallery-info h4 {
-    font-size: 1.1rem;
-    margin-bottom: 0.5rem;
-    color: var(--primary-dark);
+/* Modo oscuro para páginas legales */
+[data-theme="dark"] .legal-content h1,
+[data-theme="dark"] .legal-content h2 {
+  color: var(--light);
 }
 
-.gallery-info p {
-    font-size: 0.9rem;
-    color: var(--text-light);
-}
-
-/*==================================
-  11. PÁGINAS LEGALES (Ej. Política de Privacidad)
-==================================*/
-.legal-page-content {
-    background-color: var(--card-background);
-    padding: 2.5rem;
-    border-radius: var(--border-radius);
-    box-shadow: var(--shadow);
-    margin: 3rem auto;
-    max-width: 900px;
-    line-height: 1.8;
-}
-
-.legal-page-content h1 {
-    text-align: center;
-    margin-bottom: 2rem;
-    color: var(--primary-dark);
-}
-
-.legal-page-content h2 {
-    margin-top: 2rem;
-    margin-bottom: 1rem;
-    color: var(--accent);
-}
-
-.legal-page-content ul {
-    list-style: disc;
-    margin-left: 1.5rem;
-    margin-bottom: 1rem;
-}
-
-.legal-page-content ol {
-    list-style: decimal;
-    margin-left: 1.5rem;
-    margin-bottom: 1rem;
+[data-theme="dark"] .legal-content p,
+[data-theme="dark"] .legal-content li {
+  color: var(--text);
 }
 
 
 /*==================================
-  12. FOOTER
+  9. FOOTER
 ==================================*/
-.main-footer {
+.footer {
   background-color: var(--primary-dark);
   color: var(--text-light);
   padding: 3rem 0;
-  margin-top: 4rem;
+  text-align: center;
+  font-size: 0.9rem;
+  border-top: 1px solid var(--primary-light);
+  margin-top: auto; /* Empuja el footer hacia abajo si el contenido es corto */
 }
 
 .footer-content {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
+  flex-wrap: wrap; /* Permite que las columnas se envuelvan en pantallas pequeñas */
+  justify-content: space-around;
   gap: 2rem;
+  margin-bottom: 2rem;
 }
 
 .footer-section {
-  flex: 1;
-  min-width: 200px;
+  flex: 1 1 auto; /* Flexibilidad para las columnas */
+  min-width: 200px; /* Ancho mínimo para cada sección del footer */
+  max-width: 300px;
+  text-align: left;
 }
 
-.footer-section h3 {
+.footer-section h4 {
   color: var(--light);
-  margin-bottom: 1.5rem;
-  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
 }
 
 .footer-section p {
-  font-size: 0.9rem;
-  line-height: 1.7;
+  margin-bottom: 0.5rem;
 }
 
 .footer-section ul li {
@@ -1185,7 +985,6 @@ img {
 
 .footer-section ul li a {
   color: var(--text-light);
-  font-size: 0.9rem;
 }
 
 .footer-section ul li a:hover {
@@ -1199,9 +998,8 @@ img {
 }
 
 .social-links a {
-  color: var(--light);
   font-size: 1.5rem;
-  transition: color 0.2s ease;
+  color: var(--text-light);
 }
 
 .social-links a:hover {
@@ -1209,263 +1007,200 @@ img {
 }
 
 .footer-bottom {
-  text-align: center;
-  margin-top: 3rem;
-  padding-top: 2rem;
   border-top: 1px solid var(--primary-light);
-  font-size: 0.85rem;
-  color: var(--secondary);
+  padding-top: 1.5rem;
 }
+
 
 /*==================================
-  13. VALIDACIÓN DE CONTRASEÑAS
+  10. VALIDACIÓN DE CONTRASEÑAS
 ==================================*/
 .password-requirements {
-  margin-top: 1rem;
-  font-size: 0.85rem;
-  color: var(--text-light);
-  background-color: var(--background);
-  border: 1px solid var(--border-color);
-  padding: 0.8rem;
-  border-radius: var(--border-radius-small);
-}
-
-.password-requirements ul {
   list-style: none;
   padding: 0;
-  margin: 0;
+  margin-top: 0.5rem;
+  font-size: 0.9em;
+  color: var(--text-light);
 }
 
 .password-requirements li {
+  display: flex;
+  align-items: center;
   margin-bottom: 0.3rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
 }
 
-.password-requirements li.valid {
+.password-requirements li.valid .fas {
   color: var(--success);
 }
 
-.password-requirements li.invalid {
+.password-requirements li.invalid .fas {
   color: var(--danger);
 }
 
-.password-requirements li .icon {
-  width: 16px;
-  height: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.password-requirements li .fas {
+  margin-right: 0.5rem;
+  width: 15px; /* Asegura un ancho fijo para los iconos */
+  text-align: center;
 }
 
-.password-requirements li .icon.valid i {
-  color: var(--success);
-}
-
-.password-requirements li .icon.invalid i {
-  color: var(--danger);
-}
 
 /*==================================
-  14. MEDIA QUERIES Y RESPONSIVE
+  11. MEDIA QUERIES Y RESPONSIVE
 ==================================*/
 
-/* Tablet */
-@media (max-width: 992px) {
-  .main-header .nav-left {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
+/* Tablets y Escritorio pequeño (hasta 1024px) */
+@media (max-width: 1024px) {
+  .nav-links {
+    gap: 1rem; /* Reduce el espacio entre enlaces de navegación */
   }
 
-  .main-header nav ul {
+  .literatura-grid {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Columnas un poco más pequeñas */
+  }
+
+  .hero-content h1 {
+    font-size: 3rem; /* Tamaño de título de hero ligeramente más pequeño */
+  }
+}
+
+/* Móviles (hasta 768px) */
+@media (max-width: 768px) {
+  :root {
+      --header-height: 60px; /* Altura más pequeña para el header en móviles */
+  }
+
+  /* Oculta el menú de navegación por defecto y lo convierte en vertical */
+  .nav-links {
+    display: none;
     flex-direction: column;
-    gap: 0;
-    width: 100%;
-    background-color: var(--primary);
     position: absolute;
-    top: 100%;
+    top: var(--header-height); /* Posiciona debajo del header */
     left: 0;
-    right: 0;
-    box-shadow: var(--shadow);
-    z-index: 90;
-    max-height: 0; /* Oculta el menú */
+    width: 100%;
+    background-color: var(--primary-dark);
+    box-shadow: var(--box-shadow-dark);
+    padding: 1rem 0;
+    max-height: 0; /* Para el efecto de despliegue */
     overflow: hidden;
     transition: max-height 0.3s ease-out;
   }
 
-  .main-header nav.active ul {
-    max-height: 500px; /* Suficiente para mostrar todo el menú */
+  .nav-links.active {
+    display: flex; /* Muestra el menú cuando está activo */
+    max-height: 300px; /* Ajusta esta altura según el contenido de tu menú */
   }
 
-  .main-header nav ul li {
-    width: 100%;
-    border-bottom: 1px solid var(--primary-light);
+  .nav-links li {
+    text-align: center;
+    padding: 0.5rem 0;
   }
 
-  .main-header nav ul li:last-child {
-    border-bottom: none;
-  }
-
-  .main-header nav ul li a {
-    display: block;
-    padding: 0.8rem 1rem;
-  }
-
-  .main-header .dropdown-content {
-    position: static; /* Desactiva la posición absoluta en móvil */
-    box-shadow: none;
-    border-top: 1px solid var(--border-color);
-    border-radius: 0;
-    padding: 0;
-    margin-top: 0.5rem;
-    opacity: 1; /* Siempre visible si el padre dropdown está activo */
-    transform: none; /* Sin transformación */
-  }
-
-  .main-header .dropdown-inner {
-    flex-direction: column;
-    gap: 1rem;
-    padding: 0.5rem 1rem;
-  }
-
-  .main-header .dropdown-section h3 {
-    padding-top: 0.5rem;
-  }
-
-  .main-header .dropdown-section ul li a {
-    padding: 0.2rem 0;
-  }
-
+  /* Muestra el botón de toggle para el menú móvil */
   .mobile-menu-toggle {
-    display: block; /* Muestra el botón de menú móvil */
+    display: block;
   }
 
-  .nav-right {
-    width: 100%; /* Ocupa todo el ancho en móviles */
-    justify-content: flex-end;
-    margin-top: 1rem;
+  .action-buttons {
+    order: 1; /* Mueve los botones de acción al principio para que el toggle quede a la derecha */
+    gap: 0.5rem;
   }
 
-  .action-icons {
-    order: 2; /* Para que aparezcan a la derecha del todo */
+  /* Ajustes para los dropdowns en móviles (se centran y ocupan casi todo el ancho) */
+  .user-dropdown-content,
+  .notification-dropdown-content,
+  .language-dropdown-content {
+    min-width: unset; /* Elimina el ancho mínimo fijo */
+    width: calc(100% - 2rem); /* Ancho del 100% menos el padding del contenedor */
+    left: 50%;
+    right: auto; /* Desactiva el right para que left 50% funcione */
+    transform: translateX(-50%) translateY(-10px); /* Centra horizontalmente */
+  }
+  .dropdown.active .user-dropdown-content,
+  .dropdown.active .notification-dropdown-content,
+  .dropdown.active .language-dropdown-content {
+    transform: translateX(-50%) translateY(0); /* Mueve a su posición final */
   }
 
-  .user-actions {
-    order: 1; /* Para que aparezcan a la izquierda de los iconos */
-    flex-grow: 1; /* Ocupa el espacio disponible */
-    justify-content: center; /* Centra los botones de login/registro */
-    margin-bottom: 1rem;
+  .comunidad-preview {
+    grid-template-columns: 1fr; /* Una sola columna para las tarjetas de comunidad */
   }
 
-  .filter-bar {
-    flex-direction: column;
-    align-items: stretch;
+  /* Ajustes para la Hero Section en móviles */
+  .hero-section {
+    height: 450px; /* Altura más pequeña para móviles */
+  }
+
+  .hero-content h1 {
+    font-size: 2.5rem;
+  }
+
+  .hero-subtitle {
+    font-size: 1.2rem;
+  }
+
+  .hero-buttons {
+    display: flex;
+    flex-direction: column; /* Botones apilados verticalmente */
     gap: 1rem;
-  }
-
-  .filter-bar .search-box,
-  .filter-bar .sort-options {
-    width: 100%;
-  }
-
-  .item-detail-container {
-    flex-direction: column;
     align-items: center;
-    text-align: center;
   }
 
-  .item-detail-image {
-    width: 80%;
+  .hero-buttons .btn {
+    width: 80%; /* Botones de hero ocupan más espacio en móviles */
     max-width: 300px;
-    height: auto;
   }
 
-  .item-detail-actions {
-    flex-direction: column;
-    gap: 0.8rem;
-    width: 100%;
-  }
-
-  .item-detail-actions .btn {
-    width: 100%;
-  }
-
-  .post-item {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
-
-  .post-author-info {
-    width: 100%;
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 1rem;
-    margin-bottom: 1rem;
-  }
-
-  .post-author-info img {
-    margin: 0 auto 0.5rem auto;
-  }
-
-  .post-content-area {
-    text-align: left;
-  }
-
+  /* Ajustes para el footer en móviles */
   .footer-content {
-    flex-direction: column;
-    text-align: center;
+    flex-direction: column; /* Las secciones del footer se apilan */
+    align-items: center;
   }
 
   .footer-section {
-    min-width: unset;
+    text-align: center;
+    max-width: unset;
     width: 100%;
   }
 
-  .footer-section ul {
-    padding-left: 0;
-  }
-
-  .footer-section ul li {
-    text-align: center;
-  }
-
   .social-links {
-    justify-content: center;
+    justify-content: center; /* Centra los iconos sociales */
   }
 }
 
-/* Móviles pequeños */
+/* Móviles pequeños (hasta 480px) */
 @media (max-width: 480px) {
   .action-icons {
     gap: 0.25rem;
   }
 
+  /* Asegura que los dropdowns sigan siendo responsivos */
   .dropdown-inner {
     width: 100%;
     padding: 0.5rem;
   }
 
-  /* Ajustes para el dropdown de usuario y notificaciones en móviles */
   .user-dropdown-content,
-  .notification-dropdown-content {
-    width: calc(100% - 2rem); /* Ancho del 100% menos el padding del contenedor */
-    left: 50%;
-    right: auto; /* Desactivar right para que left 50% funcione */
-    transform: translateX(-50%) translateY(-10px); /* Centra horizontalmente */
-  }
-  .dropdown.active .user-dropdown-content,
-  .dropdown.active .notification-dropdown-content {
-    transform: translateX(-50%) translateY(0);
+  .notification-dropdown-content,
+  .language-dropdown-content {
+    width: 100%;
+    left: 0;
+    right: 0;
+    transform: none; /* Desactiva la transformación para un ajuste más simple */
   }
 
+  .dropdown.active .user-dropdown-content,
+  .dropdown.active .notification-dropdown-content,
+  .dropdown.active .language-dropdown-content {
+      transform: none;
+  }
+
+  /* Las tarjetas de comunidad ya estaban en una columna, pero se reitera */
   .comunidad-preview {
     grid-template-columns: 1fr;
   }
 }
 
-/* Estilos para la página de categorías */
+/* Estilos adicionales para la página de categorías (si aplica una plantilla diferente) */
 .categorias-header {
   text-align: center;
   margin-bottom: 3rem;
@@ -1478,49 +1213,35 @@ img {
   margin: 0 auto;
 }
 
-.categorias-section {
-  margin-bottom: 4rem;
+/* Si tienes un grid de géneros de literatura (diferente al de obras) */
+.literatura-genres-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
 }
 
-.categorias-section h2 {
-  position: relative;
-  display: inline-block;
-  padding-bottom: 0.5rem;
-}
-
-.categorias-section h2::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 100%;
-  height: 2px;
-  background-color: var(--accent);
-}
-
-.categoria-card {
+.genre-card {
+  background-color: var(--card-bg-dark);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  padding: 1.5rem;
   text-align: center;
+  transition: transform var(--transition-speed) ease, background-color var(--transition-speed) ease;
 }
 
-.categoria-card img {
-  width: 100%;
-  height: 200px; /* Altura fija para las imágenes de categoría */
-  object-fit: cover;
-  border-radius: var(--border-radius-small);
+.genre-card:hover {
+  transform: translateY(-5px);
+  background-color: var(--primary-light);
+}
+
+.genre-card .genre-icon {
+  font-size: 3rem;
+  color: var(--accent);
   margin-bottom: 1rem;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.categoria-card h3 {
+.genre-card h3 {
   font-size: 1.3rem;
-  margin-bottom: 0.5rem;
-}
-
-.categoria-card p {
-  color: var(--text-light);
-  font-size: 0.9rem;
-}
-
-.categoria-card .btn {
-  margin-top: 1rem;
+  color: var(--light);
+  margin-bottom: 0;
 }
