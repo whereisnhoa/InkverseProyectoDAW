@@ -1,106 +1,100 @@
+
 <?php
-/**
- * Procesamiento del formulario de registro
- */
+session_start();
 
-$ruta_base = $_SERVER['DOCUMENT_ROOT'] . '/proyecto';
-include_once($ruta_base . '/includes/conexion.php');
-include_once($ruta_base . '/includes/funciones.php');
+// Determinar la ruta base del proyecto de forma más robusta
+$document_root = $_SERVER['DOCUMENT_ROOT'];
+$current_file = str_replace('\\', '/', __FILE__);
+$document_root = str_replace('\\', '/', $document_root);
 
-// Verificar si se envió el formulario
-if ($_SERVER["REQUEST_METHOD"] != "POST") {
-    redirigirConMensaje(BASE_URL . '/public/register.php', 'Acceso no válido.', 'error');
+// Encontrar la posición de 'controllers' en la ruta actual
+$controllers_pos = strrpos($current_file, '/controllers/');
+if ($controllers_pos !== false) {
+    $project_path = substr($current_file, 0, $controllers_pos);
+} else {
+    // Fallback: asumir que estamos en la carpeta controllers
+    $project_path = dirname(dirname(__FILE__));
+}
+
+// Calcular la ruta relativa para BASE_URL
+$relative_path = str_replace($document_root, '', $project_path);
+
+// Definir BASE_URL si no está definido
+if (!defined('BASE_URL')) {
+    define('BASE_URL', $relative_path);
+}
+
+// Incluir archivos necesarios con rutas absolutas
+$conexion_file = $project_path . '/includes/conexion.php';
+
+// Verificar que el archivo de conexión existe antes de incluirlo
+if (!file_exists($conexion_file)) {
+    die("Error: No se pudo encontrar el archivo de conexión en: " . $conexion_file);
+}
+
+require_once($conexion_file);
+
+// Función para limpiar datos
+function limpiarDato($dato) {
+    $dato = trim($dato);
+    $dato = stripslashes($dato);
+    $dato = htmlspecialchars($dato);
+    return $dato;
+}
+
+// Obtener y limpiar datos del formulario
+$nombre = isset($_POST['nombre']) ? limpiarDato($_POST['nombre']) : '';
+$usuario = isset($_POST['usuario']) ? limpiarDato($_POST['usuario']) : '';
+$email = isset($_POST['email']) ? limpiarDato($_POST['email']) : '';
+$fecha_nacimiento = isset($_POST['fecha_nacimiento']) ? limpiarDato($_POST['fecha_nacimiento']) : '';
+$password = isset($_POST['password']) ? $_POST['password'] : '';
+$confirm_password = isset($_POST['confirm_password']) ? $_POST['confirm_password'] : '';
+
+// Verificar que todos los campos requeridos estén presentes
+if (empty($nombre) || empty($usuario) || empty($email) || empty($fecha_nacimiento) || empty($password) || empty($confirm_password)) {
+    $_SESSION['mensaje'] = "Todos los campos son obligatorios.";
+    $_SESSION['tipo_mensaje'] = "error";
+    header("Location: " . BASE_URL . "/public/register.php");
     exit();
 }
 
-// variables de datos
-$nombre = limpiarDato($_POST['nombre']);
-$usuario = limpiarDato($_POST['usuario']);
-$email = limpiarDato($_POST['email']);
-$fecha_nacimiento = limpiarDato($_POST['fecha_nacimiento']);
-$password = $_POST['password'];
-$confirm_password = $_POST['confirm_password'];
-
-// Validar datos
-if (empty($nombre) || empty($usuario) || empty($email) || empty($fecha_nacimiento) || empty($password)) {
-    redirigirConMensaje(BASE_URL . '/public/register.php', 'Todos los campos son obligatorios.', 'error');
-    exit();
-}
-
-// Validar email
-if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    redirigirConMensaje(BASE_URL . '/public/register.php', 'El correo electrónico no es válido.', 'error');
-    exit();
-}
-
-// Validar fecha de nacimiento
-$fecha_actual = new DateTime();
-$fecha_nac = new DateTime($fecha_nacimiento);
-$edad = $fecha_actual->diff($fecha_nac)->y;
-
-if ($edad < 13) {
-    redirigirConMensaje(BASE_URL . '/public/register.php', 'Debes tener al menos 13 años para registrarte.', 'error');
-    exit();
-}
-
-// Validar que las contraseñas coincidan
+// Verificar que las contraseñas coincidan
 if ($password !== $confirm_password) {
-    redirigirConMensaje(BASE_URL . '/public/register.php', 'Las contraseñas no coinciden.', 'error');
+    $_SESSION['mensaje'] = "Las contraseñas no coinciden.";
+    $_SESSION['tipo_mensaje'] = "error";
+    header("Location: " . BASE_URL . "/public/register.php");
     exit();
 }
 
-// Validar requisitos de la contraseña
-$errores_password = [];
-
-// Verificar longitud mínima
-if (strlen($password) < 8) {
-    $errores_password[] = 'La contraseña debe tener al menos 8 caracteres.';
+// Validar formato de email
+if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    $_SESSION['mensaje'] = "El formato del correo electrónico no es válido.";
+    $_SESSION['tipo_mensaje'] = "error";
+    header("Location: " . BASE_URL . "/public/register.php");
+    exit();
 }
 
-// Verificar mayúsculas
-if (!preg_match('/[A-Z]/', $password)) {
-    $errores_password[] = 'La contraseña debe incluir al menos una letra mayúscula.';
-}
-
-// Verificar minúsculas
-if (!preg_match('/[a-z]/', $password)) {
-    $errores_password[] = 'La contraseña debe incluir al menos una letra minúscula.';
-}
-
-// Verificar números
-if (!preg_match('/[0-9]/', $password)) {
-    $errores_password[] = 'La contraseña debe incluir al menos un número.';
-}
-
-// Verificar caracteres especiales
-if (!preg_match('/[!@#$%^&*()_+\-=\[\]{};\':"\\|,.<>\/?]/', $password)) {
-    $errores_password[] = 'La contraseña debe incluir al menos un carácter especial (!@#$%^&*).';
-}
-
-// Si hay errores en la contraseña, redirigir con mensaje
-if (!empty($errores_password)) {
-    $mensaje_error = 'La contraseña no cumple con los requisitos de seguridad:<ul>';
-    foreach ($errores_password as $error) {
-        $mensaje_error .= '<li>' . $error . '</li>';
-    }
-    $mensaje_error .= '</ul>';
-    
-    $_SESSION['mensaje'] = $mensaje_error;
-    $_SESSION['tipo_mensaje'] = 'error';
+// Validar requisitos de contraseña
+$password_pattern = '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/';
+if (!preg_match($password_pattern, $password)) {
+    $_SESSION['mensaje'] = "La contraseña no cumple con los requisitos de seguridad.";
+    $_SESSION['tipo_mensaje'] = "error";
     header("Location: " . BASE_URL . "/public/register.php");
     exit();
 }
 
 // Verificar que se hayan aceptado los términos y condiciones
 if (!isset($_POST['acepta_terminos'])) {
-    redirigirConMensaje(BASE_URL . '/public/register.php', 'Debes aceptar los términos y condiciones para registrarte.', 'error');
+    $_SESSION['mensaje'] = "Debes aceptar los términos y condiciones para registrarte.";
+    $_SESSION['tipo_mensaje'] = "error";
+    header("Location: " . BASE_URL . "/public/register.php");
     exit();
 }
 
-// para encriptar las contraseñas y que no se garde tal cual en la base de datos
+// Encriptar contraseña
 $passwordHash = password_hash($password, PASSWORD_DEFAULT);
 
-// comprobar si el usuario o email ya existen
+// Comprobar si el usuario o email ya existen
 $sql_check = "SELECT * FROM usuarios WHERE email = ? OR usuario = ?";
 $stmt_check = $conexion->prepare($sql_check);
 $stmt_check->bind_param("ss", $email, $usuario);
@@ -108,23 +102,26 @@ $stmt_check->execute();
 $result = $stmt_check->get_result();
 
 if ($result->num_rows > 0) {
-    $usuario_existente = $result->fetch_assoc();
-    if ($usuario_existente['email'] === $email) {
-        redirigirConMensaje(BASE_URL . '/public/register.php', 'El correo electrónico ya está en uso.', 'error');
-    } else {
-        redirigirConMensaje(BASE_URL . '/public/register.php', 'El nombre de usuario ya está en uso.', 'error');
-    }
+    $_SESSION['mensaje'] = "El correo o el nombre de usuario ya están en uso.";
+    $_SESSION['tipo_mensaje'] = "error";
+    header("Location: " . BASE_URL . "/public/register.php");
     exit();
 } else {
     // Insertar nuevo usuario
-    $sql = "INSERT INTO usuarios (nombre, usuario, email, fecha_nacimiento, password) VALUES (?, ?, ?, ?, ?)";
+    $sql = "INSERT INTO usuarios (usuario, email, fecha_nacimiento, password) VALUES (?, ?, ?, ?)";
     $stmt = $conexion->prepare($sql);
-    $stmt->bind_param("sssss", $nombre, $usuario, $email, $fecha_nacimiento, $passwordHash);
+    $stmt->bind_param("ssss", $usuario, $email, $fecha_nacimiento, $passwordHash);
 
     if ($stmt->execute()) {
-        redirigirConMensaje(BASE_URL . '/public/login.php', 'Registro completado con éxito. Ahora puedes iniciar sesión.', 'exito');
+        $_SESSION['mensaje'] = "Registro exitoso. Ahora puedes iniciar sesión.";
+        $_SESSION['tipo_mensaje'] = "exito";
+        header("Location: " . BASE_URL . "/public/login.php");
+        exit();
     } else {
-        redirigirConMensaje(BASE_URL . '/public/register.php', 'Error al registrar: ' . $stmt->error, 'error');
+        $_SESSION['mensaje'] = "Error al registrar: " . $stmt->error;
+        $_SESSION['tipo_mensaje'] = "error";
+        header("Location: " . BASE_URL . "/public/register.php");
+        exit();
     }
 }
 ?>
