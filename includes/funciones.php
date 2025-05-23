@@ -1,81 +1,55 @@
 <?php
 /**
- * Funciones útiles para el proyecto
- * Este archivo contiene funciones auxiliares utilizadas en todo el sitio
+ * Funciones de utilidad para el proyecto
  */
 
-// Iniciar sesión si aún no está iniciada
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
+// Incluir configuración si no está incluida
+if (!defined('BASE_URL')) {
+    require_once(__DIR__ . '/config.php');
 }
 
-// Mostrar mensajes almacenados en sesión (éxito o error)
-function mostrarMensaje() {
-    if (isset($_SESSION['mensaje'])) {
-        $tipo = isset($_SESSION['tipo_mensaje']) ? $_SESSION['tipo_mensaje'] : 'info';
-        echo "<div class='alerta alerta-{$tipo}'>" . $_SESSION['mensaje'] . "</div>";
-        unset($_SESSION['mensaje']);
-        unset($_SESSION['tipo_mensaje']);
-    }
-}
-
-// Redirigir con mensaje
-function redirigirConMensaje($url, $mensaje, $tipo = 'info') {
-    $_SESSION['mensaje'] = $mensaje;
-    $_SESSION['tipo_mensaje'] = $tipo;
-    header("Location: $url");
-    exit;
-}
-
-// Validar edad mínima
-function esMayorEdad($fechaNacimiento) {
-    $hoy = new DateTime();
-    $fecha = new DateTime($fechaNacimiento);
-    $edad = $hoy->diff($fecha)->y;
-    return $edad >= 18;
-}
-
-// Comprobar si el usuario está logueado
-function estaLogueado() {
-    return isset($_SESSION['usuario_id']);
-}
-
-// Verificar si el usuario está logueado, si no, redirigir al login
+/**
+ * Verificar si el usuario está logueado
+ */
 function verificarLogin() {
-    if (!estaLogueado()) {
-        // Determinar la ruta base del proyecto
-        $document_root = $_SERVER['DOCUMENT_ROOT'];
-        $current_path = dirname(__FILE__);
-        $project_path = str_replace('\\', '/', substr($current_path, 0, strrpos($current_path, '/includes')));
-        $relative_path = str_replace(str_replace('\\', '/', $document_root), '', $project_path);
-        
-        // Definir BASE_URL si no está definido
-        if (!defined('BASE_URL')) {
-            define('BASE_URL', $relative_path);
-        }
-        
-        // Guardar mensaje y redirigir
-        $_SESSION['mensaje'] = "Debes iniciar sesión para acceder a esta página.";
-        $_SESSION['tipo_mensaje'] = "error";
+    if (!isset($_SESSION['usuario_id']) || empty($_SESSION['usuario_id'])) {
         header("Location: " . BASE_URL . "/public/login.php");
         exit();
     }
 }
 
-// Proteger páginas privadas (alias de verificarLogin para mantener compatibilidad)
-function requerirLogin() {
-    verificarLogin();
+/**
+ * Verificar si el usuario está logueado (sin redirección)
+ */
+function estaLogueado() {
+    return isset($_SESSION['usuario_id']) && !empty($_SESSION['usuario_id']);
 }
 
-// Limpiar datos de entrada
-function limpiarDato($dato) {
-    $dato = trim($dato);
-    $dato = stripslashes($dato);
-    $dato = htmlspecialchars($dato);
-    return $dato;
+/**
+ * Verificar si un usuario sigue a otro
+ */
+function verificarSeguimiento($conexion, $seguidor_id, $seguido_id) {
+    $sql = "SELECT COUNT(*) as count FROM seguidores WHERE seguidor_id = ? AND seguido_id = ?";
+    $stmt = $conexion->prepare($sql);
+    $stmt->bind_param("ii", $seguidor_id, $seguido_id);
+    $stmt->execute();
+    $result = $stmt->get_result()->fetch_assoc();
+    return $result['count'] > 0;
 }
 
-// Generar token CSRF
+/**
+ * Limpiar y validar entrada de datos
+ */
+function limpiarDatos($datos) {
+    $datos = trim($datos);
+    $datos = stripslashes($datos);
+    $datos = htmlspecialchars($datos);
+    return $datos;
+}
+
+/**
+ * Generar token CSRF
+ */
 function generarTokenCSRF() {
     if (!isset($_SESSION['csrf_token'])) {
         $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -83,10 +57,130 @@ function generarTokenCSRF() {
     return $_SESSION['csrf_token'];
 }
 
-// Verificar token CSRF
+/**
+ * Verificar token CSRF
+ */
 function verificarTokenCSRF($token) {
-    if (!isset($_SESSION['csrf_token']) || $token !== $_SESSION['csrf_token']) {
-        redirigirConMensaje(BASE_URL . '/public/index.php', 'Error de validación. Por favor, intenta nuevamente.', 'error');
+    return isset($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $token);
+}
+
+/**
+ * Redireccionar con mensaje
+ */
+function redirigirConMensaje($url, $mensaje, $tipo = 'info') {
+    $_SESSION['mensaje'] = $mensaje;
+    $_SESSION['tipo_mensaje'] = $tipo;
+    header("Location: " . $url);
+    exit();
+}
+
+/**
+ * Mostrar mensaje de sesión
+ */
+function mostrarMensaje() {
+    if (isset($_SESSION['mensaje'])) {
+        $tipo = isset($_SESSION['tipo_mensaje']) ? $_SESSION['tipo_mensaje'] : 'info';
+        echo '<div class="alerta alerta-' . $tipo . '">' . $_SESSION['mensaje'] . '</div>';
+        unset($_SESSION['mensaje']);
+        unset($_SESSION['tipo_mensaje']);
     }
+}
+
+/**
+ * Validar email
+ */
+function validarEmail($email) {
+    return filter_var($email, FILTER_VALIDATE_EMAIL);
+}
+
+/**
+ * Validar contraseña
+ */
+function validarPassword($password) {
+    // Mínimo 8 caracteres, al menos una letra y un número
+    return strlen($password) >= 8 && preg_match('/[A-Za-z]/', $password) && preg_match('/[0-9]/', $password);
+}
+
+/**
+ * Formatear fecha
+ */
+function formatearFecha($fecha, $formato = 'd/m/Y') {
+    return date($formato, strtotime($fecha));
+}
+
+/**
+ * Calcular tiempo transcurrido
+ */
+function tiempoTranscurrido($fecha) {
+    $tiempo = time() - strtotime($fecha);
+    
+    if ($tiempo < 60) {
+        return 'hace ' . $tiempo . ' segundos';
+    } elseif ($tiempo < 3600) {
+        return 'hace ' . round($tiempo / 60) . ' minutos';
+    } elseif ($tiempo < 86400) {
+        return 'hace ' . round($tiempo / 3600) . ' horas';
+    } elseif ($tiempo < 2592000) {
+        return 'hace ' . round($tiempo / 86400) . ' días';
+    } else {
+        return formatearFecha($fecha);
+    }
+}
+
+/**
+ * Subir archivo
+ */
+function subirArchivo($archivo, $directorio, $tipos_permitidos = ['jpg', 'jpeg', 'png', 'gif'], $tamaño_maximo = 2097152) {
+    if (!isset($archivo['error']) || is_array($archivo['error'])) {
+        throw new RuntimeException('Parámetros de archivo inválidos.');
+    }
+
+    switch ($archivo['error']) {
+        case UPLOAD_ERR_OK:
+            break;
+        case UPLOAD_ERR_NO_FILE:
+            throw new RuntimeException('No se envió ningún archivo.');
+        case UPLOAD_ERR_INI_SIZE:
+        case UPLOAD_ERR_FORM_SIZE:
+            throw new RuntimeException('El archivo excede el tamaño máximo permitido.');
+        default:
+            throw new RuntimeException('Error desconocido.');
+    }
+
+    if ($archivo['size'] > $tamaño_maximo) {
+        throw new RuntimeException('El archivo excede el tamaño máximo permitido.');
+    }
+
+    $finfo = new finfo(FILEINFO_MIME_TYPE);
+    $mime = $finfo->file($archivo['tmp_name']);
+    $extensiones_mime = [
+        'image/jpeg' => 'jpg',
+        'image/png' => 'png',
+        'image/gif' => 'gif'
+    ];
+
+    if (!array_key_exists($mime, $extensiones_mime)) {
+        throw new RuntimeException('Formato de archivo no válido.');
+    }
+
+    $extension = $extensiones_mime[$mime];
+    if (!in_array($extension, $tipos_permitidos)) {
+        throw new RuntimeException('Tipo de archivo no permitido.');
+    }
+
+    // Crear directorio si no existe
+    if (!is_dir($directorio)) {
+        mkdir($directorio, 0755, true);
+    }
+
+    // Generar nombre único
+    $nombre_archivo = uniqid() . '.' . $extension;
+    $ruta_completa = $directorio . '/' . $nombre_archivo;
+
+    if (!move_uploaded_file($archivo['tmp_name'], $ruta_completa)) {
+        throw new RuntimeException('Error al mover el archivo.');
+    }
+
+    return $nombre_archivo;
 }
 ?>
