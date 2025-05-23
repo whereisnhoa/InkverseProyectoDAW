@@ -81,7 +81,7 @@ if (!empty($usuario['fecha_nacimiento'])) {
 }
 
 // Avatar: usar el del usuario o el por defecto
-$avatar = !empty($usuario['avatar']) ? $usuario['avatar'] : BASE_URL . '/img/default-avatar.png';
+$avatar = !empty($usuario['avatar']) ? $usuario['avatar'] : BASE_URL . '/public/img/avatar_default.png';
 
 // Incluir header DESPUÉS de procesar los datos
 include_once(__DIR__ . '/../includes/header.php');
