@@ -1,15 +1,16 @@
 
 </main>
 
-    <footer>
-        <div class="footer-container">
+<footer>
+    <div class="container">
+        <div class="footer-grid">
             <div class="footer-section footer-about">
-                <h3>Inkverse</h3>
+                <h3>InkVerse</h3>
                 <div class="footer-logo">
                     <img src="<?php echo BASE_URL; ?>/includes/img/inkverse3.jpg" alt="Logo">
                 </div>
                 <p>Plataforma para compartir y descubrir obras literarias, cómics y manga. Un espacio para lectores y creadores.</p>
-                <div class="social-icons">
+                <div class="social-links">
                     <a href="#" aria-label="Facebook" title="Facebook"><i class="fab fa-facebook-f"></i></a>
                     <a href="#" aria-label="Twitter" title="Twitter"><i class="fab fa-twitter"></i></a>
                     <a href="#" aria-label="Instagram" title="Instagram"><i class="fab fa-instagram"></i></a>
@@ -70,19 +71,20 @@
         </div>
         
         <div class="footer-bottom">
-            <div class="footer-bottom-container">
-                <p>Proyecto Ainhoa &copy; <?php echo date('Y'); ?> - Todos los derechos reservados</p>
-                <div class="footer-legal">
-                    <a href="<?php echo BASE_URL; ?>/public/terminos.php">Términos</a>
-                    <a href="<?php echo BASE_URL; ?>/public/privacidad.php">Privacidad</a>
-                    <a href="<?php echo BASE_URL; ?>/public/cookies.php">Cookies</a>
-                    <a href="<?php echo BASE_URL; ?>/public/contacto.php">Contacto</a>
-                </div>
+            <p>InkVerse &copy; <?php echo date('Y'); ?> - Todos los derechos reservados</p>
+            <div class="footer-links">
+                <a href="<?php echo BASE_URL; ?>/public/terminos.php">Términos</a>
+                <a href="<?php echo BASE_URL; ?>/public/privacidad.php">Privacidad</a>
+                <a href="<?php echo BASE_URL; ?>/public/cookies.php">Cookies</a>
+                <a href="<?php echo BASE_URL; ?>/public/contacto.php">Contacto</a>
             </div>
         </div>
-    </footer>
+    </div>
+</footer>
 
-    <!-- Scripts al final del documento para mejorar el rendimiento -->
-    <script src="<?php echo BASE_URL; ?>/js/script.js"></script>
+<!-- Scripts al final del documento para mejorar el rendimiento -->
+<script src="<?php echo BASE_URL; ?>/js/script.js"></script>
+
 </body>
+
 </html>
