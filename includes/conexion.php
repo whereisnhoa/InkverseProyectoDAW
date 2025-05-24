@@ -4,9 +4,16 @@
  * Este archivo establece la conexión con la base de datos MySQL
  */
 
-// Incluir configuración si no está incluida
-if (!defined('BASE_URL')) {
-    require_once(__DIR__ . '/config.php');
+// Incluir configuración
+$config_path = __DIR__ . '/config.php';
+if (!defined('DB_HOST') && file_exists($config_path)) 
+{
+    require_once($config_path);
+}
+
+// Verificar que las constantes estén definidas antes de continuar
+if (!defined('DB_HOST') || !defined('DB_USER') || !defined('DB_PASS') || !defined('DB_NAME')) {
+    die("Error: Las constantes de base de datos no están definidas. Verifica config.php");
 }
 
 // Conexión a la base de datos usando las constantes de config.php
@@ -20,6 +27,7 @@ try {
 
     // Establecer charset a utf8
     $conexion->set_charset("utf8");
+    
 } catch (Exception $e) {
     die("Error al conectar con la base de datos: " . $e->getMessage());
 }
