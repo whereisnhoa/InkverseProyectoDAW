@@ -1,4 +1,3 @@
-
 /**
  * Script principal para InkVerse
  * Maneja la funcionalidad del frontend
@@ -6,6 +5,9 @@
 
 // Variables globales
 let currentTheme = localStorage.getItem('theme') || 'light';
+const BASE_URL = window.BASE_URL || ''; // Asegúrate de que BASE_URL esté definido globalmente
+const TEXTOS_JS = window.TEXTOS_JS || {}; // Asegúrate de que TEXTOS_JS esté definido globalmente
+const IS_USER_MINOR = window.IS_USER_MINOR || false; // Asegúrate de que IS_USER_MINOR esté definido globalmente
 
 // Inicialización cuando el DOM está listo
 document.addEventListener('DOMContentLoaded', function() {
@@ -15,6 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeNotifications();
     initializeRandomContent();
     initializeForms();
+    initializeFavoritos();
 });
 
 /**
@@ -352,6 +355,180 @@ function validateField(field) {
 }
 
 /**
+ * Inicializar sistema de favoritos
+ */
+function initializeFavoritos() {
+    // Botones de favoritos en las páginas mejoradas
+    document.querySelectorAll('.btn-favorito').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const obraId = this.dataset.obraId;
+            const tipo = this.dataset.tipo;
+            toggleFavorito(obraId, tipo, this);
+        });
+    });
+    
+    // Botones de quitar favoritos
+    document.querySelectorAll('.btn-quitar-favorito').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const obraId = this.dataset.obraId;
+            const tipo = this.dataset.tipo;
+            
+            if (confirm('¿Estás seguro de que quieres quitar esta obra de tus favoritos?')) {
+                quitarDeFavoritos(obraId, tipo, this);
+            }
+        });
+    });
+}
+
+/**
+ * Función mejorada para manejar favoritos (compatible con el controlador PHP)
+ */
+function toggleFavorito(obraId, tipo, button = null) {
+    if (!obraId || !tipo) {
+        showAlert('Error: Datos de obra inválidos', 'error');
+        return;
+    }
+    
+    // Determinar la ruta base según la ubicación actual
+    const currentPath = window.location.pathname;
+    let basePath = '';
+    
+    if (currentPath.includes('/public/')) {
+        basePath = '../controllers/';
+    } else if (currentPath.includes('/usuario/')) {
+        basePath = '../controllers/';
+    } else {
+        basePath = './controllers/';
+    }
+    
+    // Hacer petición AJAX con datos de formulario
+    fetch(basePath + 'procesar-favorito.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: `accion=toggle&contenido_id=${obraId}&tipo_contenido=${tipo}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            if (button) {
+                updateFavoritoButton(button, data.agregado);
+            }
+            
+            // Actualizar todos los botones de la misma obra
+            document.querySelectorAll(`[data-obra-id="${obraId}"][data-tipo="${tipo}"]`).forEach(btn => {
+                if (btn !== button) {
+                    updateFavoritoButton(btn, data.agregado);
+                }
+            });
+            
+            showAlert(data.mensaje, data.agregado ? 'success' : 'info');
+        } else {
+            showAlert(data.mensaje || 'Error al procesar favorito', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showAlert('Error de conexión', 'error');
+    });
+}
+
+/**
+ * Función para quitar de favoritos
+ */
+function quitarDeFavoritos(obraId, tipo, button = null) {
+    if (!obraId || !tipo) {
+        showAlert('Error: Datos de obra inválidos', 'error');
+        return;
+    }
+    
+    // Determinar la ruta base según la ubicación actual
+    const currentPath = window.location.pathname;
+    let basePath = '';
+    
+    if (currentPath.includes('/public/')) {
+        basePath = '../controllers/';
+    } else if (currentPath.includes('/usuario/')) {
+        basePath = '../controllers/';
+    } else {
+        basePath = './controllers/';
+    }
+    
+    fetch(basePath + 'procesar-favorito.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: `accion=quitar&contenido_id=${obraId}&tipo_contenido=${tipo}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Si estamos en la página de favoritos, remover la tarjeta
+            if (window.location.pathname.includes('favoritos')) {
+                const card = document.querySelector(`[data-obra-id="${obraId}"][data-tipo="${tipo}"]`);
+                if (card && card.closest('.obra-card')) {
+                    const obraCard = card.closest('.obra-card');
+                    obraCard.style.animation = 'fadeOut 0.3s ease-out';
+                    setTimeout(() => {
+                        obraCard.remove();
+                        
+                        // Si no quedan obras, recargar la página
+                        if (document.querySelectorAll('.obra-card').length === 0) {
+                            location.reload();
+                        }
+                    }, 300);
+                }
+            } else if (button) {
+                updateFavoritoButton(button, false);
+            }
+            
+            showAlert(data.mensaje, 'success');
+        } else {
+            showAlert(data.mensaje || 'Error al quitar de favoritos', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showAlert('Error de conexión', 'error');
+    });
+}
+
+/**
+ * Actualizar apariencia del botón de favorito
+ */
+function updateFavoritoButton(button, isFavorito) {
+    if (!button) return;
+    
+    const icon = button.querySelector('i');
+    
+    if (isFavorito) {
+        // Está en favoritos
+        if (icon) {
+            icon.className = 'fas fa-heart';
+        }
+        button.classList.add('favorited');
+        button.style.background = '#e74c3c';
+        button.style.color = 'white';
+        button.title = 'Quitar de favoritos';
+    } else {
+        // No está en favoritos
+        if (icon) {
+            icon.className = 'far fa-heart';
+        }
+        button.classList.remove('favorited');
+        button.style.background = 'rgba(255,255,255,0.9)';
+        button.style.color = '#333';
+        button.title = 'Añadir a favoritos';
+    }
+}
+
+/**
  * Utilidades generales
  */
 
@@ -373,24 +550,58 @@ function makeRequest(url, options = {}) {
         });
 }
 
-// Función para mostrar alertas
+// Función mejorada para mostrar alertas
 function showAlert(message, type = 'info') {
-    const alertContainer = document.querySelector('.alert-container') || document.body;
+    // Remover alertas existentes
+    const existingAlerts = document.querySelectorAll('.alerta');
+    existingAlerts.forEach(alert => alert.remove());
+    
     const alert = document.createElement('div');
-    alert.className = `alerta alerta-${type} fade-in`;
+    alert.className = `alerta alerta-${type}`;
     alert.textContent = message;
+    alert.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+        padding: 12px 20px;
+        border-radius: 6px;
+        color: white;
+        font-weight: 500;
+        animation: slideIn 0.3s ease-out;
+        max-width: 300px;
+        word-wrap: break-word;
+    `;
     
-    alertContainer.insertBefore(alert, alertContainer.firstChild);
+    // Colores según el tipo
+    switch(type) {
+        case 'success':
+            alert.style.background = '#27ae60';
+            break;
+        case 'error':
+            alert.style.background = '#e74c3c';
+            break;
+        case 'info':
+            alert.style.background = '#3498db';
+            break;
+        case 'warning':
+            alert.style.background = '#f39c12';
+            break;
+        default:
+            alert.style.background = '#6c757d';
+    }
     
-    // Auto-remove after 5 seconds
+    document.body.appendChild(alert);
+    
+    // Auto-remove after 4 seconds
     setTimeout(() => {
-        alert.style.opacity = '0';
+        alert.style.animation = 'slideOut 0.3s ease-out';
         setTimeout(() => {
             if (alert.parentNode) {
                 alert.parentNode.removeChild(alert);
             }
         }, 300);
-    }, 5000);
+    }, 4000);
 }
 
 // Función para formatear fechas
@@ -432,45 +643,58 @@ function initializeLazyLoading() {
 // Inicializar lazy loading cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', initializeLazyLoading);
 
-// Función para manejar favoritos
-function toggleFavorito(obraId, tipo) {
-    makeRequest(`${BASE_URL}/controllers/procesar-favoritos.php`, {
-        method: 'POST',
-        body: JSON.stringify({
-            obra_id: obraId,
-            tipo: tipo
-        })
-    })
-    .then(data => {
-        if (data.success) {
-            const button = document.querySelector(`[data-obra-id="${obraId}"]`);
-            if (button) {
-                const icon = button.querySelector('i');
-                if (data.status === 'added') {
-                    icon.className = 'fas fa-heart';
-                    button.classList.add('favorited');
-                    showAlert('Añadido a favoritos', 'success');
-                } else {
-                    icon.className = 'far fa-heart';
-                    button.classList.remove('favorited');
-                    showAlert('Eliminado de favoritos', 'info');
-                }
-            }
-        } else {
-            showAlert('Error al procesar favorito', 'error');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showAlert('Error de conexión', 'error');
-    });
-}
+// Añadir animaciones CSS dinámicamente
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+    
+    @keyframes slideOut {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(100%); opacity: 0; }
+    }
+    
+    @keyframes fadeOut {
+        from { opacity: 1; transform: scale(1); }
+        to { opacity: 0; transform: scale(0.8); }
+    }
+    
+    .btn-favorito.favorited {
+        background: #e74c3c !important;
+        color: white !important;
+    }
+    
+    .spinner {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #3498db;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 2s linear infinite;
+        margin: 20px auto;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+`;
+document.head.appendChild(style);
 
 // Exportar funciones para uso global
 window.InkVerse = {
     toggleFavorito,
+    quitarDeFavoritos,
     showAlert,
     makeRequest,
     formatDate,
-    truncateText
+    truncateText,
+    updateFavoritoButton
 };
+
+// Hacer funciones disponibles globalmente para compatibilidad
+window.toggleFavorito = toggleFavorito;
+window.quitarDeFavoritos = quitarDeFavoritos;
+window.showAlert = showAlert;
