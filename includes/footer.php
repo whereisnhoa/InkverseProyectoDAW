@@ -57,22 +57,12 @@
                 </ul>
             </div>
             
-            <div class="footer-section">
-                <h3>Ayuda</h3>
-                <ul>
-                    <li><a href="<?php echo BASE_URL; ?>/public/contacto.php">Contacto</a></li>
-                    <li><a href="<?php echo BASE_URL; ?>/public/faq.php">Preguntas Frecuentes</a></li>
-                    <li><a href="<?php echo BASE_URL; ?>/public/terminos.php">Términos y Condiciones</a></li>
-                    <li><a href="<?php echo BASE_URL; ?>/public/privacidad.php">Política de Privacidad</a></li>
-                    <li><a href="<?php echo BASE_URL; ?>/public/cookies.php">Política de Cookies</a></li>
-                    <li><a href="<?php echo BASE_URL; ?>/public/acerca.php">Acerca de Nosotros</a></li>
-                </ul>
-            </div>
         </div>
         
         <div class="footer-bottom">
             <p>InkVerse &copy; <?php echo date('Y'); ?> - Todos los derechos reservados</p>
             <div class="footer-links">
+                <a href="<?php echo BASE_URL; ?>/public/acerca.php">Acerca de Nosotros</a>
                 <a href="<?php echo BASE_URL; ?>/public/terminos.php">Términos</a>
                 <a href="<?php echo BASE_URL; ?>/public/privacidad.php">Privacidad</a>
                 <a href="<?php echo BASE_URL; ?>/public/cookies.php">Cookies</a>
