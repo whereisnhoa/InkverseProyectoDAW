@@ -1,4 +1,3 @@
-
 <?php
 include '../includes/header.php';
 include_once('../includes/funciones.php');
@@ -43,89 +42,93 @@ $sql_base .= " ORDER BY ga.fecha_subida DESC LIMIT 24";
 $result_arte = $conexion->query($sql_base);
 ?>
 
-<div class="container">
-    <h1>Galería de Arte</h1>
-    <p class="mb-4">Explora ilustraciones, portadas y arte conceptual creado por nuestra comunidad.</p>
+<link rel="stylesheet" href="<?php echo BASE_URL; ?>/css/comunidad.css">
+
+<div class="container arte-container">
+    <h1 class="text-center mb-2">Galería de Arte</h1>
+    <p class="mb-4 text-center">Explora ilustraciones, portadas y arte conceptual creado por nuestra comunidad. Inspírate y comparte tus propias obras.</p>
     
     <!-- Navegación de categorías -->
-    <div class="categorias-strip">
+    <nav class="categorias-strip mb-4" aria-label="Navegación de categorías">
         <div class="categorias-strip-inner">
             <a href="<?php echo BASE_URL; ?>/comunidad/arte.php" class="categoria-pill <?php echo $categoria_id == 0 ? 'active' : ''; ?>">
-                Todas las categorías
+                <i class="fas fa-th-large"></i> Todas las categorías
             </a>
             <?php foreach ($categorias as $cat): ?>
                 <a href="<?php echo BASE_URL; ?>/comunidad/arte.php?categoria=<?php echo $cat['id']; ?>" 
                    class="categoria-pill <?php echo $categoria_id == $cat['id'] ? 'active' : ''; ?>">
-                    <i class="fas <?php echo htmlspecialchars($cat['icono']); ?>"></i>
+                    <i class="fas <?php echo htmlspecialchars($cat['icono']); ?>" aria-hidden="true"></i>
                     <?php echo htmlspecialchars($cat['nombre']); ?>
                 </a>
             <?php endforeach; ?>
         </div>
-    </div>
+    </nav>
     
     <!-- Sección de subida de arte (solo para usuarios logueados) -->
     <?php if ($usuario_logueado): ?>
-        <div class="arte-upload-section">
-            <h2>Comparte tu arte</h2>
-            <p>Sube tus creaciones artísticas relacionadas con la literatura y los cómics.</p>
-            
-            <a href="<?php echo BASE_URL; ?>/comunidad/subir_arte.php" class="btn">
-                <i class="fas fa-cloud-upload-alt"></i> Subir nueva obra
-            </a>
-        </div>
+        <section class="arte-upload-section mb-4">
+            <div class="card card-upload text-center">
+                <h2>Comparte tu arte</h2>
+                <p>Sube tus creaciones artísticas relacionadas con la literatura y los cómics.</p>
+                <a href="<?php echo BASE_URL; ?>/comunidad/subir_arte.php" class="btn btn-primary">
+                    <i class="fas fa-cloud-upload-alt"></i> Subir nueva obra
+                </a>
+            </div>
+        </section>
     <?php else: ?>
-        <div class="text-center mt-3 mb-4">
+        <div class="alert alert-info text-center mt-3 mb-4" role="alert">
             <p>Necesitas iniciar sesión para compartir tu arte.</p>
-            <a href="<?php echo BASE_URL; ?>/public/login.php" class="btn">Iniciar sesión</a>
+            <a href="<?php echo BASE_URL; ?>/public/login.php" class="btn btn-outline-primary">Iniciar sesión</a>
         </div>
     <?php endif; ?>
     
     <!-- Galería de imágenes -->
-    <div class="galeria-grid">
+    <section class="galeria-grid-section">
         <?php if ($result_arte && $result_arte->num_rows > 0): ?>
-            <?php while ($arte = $result_arte->fetch_assoc()): ?>
-                <div class="galeria-item">
-                    <a href="<?php echo BASE_URL; ?>/comunidad/ver_arte.php?id=<?php echo $arte['id']; ?>" class="galeria-link">
-                        <div class="galeria-imagen">
-                            <?php if (!empty($arte['thumbnail'])): ?>
-                                <img src="<?php echo htmlspecialchars($arte['thumbnail']); ?>" alt="<?php echo htmlspecialchars($arte['titulo']); ?>">
-                            <?php else: ?>
-                                <img src="<?php echo htmlspecialchars($arte['imagen']); ?>" alt="<?php echo htmlspecialchars($arte['titulo']); ?>">
-                            <?php endif; ?>
-                            
-                            <?php if ($arte['publico_adulto']): ?>
-                                <span class="badge-adulto">+18</span>
-                            <?php endif; ?>
-                        </div>
-                        <div class="galeria-info">
-                            <h3><?php echo htmlspecialchars($arte['titulo']); ?></h3>
-                            <p class="galeria-autor">Por: <?php echo htmlspecialchars($arte['autor_nombre']); ?></p>
-                            <div class="galeria-meta">
-                                <span><i class="fas fa-heart"></i> <?php echo $arte['me_gusta']; ?></span>
-                                <span><i class="fas <?php echo htmlspecialchars($categorias[$arte['categoria_id']-1]['icono']); ?>"></i> <?php echo htmlspecialchars($arte['categoria_nombre']); ?></span>
+            <div class="galeria-grid">
+                <?php while ($arte = $result_arte->fetch_assoc()): ?>
+                    <article class="galeria-item" tabindex="0" aria-label="Obra: <?php echo htmlspecialchars($arte['titulo']); ?>">
+                        <a href="<?php echo BASE_URL; ?>/comunidad/ver_arte.php?id=<?php echo $arte['id']; ?>" class="galeria-link">
+                            <figure class="galeria-imagen">
+                                <?php if (!empty($arte['thumbnail'])): ?>
+                                    <img src="<?php echo htmlspecialchars($arte['thumbnail']); ?>" alt="Miniatura de <?php echo htmlspecialchars($arte['titulo']); ?>">
+                                <?php else: ?>
+                                    <img src="<?php echo htmlspecialchars($arte['imagen']); ?>" alt="Imagen de <?php echo htmlspecialchars($arte['titulo']); ?>">
+                                <?php endif; ?>
+                                <?php if ($arte['publico_adulto']): ?>
+                                    <span class="badge badge-adulto" title="Contenido +18">+18</span>
+                                <?php endif; ?>
+                            </figure>
+                            <div class="galeria-info">
+                                <h3 class="galeria-titulo"><?php echo htmlspecialchars($arte['titulo']); ?></h3>
+                                <p class="galeria-autor">Por: <?php echo htmlspecialchars($arte['autor_nombre']); ?></p>
+                                <div class="galeria-meta">
+                                    <span title="Me gusta"><i class="fas fa-heart"></i> <?php echo (int)$arte['me_gusta']; ?></span>
+                                    <span title="Categoría"><i class="fas <?php echo htmlspecialchars($categorias[$arte['categoria_id']-1]['icono'] ?? 'fa-tag'); ?>"></i> <?php echo htmlspecialchars($arte['categoria_nombre']); ?></span>
+                                </div>
                             </div>
-                        </div>
-                    </a>
-                </div>
-            <?php endwhile; ?>
+                        </a>
+                    </article>
+                <?php endwhile; ?>
+            </div>
         <?php else: ?>
-            <div class="no-results">
-                <i class="fas fa-palette fa-3x"></i>
+            <div class="no-results text-center my-5">
+                <i class="fas fa-palette fa-3x mb-3"></i>
                 <h2>No hay obras de arte disponibles</h2>
                 <?php if ($categoria_id > 0): ?>
                     <p>No se encontraron obras en esta categoría.</p>
-                    <a href="<?php echo BASE_URL; ?>/comunidad/arte.php" class="btn mt-3">Ver todas las categorías</a>
+                    <a href="<?php echo BASE_URL; ?>/comunidad/arte.php" class="btn btn-outline-secondary mt-3">Ver todas las categorías</a>
                 <?php else: ?>
                     <p>Sé el primero en compartir tu arte con la comunidad.</p>
                     <?php if ($usuario_logueado): ?>
-                        <a href="<?php echo BASE_URL; ?>/comunidad/subir_arte.php" class="btn mt-3">Subir arte</a>
+                        <a href="<?php echo BASE_URL; ?>/comunidad/subir_arte.php" class="btn btn-primary mt-3">Subir arte</a>
                     <?php else: ?>
-                        <a href="<?php echo BASE_URL; ?>/public/login.php" class="btn mt-3">Iniciar sesión para subir arte</a>
+                        <a href="<?php echo BASE_URL; ?>/public/login.php" class="btn btn-outline-primary mt-3">Iniciar sesión para subir arte</a>
                     <?php endif; ?>
                 <?php endif; ?>
             </div>
         <?php endif; ?>
-    </div>
+    </section>
 </div>
 
 <?php include '../includes/footer.php'; ?>

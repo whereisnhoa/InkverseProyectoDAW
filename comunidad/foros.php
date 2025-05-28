@@ -26,6 +26,8 @@ $sql_temas_recientes = "SELECT tf.*, cf.nombre as categoria_nombre, u.usuario as
 $result_temas_recientes = $conexion->query($sql_temas_recientes);
 ?>
 
+<link rel="stylesheet" href="<?php echo BASE_URL; ?>/css/comunidad.css">
+
 <div class="container">
     <h1>Foros de Discusión</h1>
     <p class="mb-4">Participa en conversaciones sobre literatura, comparte opiniones y conecta con otros lectores.</p>
