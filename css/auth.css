@@ -1,28 +1,28 @@
-
-/* ====================
+/* ===================
    LOGIN Y REGISTRO 
-   ==================== */
+   =================== */
 
-/* Fondo con gradiente suave */
+/* Fondo con gradiente */
 body.auth-bg {
   background: linear-gradient(120deg, #e9e2fd 0%, #f4edfa 100%);
   min-height: 100vh;
   font-family: 'Poppins', 'Segoe UI', Arial, sans-serif;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
-/* Contenedor tipo tarjeta glassmorphism */
+/* Contenedor principal */
 .auth-container {
   max-width: 440px;
-  margin: 2.5em auto;
+  margin: 2.5em auto 2.5em auto;
   background: rgba(255,255,255,0.91);
   border-radius: 18px;
   padding: 2.2em 2.2em 1.6em 2.2em;
   box-shadow: 0 6px 38px #8c52ff2a, 0 1.5px 12px #ff8cda18;
   backdrop-filter: blur(8px);
   animation: fadeInAuth .7s cubic-bezier(.7,.4,.2,1);
+  margin-bottom: 60px;
 }
 
 /* Títulos */
@@ -115,7 +115,49 @@ body.auth-bg {
   outline: none;
 }
 
-/* Requisitos de contraseña y barra de fuerza */
+/* ====== Checkbox de términos y condiciones ====== */
+.auth-container .checkbox-inline {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1em;
+  margin-bottom: .6em;
+  flex-wrap: wrap;
+}
+.auth-container .checkbox-inline input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin: 0 7px 0 0;
+  accent-color: #8c52ff;
+  flex-shrink: 0;
+}
+.auth-container .checkbox-inline label,
+.auth-container .checkbox-inline span {
+  margin: 0;
+  font-weight: 600;
+  color: #4b2997;
+  min-width: max-content;
+}
+.auth-container .checkbox-inline a {
+  margin: 0 2px;
+  color: #8c52ff;
+  font-weight: 500;
+  text-decoration: underline;
+  white-space: nowrap;
+}
+.auth-container .checkbox-inline a:hover {
+  color: #6c39c3;
+}
+
+@media (max-width: 600px) {
+  .auth-container .checkbox-inline {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+}
+
+/* Requisitos de contraseña y barra de nivel de seguridad de la contraseña */
 .auth-container .password-requirements {
   font-size: 0.93em;
   color: #7b6c9e;
@@ -145,20 +187,6 @@ body.auth-bg {
   font-size: .97em;
   margin-top: 6px;
   display: none;
-}
-
-/* Checkbox de términos */
-.auth-container .checkbox-inline {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  font-size: 1em;
-  margin-bottom: .6em;
-}
-.auth-container .checkbox-inline input[type="checkbox"] {
-  width: auto;
-  margin-top: 4px;
-  accent-color: #8c52ff;
 }
 
 /* Textos y links adicionales */

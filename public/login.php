@@ -61,33 +61,6 @@ if (file_exists($header_file)) {
         <p><a href="<?php echo BASE_URL; ?>/public/recuperar-password.php">¿Olvidaste tu contraseña?</a></p>
     </div>
 </div>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const passwordInput = document.getElementById('password');
-    const togglePassword = document.getElementById('togglePassword');
-    function togglePasswordVisibility() {
-        const icon = togglePassword.querySelector('i');
-        if (passwordInput.type === 'password') {
-            passwordInput.type = 'text';
-            icon.classList.remove('fa-eye');
-            icon.classList.add('fa-eye-slash');
-            togglePassword.setAttribute('aria-label', 'Ocultar contraseña');
-        } else {
-            passwordInput.type = 'password';
-            icon.classList.remove('fa-eye-slash');
-            icon.classList.add('fa-eye');
-            togglePassword.setAttribute('aria-label', 'Mostrar contraseña');
-        }
-    }
-    togglePassword.addEventListener('click', togglePasswordVisibility);
-    togglePassword.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            togglePasswordVisibility();
-        }
-    });
-});
-</script>
 
 <?php 
 if (file_exists($footer_file)) {
