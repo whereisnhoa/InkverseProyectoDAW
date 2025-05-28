@@ -24,6 +24,8 @@ $usuario = $stmt->get_result()->fetch_assoc();
 include_once(__DIR__ . '/../includes/header.php');
 ?>
 
+<link rel="stylesheet" href="<?php echo BASE_URL; ?>/css/usuario.css">
+
 <div class="editar-perfil-container">
     <div class="editar-perfil-card">
         <div class="card-header">

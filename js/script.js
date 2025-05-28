@@ -882,8 +882,69 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
+// ==========  14. USUARIO: Perfil y avatar ==========
+function initializeUsuarioPage() {
+  // Modal avatar (sólo si existe el modal en el DOM)
+  const modal = document.getElementById('modal-avatar');
+  const btnCambiarAvatar = document.getElementById('cambiar-avatar');
+  const cerrarModal = document.querySelector('.cerrar-modal');
+  const cancelarAvatar = document.getElementById('cancelar-avatar');
+  const inputAvatar = document.getElementById('avatar');
+  const previewImg = document.querySelector('#preview-avatar img');
+
+  // Función para abrir modal
+  function abrirModalAvatar() {
+    if (modal) modal.classList.add('show');
+  }
+  // Función para cerrar modal
+  function cerrarModalAvatar() {
+    if (modal) modal.classList.remove('show');
+  }
+
+  // Abrir modal al click en botón
+  if (btnCambiarAvatar && modal) {
+    btnCambiarAvatar.addEventListener('click', abrirModalAvatar);
+  }
+  // Cerrar modal en botón X o cancelar
+  if (cerrarModal && modal) {
+    cerrarModal.addEventListener('click', cerrarModalAvatar);
+  }
+  if (cancelarAvatar && modal) {
+    cancelarAvatar.addEventListener('click', cerrarModalAvatar);
+  }
+  // Cerrar modal al hacer click fuera del contenido
+  if (modal) {
+    window.addEventListener('click', function(event) {
+      if (event.target === modal) cerrarModalAvatar();
+    });
+  }
+  // Preview de imagen de avatar
+  if (inputAvatar && previewImg) {
+    inputAvatar.addEventListener('change', function() {
+      const file = this.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          previewImg.src = e.target.result;
+        }
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+}
+
+// Inicialización automática solo si se detecta la página de usuario
+document.addEventListener('DOMContentLoaded', function() {
+  if (
+    document.querySelector('.perfil-container') ||
+    document.querySelector('.editar-perfil-container')
+  ) {
+    initializeUsuarioPage();
+  }
+});
+
 // =============================
-// 14. Exportar funciones globales
+// 15. Exportar funciones globales
 // =============================
 window.InkVerse = {
   toggleFavorito,
