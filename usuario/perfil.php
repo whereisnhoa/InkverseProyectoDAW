@@ -91,16 +91,11 @@ include_once(__DIR__ . '/../includes/header.php');
 
 <div class="perfil-container">
     <?php mostrarMensaje(); ?>
-    
-    <!-- Cabecera del perfil -->
     <div class="perfil-header">
-        <div class="perfil-cover"></div>
+        <div class="perfil-cover" style="background-image:url('<?php echo htmlspecialchars($usuario['banner'] ?? BASE_URL.'/public/img/banner_default.jpg'); ?>');"></div>
         <div class="perfil-avatar-container">
             <div class="perfil-avatar">
                 <img src="<?php echo htmlspecialchars($avatar); ?>" alt="Avatar de <?php echo htmlspecialchars($usuario['usuario']); ?>">
-                <button id="cambiar-avatar" class="btn-cambiar-avatar" title="Cambiar avatar">
-                    <i class="fas fa-camera"></i>
-                </button>
             </div>
         </div>
         <div class="perfil-info">
@@ -110,6 +105,30 @@ include_once(__DIR__ . '/../includes/header.php');
                     <?php echo !empty($usuario['nombre']) ? htmlspecialchars($usuario['nombre']) : ''; ?>
                     <?php echo $edad ? ' · ' . $edad . ' años' : ''; ?>
                 </p>
+            <?php endif; ?>
+            <!-- REDES SOCIALES -->
+            <?php if (!empty($usuario['X'])): ?>
+                <a href="<?php echo htmlspecialchars($usuario['X']); ?>" target="_blank" title="X">
+                    <i class="fa-brands fa-x-twitter"></i>
+                </a>
+            <?php endif; ?>
+
+            <?php if (!empty($usuario['instagram'])): ?>
+                <a href="<?php echo htmlspecialchars($usuario['instagram']); ?>" target="_blank" title="Instagram">
+                    <i class="fab fa-instagram"></i>
+                </a>
+            <?php endif; ?>
+
+            <?php if (!empty($usuario['facebook'])): ?>
+                <a href="<?php echo htmlspecialchars($usuario['facebook']); ?>" target="_blank" title="Facebook">
+                    <i class="fab fa-facebook"></i>
+                </a>
+            <?php endif; ?>
+
+            <?php if (!empty($usuario['sitio_web'])): ?>
+                <a href="<?php echo htmlspecialchars($usuario['sitio_web']); ?>" target="_blank" title="Sitio Web">
+                    <i class="fas fa-globe"></i>
+                </a>
             <?php endif; ?>
             
             <div class="perfil-estadisticas">

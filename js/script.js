@@ -882,53 +882,69 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
-// ==========  14. USUARIO: Perfil y avatar ==========
+// ===== 14. USUARIO: Perfil y edición de avatar, banner, redes sociales =====
+
+/**
+ * - Previsualización de avatar y banner
+ * - Modal de avatar
+ */
+
 function initializeUsuarioPage() {
-  // Modal avatar (sólo si existe el modal en el DOM)
+  // Previsualización de avatar (input type="file" con id="avatar")
+  const inputAvatar = document.getElementById('avatar');
+  const previewAvatar = document.querySelector('#preview-avatar img');
+  if (inputAvatar && previewAvatar) {
+    inputAvatar.addEventListener('change', function() {
+      const file = this.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          previewAvatar.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+  // Previsualización de banner 
+  const inputBanner = document.getElementById('banner');
+  const previewBanner = document.querySelector('#preview-banner img');
+  if (inputBanner && previewBanner) {
+    inputBanner.addEventListener('change', function() {
+      const file = this.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          previewBanner.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+
+  // Si usa modal para avatar/banner, activa/cierra modal aquí
   const modal = document.getElementById('modal-avatar');
   const btnCambiarAvatar = document.getElementById('cambiar-avatar');
   const cerrarModal = document.querySelector('.cerrar-modal');
   const cancelarAvatar = document.getElementById('cancelar-avatar');
-  const inputAvatar = document.getElementById('avatar');
-  const previewImg = document.querySelector('#preview-avatar img');
 
-  // Función para abrir modal
   function abrirModalAvatar() {
     if (modal) modal.classList.add('show');
   }
-  // Función para cerrar modal
   function cerrarModalAvatar() {
     if (modal) modal.classList.remove('show');
   }
-
-  // Abrir modal al click en botón
   if (btnCambiarAvatar && modal) {
     btnCambiarAvatar.addEventListener('click', abrirModalAvatar);
   }
-  // Cerrar modal en botón X o cancelar
   if (cerrarModal && modal) {
     cerrarModal.addEventListener('click', cerrarModalAvatar);
   }
   if (cancelarAvatar && modal) {
     cancelarAvatar.addEventListener('click', cerrarModalAvatar);
   }
-  // Cerrar modal al hacer click fuera del contenido
   if (modal) {
     window.addEventListener('click', function(event) {
       if (event.target === modal) cerrarModalAvatar();
-    });
-  }
-  // Preview de imagen de avatar
-  if (inputAvatar && previewImg) {
-    inputAvatar.addEventListener('change', function() {
-      const file = this.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          previewImg.src = e.target.result;
-        }
-        reader.readAsDataURL(file);
-      }
     });
   }
 }

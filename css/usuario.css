@@ -405,3 +405,19 @@
   .perfil-avatar { width: 100px; height: 100px; }
   #preview-avatar { width: 100px; height: 100px; }
 }
+
+.perfil-redes {
+    margin: 10px 0 15px;
+    display: flex;
+    gap: 12px;
+}
+.perfil-redes a {
+    color: #555;
+    font-size: 22px;
+    transition: color 0.18s;
+    opacity: 0.85;
+}
+.perfil-redes a:hover {
+    color: #4361ee;
+    opacity: 1;
+}
