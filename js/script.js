@@ -959,8 +959,48 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 
+// === 15. Funciones específicas para la página de categorías ===
+
+// Inicializar AOS y scroll suave para navegación interna de categorías
+document.addEventListener('DOMContentLoaded', function() {
+  // Inicializar animaciones AOS solo si está la librería
+  if (typeof AOS !== "undefined" && AOS.init) {
+    AOS.init({
+      duration: 800,
+      easing: 'ease-out-cubic',
+      once: true,
+      offset: 100
+    });
+  }
+
+  // Smooth scroll para navegación rápida
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      if (this.hash && document.querySelector(this.hash)) {
+        e.preventDefault();
+        const target = document.querySelector(this.hash);
+        target.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }
+    });
+  });
+
+  // Parallax effect para elementos flotantes en categorías
+  window.addEventListener('scroll', function() {
+    const scrolled = window.pageYOffset;
+    const parallax = document.querySelectorAll('.floating-cat');
+    const speed = 0.5;
+    parallax.forEach(element => {
+      const yPos = -(scrolled * speed);
+      element.style.transform = `translateY(${yPos}px)`;
+    });
+  });
+});
+
 // =============================
-// 15. Exportar funciones globales
+// 16. Exportar funciones globales
 // =============================
 window.InkVerse = {
   toggleFavorito,

@@ -437,7 +437,7 @@ if (isset($_SESSION['usuario_id'])) {
                                     <div class="dropdown-section">
                                         <h4>Información</h4>
                                         <div class="dropdown-links">
-                                            <a href="<?php echo BASE_URL; ?>/public/acerca-de.php">
+                                            <a href="<?php echo BASE_URL; ?>/public/acerca.php">
                                                 <i class="fas fa-info-circle"></i> <?= htmlspecialchars($TEXTOS['acerca_de']) ?>
                                             </a>
                                             <a href="<?php echo BASE_URL; ?>/public/contacto.php">
