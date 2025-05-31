@@ -1,4 +1,3 @@
-
 <?php
 include '../includes/header.php';
 include_once('../includes/funciones.php');
@@ -14,26 +13,28 @@ $sql_categorias = "SELECT * FROM categorias_arte ORDER BY nombre";
 $result_categorias = $conexion->query($sql_categorias);
 ?>
 
-<div class="container">
-    <h1>Subir nueva obra de arte</h1>
-    <p class="mb-4">Comparte tus creaciones artísticas con la comunidad.</p>
+<link rel="stylesheet" href="<?php echo BASE_URL; ?>/css/comunidad.css">
+
+<body class="body-subir">
+<div class="subir-main-container">
+    <h1 class="titulo-subir">Subir nueva obra de arte</h1>
+    <p class="subir-descripcion">Comparte tus creaciones artísticas con la comunidad.</p>
     
-    <form action="<?php echo BASE_URL; ?>/controllers/procesar-arte.php" method="POST" enctype="multipart/form-data" class="form">
-        <!-- Token CSRF para seguridad -->
+    <form action="<?php echo BASE_URL; ?>/controllers/procesar-arte.php" method="POST" enctype="multipart/form-data" class="form-card" aria-label="Formulario para subir arte">
         <input type="hidden" name="csrf_token" value="<?php echo generarTokenCSRF(); ?>">
         
         <div class="form-group">
-            <label for="titulo">Título de la obra:</label>
-            <input type="text" id="titulo" name="titulo" required>
+            <label for="titulo">Título de la obra: <span style="color:#e23c7d">*</span></label>
+            <input type="text" id="titulo" name="titulo" required maxlength="100" autocomplete="off">
         </div>
         
         <div class="form-group">
             <label for="descripcion">Descripción:</label>
-            <textarea id="descripcion" name="descripcion" rows="4"></textarea>
+            <textarea id="descripcion" name="descripcion" rows="4" maxlength="500"></textarea>
         </div>
         
         <div class="form-group">
-            <label for="categoria_id">Categoría:</label>
+            <label for="categoria_id">Categoría: <span style="color:#e23c7d">*</span></label>
             <select id="categoria_id" name="categoria_id" required>
                 <option value="">Selecciona una categoría</option>
                 <?php while ($categoria = $result_categorias->fetch_assoc()): ?>
@@ -43,7 +44,7 @@ $result_categorias = $conexion->query($sql_categorias);
         </div>
         
         <div class="form-group">
-            <label for="imagen">Imagen (JPG, PNG o GIF, máx. 5MB):</label>
+            <label for="imagen">Imagen (JPG, PNG o GIF, máx. 5MB): <span style="color:#e23c7d">*</span></label>
             <input type="file" id="imagen" name="imagen" accept="image/jpeg, image/png, image/gif" required>
             <small>Recomendamos imágenes de al menos 800x600 píxeles para una mejor visualización.</small>
         </div>
@@ -68,5 +69,5 @@ $result_categorias = $conexion->query($sql_categorias);
         </div>
     </form>
 </div>
-
+</body>
 <?php include '../includes/footer.php'; ?>

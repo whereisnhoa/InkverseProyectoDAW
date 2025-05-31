@@ -1,7 +1,6 @@
 /**
  * Script principal para InkVerse
  * Maneja la funcionalidad del frontend: temas, menús, formularios, favoritos, alertas, etc.
- * Incluye lógica para login y registro (mostrar/ocultar contraseña, validación de formularios).
  */
 
 // ==========================
@@ -25,7 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initializeFavoritos();
   initializeSearch();
   initializeLanguageSelector();
-  initializeAuthScripts(); // <-- login/register scripts
+  initializeAuthScripts();
   initializeLazyLoading();
 });
 
@@ -36,7 +35,6 @@ function initializeTheme() {
   const themeToggle = document.querySelector(".dark-mode-toggle");
   const body = document.body;
 
-  // Aplicar tema guardado
   if (currentTheme === "dark") {
     body.setAttribute("data-theme", "dark");
     if (themeToggle) {
@@ -44,12 +42,10 @@ function initializeTheme() {
     }
   }
 
-  // Cambiar tema al hacer click
   if (themeToggle) {
     themeToggle.addEventListener("click", function (e) {
       e.preventDefault();
       e.stopPropagation();
-
       if (currentTheme === "light") {
         currentTheme = "dark";
         body.setAttribute("data-theme", "dark");
@@ -77,7 +73,6 @@ function initializeDropdowns() {
       toggle.addEventListener("click", (e) => {
         e.preventDefault();
         e.stopPropagation();
-        // Cerrar otros dropdowns
         dropdowns.forEach((otherDropdown) => {
           if (otherDropdown !== dropdown) {
             otherDropdown.classList.remove("active");
@@ -85,14 +80,12 @@ function initializeDropdowns() {
         });
         dropdown.classList.toggle("active");
       });
-
       content.addEventListener("click", (e) => {
         e.stopPropagation();
       });
     }
   });
 
-  // Cerrar dropdowns al hacer click fuera
   document.addEventListener("click", (e) => {
     if (!e.target.closest(".dropdown")) {
       dropdowns.forEach((dropdown) => {
@@ -101,7 +94,6 @@ function initializeDropdowns() {
     }
   });
 
-  // Cerrar dropdowns con Escape
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
       dropdowns.forEach((dropdown) => {
@@ -110,7 +102,6 @@ function initializeDropdowns() {
     }
   });
 
-  // Hover en desktop para mega dropdowns
   dropdowns.forEach((dropdown) => {
     if (dropdown.querySelector(".mega-dropdown")) {
       let hoverTimeout;
@@ -171,7 +162,6 @@ function initializeMobileMenu() {
 
     mobileOverlay.addEventListener("click", closeMobileMenu);
 
-    // Dropdowns en menú móvil
     mobileDropdowns.forEach((dropdown) => {
       const toggle = dropdown.querySelector(".dropdown-toggle");
       const content = dropdown.querySelector(".dropdown-mobile-content");
@@ -183,7 +173,6 @@ function initializeMobileMenu() {
       }
     });
 
-    // Cerrar menú móvil al cambiar a desktop
     window.addEventListener("resize", () => {
       if (window.innerWidth > 768) {
         closeMobileMenu();
@@ -208,8 +197,7 @@ function initializeNotifications() {
         setTimeout(() => {
           const badge = this.querySelector(".notification-badge");
           if (badge && badge.textContent !== "0") {
-            // Aquí podrías hacer una llamada AJAX para marcar como vistas
-            // console.log("Marcando notificaciones como vistas...");
+            // Marcar como vistas
           }
         }, 1000);
       });
@@ -361,7 +349,6 @@ function displayRandomContent(obra, container) {
 // 8. Formularios (validación básica)
 // =============================
 function initializeForms() {
-  // Validación en tiempo real (para formularios con data-validate)
   const forms = document.querySelectorAll("form[data-validate]");
   forms.forEach((form) => {
     const inputs = form.querySelectorAll("input, textarea, select");
@@ -471,17 +458,7 @@ function toggleFavorito(obraId, tipo, button = null) {
     showAlert("Error: Datos de obra inválidos", "error");
     return;
   }
-  // Determinar la ruta base según la ubicación actual
-  const currentPath = window.location.pathname;
-  let basePath = "";
-  if (currentPath.includes("/public/")) {
-    basePath = "../controllers/";
-  } else if (currentPath.includes("/usuario/")) {
-    basePath = "../controllers/";
-  } else {
-    basePath = "./controllers/";
-  }
-  fetch(basePath + "procesar-favorito.php", {
+  fetch("controllers/procesar-favorito.php", {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
@@ -493,7 +470,6 @@ function toggleFavorito(obraId, tipo, button = null) {
     .then((data) => {
       if (data.success) {
         if (button) updateFavoritoButton(button, data.agregado);
-        // Actualizar todos los botones de la misma obra
         document.querySelectorAll(`[data-obra-id="${obraId}"][data-tipo="${tipo}"]`).forEach((btn) => {
           if (btn !== button) updateFavoritoButton(btn, data.agregado);
         });
@@ -510,16 +486,7 @@ function quitarDeFavoritos(obraId, tipo, button = null) {
     showAlert("Error: Datos de obra inválidos", "error");
     return;
   }
-  const currentPath = window.location.pathname;
-  let basePath = "";
-  if (currentPath.includes("/public/")) {
-    basePath = "../controllers/";
-  } else if (currentPath.includes("/usuario/")) {
-    basePath = "../controllers/";
-  } else {
-    basePath = "./controllers/";
-  }
-  fetch(basePath + "procesar-favorito.php", {
+  fetch("controllers/procesar-favorito.php", {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
@@ -562,12 +529,14 @@ function updateFavoritoButton(button, isFavorito) {
     button.style.background = "#e74c3c";
     button.style.color = "white";
     button.title = "Quitar de favoritos";
+    button.innerHTML = `<i class="fas fa-heart"></i> Quitar de favoritos`;
   } else {
     if (icon) icon.className = "far fa-heart";
     button.classList.remove("favorited");
     button.style.background = "rgba(255,255,255,0.9)";
     button.style.color = "#333";
     button.title = "Añadir a favoritos";
+    button.innerHTML = `<i class="far fa-heart"></i> Añadir a favoritos`;
   }
 }
 
@@ -576,7 +545,6 @@ function updateFavoritoButton(button, isFavorito) {
 // =============================
 
 function initializeAuthScripts() {
-  // Mostrar/ocultar contraseña principal (login y register)
   const passwordInput = document.getElementById('password');
   const togglePassword = document.getElementById('togglePassword');
   if(passwordInput && togglePassword) {
@@ -596,7 +564,6 @@ function initializeAuthScripts() {
     });
   }
 
-  // Mostrar/ocultar confirmar contraseña (solo register)
   const confirmPasswordInput = document.getElementById('confirm_password');
   const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
   if(confirmPasswordInput && toggleConfirmPassword) {
@@ -616,9 +583,7 @@ function initializeAuthScripts() {
     });
   }
 
-  // Validación de fortaleza y coincidencia de contraseña en register
   if(passwordInput && confirmPasswordInput) {
-    // Elementos para barra y feedback de fortaleza
     const passwordStrengthContainer = document.getElementById('passwordStrengthContainer');
     const passwordStrength = document.getElementById('passwordStrength');
     const passwordStrengthBar = document.getElementById('passwordStrengthBar');
@@ -632,7 +597,6 @@ function initializeAuthScripts() {
     const submitBtn = document.getElementById('submitBtn');
     const form = document.getElementById('registroForm');
 
-    // Actualiza el estado de cada requisito (verde/rojo)
     function updateRequirement(element, isMet) {
       if (!element) return;
       if (isMet) {
@@ -646,7 +610,6 @@ function initializeAuthScripts() {
       }
     }
 
-    // Valida la fortaleza de la contraseña
     function checkPasswordStrength(password) {
       if (!passwordStrengthContainer || !passwordStrength || !passwordStrengthBar || !passwordStrengthText) return true;
 
@@ -690,7 +653,6 @@ function initializeAuthScripts() {
       return hasLength && hasUppercase && hasLowercase && hasNumber && hasSpecial;
     }
 
-    // Verifica coincidencia de contraseñas
     function checkPasswordMatch() {
       if (!passwordMatchError) return true;
       const password = passwordInput.value;
@@ -708,7 +670,6 @@ function initializeAuthScripts() {
       }
     }
 
-    // Eventos de validación en tiempo real
     passwordInput.addEventListener('input', function() {
       checkPasswordStrength(this.value);
       if (confirmPasswordInput.value !== '') {
@@ -719,7 +680,6 @@ function initializeAuthScripts() {
       checkPasswordMatch();
     });
 
-    // Validación antes de enviar el formulario
     if(form) {
       form.addEventListener('submit', function(e) {
         const isPasswordValid = checkPasswordStrength(passwordInput.value);
@@ -740,7 +700,7 @@ function initializeAuthScripts() {
 }
 
 // =============================
-// 11. Lazy Loading para imágenes (para que no carguen todas las imágenes a la vez, solo las visibles)
+// 11. Lazy Loading para imágenes
 // =============================
 function initializeLazyLoading() {
   const images = document.querySelectorAll('img[loading="lazy"]');
@@ -764,7 +724,6 @@ function initializeLazyLoading() {
 // =============================
 
 function showAlert(message, type = "info") {
-  // Quita alertas anteriores
   const existingAlerts = document.querySelectorAll(".alerta");
   existingAlerts.forEach((alert) => alert.remove());
 
@@ -884,13 +843,7 @@ document.head.appendChild(style);
 
 // ===== 14. USUARIO: Perfil y edición de avatar, banner, redes sociales =====
 
-/**
- * - Previsualización de avatar y banner
- * - Modal de avatar
- */
-
 function initializeUsuarioPage() {
-  // Previsualización de avatar (input type="file" con id="avatar")
   const inputAvatar = document.getElementById('avatar');
   const previewAvatar = document.querySelector('#preview-avatar img');
   if (inputAvatar && previewAvatar) {
@@ -905,7 +858,6 @@ function initializeUsuarioPage() {
       }
     });
   }
-  // Previsualización de banner 
   const inputBanner = document.getElementById('banner');
   const previewBanner = document.querySelector('#preview-banner img');
   if (inputBanner && previewBanner) {
@@ -921,7 +873,6 @@ function initializeUsuarioPage() {
     });
   }
 
-  // Si usa modal para avatar/banner, activa/cierra modal aquí
   const modal = document.getElementById('modal-avatar');
   const btnCambiarAvatar = document.getElementById('cambiar-avatar');
   const cerrarModal = document.querySelector('.cerrar-modal');
@@ -949,7 +900,6 @@ function initializeUsuarioPage() {
   }
 }
 
-// Inicialización automática solo si se detecta la página de usuario
 document.addEventListener('DOMContentLoaded', function() {
   if (
     document.querySelector('.perfil-container') ||
@@ -961,9 +911,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // === 15. Funciones específicas para la página de categorías ===
 
-// Inicializar AOS y scroll suave para navegación interna de categorías
 document.addEventListener('DOMContentLoaded', function() {
-  // Inicializar animaciones AOS solo si está la librería
   if (typeof AOS !== "undefined" && AOS.init) {
     AOS.init({
       duration: 800,
@@ -972,8 +920,6 @@ document.addEventListener('DOMContentLoaded', function() {
       offset: 100
     });
   }
-
-  // Smooth scroll para navegación rápida
   document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
       if (this.hash && document.querySelector(this.hash)) {
@@ -987,7 +933,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
-  // Parallax effect para elementos flotantes en categorías
   window.addEventListener('scroll', function() {
     const scrolled = window.pageYOffset;
     const parallax = document.querySelectorAll('.floating-cat');
@@ -1011,7 +956,6 @@ window.InkVerse = {
   updateFavoritoButton,
 };
 
-// Para compatibilidad global
 window.toggleFavorito = toggleFavorito;
 window.quitarDeFavoritos = quitarDeFavoritos;
 window.showAlert = showAlert;

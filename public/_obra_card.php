@@ -1,4 +1,3 @@
-
 <?php
 if (!isset($obra)) return;
 ?>
@@ -15,7 +14,7 @@ if (!isset($obra)) return;
     </div>
     <div class="obra-info">
         <h3>
-            <a href="<?php echo BASE_URL . '/public/' . ($tipo == 'libro' ? 'libro' : 'comic') . '.php?id=' . $obra['id']; ?>">
+            <a href="<?php echo BASE_URL . '/public/obra.php?id=' . $obra['id'] . '&tipo=' . $tipo; ?>">
                 <?php echo htmlspecialchars($obra['titulo']); ?>
             </a>
         </h3>
@@ -36,7 +35,7 @@ if (!isset($obra)) return;
             ?>
         </p>
         <div class="obra-actions">
-            <a href="<?php echo BASE_URL . '/public/' . ($tipo == 'libro' ? 'libro' : 'comic') . '.php?id=' . $obra['id']; ?>"
+            <a href="<?php echo BASE_URL . '/public/obra.php?id=' . $obra['id'] . '&tipo=' . $tipo; ?>"
                class="btn btn-outline">
                 <i class="fas fa-eye"></i> Ver obra
             </a>

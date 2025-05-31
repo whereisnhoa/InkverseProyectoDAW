@@ -1,4 +1,3 @@
-
 <?php
 
 require_once(__DIR__ . '/../includes/header.php');
@@ -17,11 +16,11 @@ if (empty($busqueda))
 
     <h1>Búsqueda Avanzada</h1>
     
-    <form action="<?php echo BASE_URL; ?>/public/buscar.php" method="GET" class="search-form">
+    <form action="<?php echo BASE_URL; ?>/public/buscar.php" method="GET" class="search-form" role="search" aria-label="Formulario de búsqueda avanzada">
 
         <div class="form-group">
             <label for="q">Palabras clave:</label>
-            <input type="text" id="q" name="q" class="form-control" placeholder="Título, autor, descripción...">
+            <input type="text" id="q" name="q" class="form-control" placeholder="Título, autor, descripción..." autocomplete="off">
         </div>
         
         <div class="form-group">
@@ -275,11 +274,11 @@ if (empty($busqueda))
                     <div class="obra-card-body">
 
                         <?php if (!empty($obra['portada'])): ?>
-                            <img src="<?php echo htmlspecialchars($obra['portada']); ?>" alt="Portada" class="obra-portada">
+                            <img src="<?php echo htmlspecialchars($obra['portada']); ?>" alt="Portada" class="obra-portada" loading="lazy">
                         <?php endif; ?>
 
                         <p class="obra-autor">Por: <?php echo htmlspecialchars($obra['autor']); ?></p>
-                        <p class="obra-descripcion"><?php echo substr(htmlspecialchars($obra['descripcion']), 0, 150) . '...'; ?></p>
+                        <p class="obra-descripcion"><?php echo mb_substr(htmlspecialchars($obra['descripcion']), 0, 150, 'UTF-8') . '...'; ?></p>
 
                     </div>
 

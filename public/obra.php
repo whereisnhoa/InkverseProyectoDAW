@@ -1,131 +1,192 @@
-
 <?php
-session_start();
 include '../includes/conexion.php';
 include '../includes/header.php';
 
-if (!isset($_GET['id']) || !isset($_GET['tipo'])) {
-    echo '<div class="alerta alerta-error">Obra no especificada correctamente.</div>';
+$usuario_id = $_SESSION['usuario_id'] ?? null;
+
+$id = isset($_GET['id']) ? intval($_GET['id']) : 0;
+$tipo = $_GET['tipo'] ?? '';
+$capSeleccionado = isset($_GET['cap']) ? intval($_GET['cap']) : 1;
+
+if (!$id || ($tipo !== 'libro' && $tipo !== 'comic')) {
+    echo "<div class='alerta alerta-error'>Obra no encontrada.</div>";
     include '../includes/footer.php';
     exit();
 }
 
-$contenido_id = $_GET['id'];
-$tipo_contenido = $_GET['tipo']; // 'libro' o 'comic'
-
-// Obtener datos de la obra según su tipo
-if ($tipo_contenido === 'libro') {
-    $sql = "SELECT l.*, c.nombre as categoria FROM libros l 
-            LEFT JOIN categorias c ON l.categoria_id = c.id 
-            WHERE l.id = ?";
+if ($tipo === 'libro') {
+    $stmt = $conexion->prepare("SELECT l.*, c.nombre AS categoria_nombre, u.usuario AS autor_nombre
+        FROM libros AS l
+        LEFT JOIN categorias AS c ON l.categoria_id = c.id
+        LEFT JOIN usuarios AS u ON l.usuario_id = u.id
+        WHERE l.id = ?");
+    $tablaCap = "capitulos_libro";
+    $colObra = "libro_id";
 } else {
-    $sql = "SELECT * FROM comics WHERE id = ?";
+    $stmt = $conexion->prepare("SELECT co.*, c.nombre AS categoria_nombre, u.usuario AS autor_nombre
+        FROM comics AS co
+        LEFT JOIN categorias AS c ON co.categoria_id = c.id
+        LEFT JOIN usuarios AS u ON co.usuario_id = u.id
+        WHERE co.id = ?");
+    $tablaCap = "capitulos_comic";
+    $colObra = "comic_id";
 }
-
-$stmt = $conexion->prepare($sql);
-$stmt->bind_param("i", $contenido_id);
+$stmt->bind_param("i", $id);
 $stmt->execute();
-$obra = $stmt->get_result()->fetch_assoc();
+$result = $stmt->get_result();
+$obra = $result->fetch_assoc();
+$stmt->close();
 
-if (!$obra) {
-    echo '<div class="alerta alerta-error">Obra no encontrada.</div>';
-    include '../includes/footer.php';
-    exit();
+$autor = !empty($obra['autor_nombre']) ? htmlspecialchars($obra['autor_nombre']) : 'Anónimo';
+$titulo = htmlspecialchars($obra['titulo'] ?? 'Sin título');
+$categoria = htmlspecialchars($obra['categoria_nombre'] ?? 'Sin categoría');
+$fecha = !empty($obra['fecha_subida']) ? date('d/m/Y', strtotime($obra['fecha_subida'])) : '';
+$descripcion = !empty($obra['descripcion']) ? nl2br(htmlspecialchars($obra['descripcion'])) : 'Sin descripción.';
+$portada = !empty($obra['portada']) ? BASE_URL . $obra['portada'] : BASE_URL . '/public/img/portada_default.png';
+
+$esFavorito = false;
+if ($usuario_id) {
+    $stmtFav = $conexion->prepare("SELECT 1 FROM favoritos WHERE usuario_id = ? AND tipo_contenido = ? AND contenido_id = ?");
+    $stmtFav->bind_param("isi", $usuario_id, $tipo, $id);
+    $stmtFav->execute();
+    $stmtFav->store_result();
+    $esFavorito = $stmtFav->num_rows > 0;
+    $stmtFav->close();
 }
+
+$stmt_count = $conexion->prepare("SELECT COUNT(*) as total FROM $tablaCap WHERE $colObra = ?");
+$stmt_count->bind_param("i", $id);
+$stmt_count->execute();
+$resCount = $stmt_count->get_result();
+$totalCaps = $resCount->fetch_assoc()['total'] ?? 0;
+$stmt_count->close();
+
+$stmt_titulos = $conexion->prepare("SELECT numero, titulo FROM $tablaCap WHERE $colObra = ? ORDER BY numero ASC");
+$stmt_titulos->bind_param("i", $id);
+$stmt_titulos->execute();
+$resTitulos = $stmt_titulos->get_result();
+$listaCapitulos = [];
+while ($row = $resTitulos->fetch_assoc()) {
+    $listaCapitulos[] = $row;
+}
+$stmt_titulos->close();
+
+$stmt_cap = $conexion->prepare("SELECT * FROM $tablaCap WHERE $colObra = ? AND numero = ?");
+$stmt_cap->bind_param("ii", $id, $capSeleccionado);
+$stmt_cap->execute();
+$capitulo = $stmt_cap->get_result()->fetch_assoc();
+$stmt_cap->close();
 ?>
 
-<div class="mb-4">
-  <h1><?= htmlspecialchars($obra['titulo']) ?></h1>
-  
-  <div class="flex gap-2 mb-2">
-    <?php if ($tipo_contenido === 'libro' && isset($obra['categoria'])): ?>
-      <span class="badge badge-categoria"><?= htmlspecialchars($obra['categoria']) ?></span>
-    <?php endif; ?>
-    
-    <?php if ($obra['publico_adulto']): ?>
-      <span class="badge badge-adulto">+18</span>
-    <?php endif; ?>
-  </div>
-  
-  <p class="mb-3"><strong>Autor:</strong> <?= htmlspecialchars($obra['autor']) ?></p>
-  
-  <div class="obra-card mb-4">
-    <div class="obra-card-body">
-      <p><?= nl2br(htmlspecialchars($obra['descripcion'])) ?></p>
+<!-- FontAwesome para los íconos de favoritos -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<div class="obra-detalle-container">
+    <div class="obra-header">
+        <img class="obra-portada-detalle" src="<?php echo $portada; ?>" alt="Portada de <?php echo $titulo; ?>">
+        <div class="obra-header-info">
+            <h1 class="obra-titulo"><?php echo $titulo; ?></h1>
+            <div class="obra-meta">
+                <span class="obra-categoria"><?php echo strtoupper($categoria); ?></span>
+                <span class="obra-autor-fecha">
+                    Por <b><?php echo $autor; ?></b><?php echo $fecha ? " · $fecha" : ""; ?>
+                </span>
+            </div>
+        </div>
     </div>
-  </div>
-  
-  <!-- Favoritos -->
-  <?php
-  if (isset($_SESSION['usuario_id'])):
-      // Verificar si la obra ya está en favoritos
-      $ya_favorito = false;
-      $check = $conexion->prepare("SELECT id FROM favoritos WHERE usuario_id = ? AND tipo_contenido = ? AND contenido_id = ?");
-      $check->bind_param("isi", $_SESSION['usuario_id'], $tipo_contenido, $contenido_id);
-      $check->execute();
-      $check->store_result();
-      $ya_favorito = $check->num_rows > 0;
-  ?>
-  
-  <form action="../controllers/procesar-favorito.php" method="POST" class="mb-4">
-      <input type="hidden" name="contenido_id" value="<?= $contenido_id ?>">
-      <input type="hidden" name="tipo_contenido" value="<?= $tipo_contenido ?>">
-      <?php if ($ya_favorito): ?>
-          <input type="hidden" name="accion" value="quitar">
-          <button type="submit" class="btn btn-danger"><i class="fas fa-heart-broken"></i> Quitar de favoritos</button>
-      <?php else: ?>
-          <input type="hidden" name="accion" value="agregar">
-          <button type="submit" class="btn"><i class="fas fa-heart"></i> Añadir a favoritos</button>
-      <?php endif; ?>
-  </form>
-  <?php endif; ?>
+    <div class="obra-sinopsis">
+        <?php echo $descripcion; ?>
+    </div>
+
+    <?php if ($totalCaps > 0 && $capitulo): ?>
+        <div class="obra-capitulos">
+            <div class="capitulo-paginacion">
+                <?php if ($capSeleccionado > 1): ?>
+                    <a href="obra.php?id=<?php echo $id; ?>&tipo=<?php echo $tipo; ?>&cap=<?php echo $capSeleccionado-1; ?>">
+                        <i class="fas fa-arrow-left"></i> Anterior
+                    </a>
+                <?php else: ?>
+                    <button disabled><i class="fas fa-arrow-left"></i> Anterior</button>
+                <?php endif; ?>
+
+                <span class="paginacion-info">
+                    Capítulo <?php echo $capSeleccionado; ?> de <?php echo $totalCaps; ?>
+                </span>
+
+                <?php if ($capSeleccionado < $totalCaps): ?>
+                    <a href="obra.php?id=<?php echo $id; ?>&tipo=<?php echo $tipo; ?>&cap=<?php echo $capSeleccionado+1; ?>">
+                        Siguiente <i class="fas fa-arrow-right"></i>
+                    </a>
+                <?php else: ?>
+                    <button disabled>Siguiente <i class="fas fa-arrow-right"></i></button>
+                <?php endif; ?>
+            </div>
+
+            <form class="capitulo-selector-form" method="get" action="">
+                <input type="hidden" name="id" value="<?php echo $id; ?>">
+                <input type="hidden" name="tipo" value="<?php echo $tipo; ?>">
+                <label for="cap">Ir al capítulo:</label>
+                <select name="cap" id="cap" onchange="this.form.submit()">
+                    <?php foreach ($listaCapitulos as $cap): ?>
+                        <option value="<?php echo $cap['numero']; ?>" <?php if ($capSeleccionado == $cap['numero']) echo 'selected'; ?>>
+                            Capítulo <?php echo intval($cap['numero']); ?>
+                            <?php echo $cap['titulo'] ? ' - '.htmlspecialchars($cap['titulo']) : ''; ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+                <noscript><button type="submit">Ir</button></noscript>
+            </form>
+
+            <div class="obra-capitulo">
+                <h3>
+                    Capítulo <?php echo intval($capitulo['numero']); ?><?php echo $capitulo['titulo'] ? ": ".htmlspecialchars($capitulo['titulo']) : ""; ?>
+                </h3>
+                <?php if ($tipo === 'libro'): ?>
+                    <div class="capitulo-texto">
+                        <?php echo nl2br(htmlspecialchars($capitulo['contenido'])); ?>
+                    </div>
+                <?php else: ?>
+                    <?php if (!empty($capitulo['imagen'])): ?>
+                        <div class="capitulo-imagen">
+                            <img src="<?php echo BASE_URL . htmlspecialchars($capitulo['imagen']); ?>" alt="Página">
+                        </div>
+                    <?php else: ?>
+                        <div class="capitulo-texto">
+                            <?php echo nl2br(htmlspecialchars($capitulo['contenido'])); ?>
+                        </div>
+                    <?php endif; ?>
+                <?php endif; ?>
+            </div>
+        </div>
+    <?php endif; ?>
+
+    <div class="obra-acciones">
+        <?php if ($usuario_id): ?>
+        <button class="btn-favorito<?php if($esFavorito) echo ' favorited'; ?>"
+                data-obra-id="<?php echo $id; ?>"
+                data-tipo="<?php echo $tipo; ?>"
+                type="button"
+                title="<?php echo $esFavorito ? 'Quitar de favoritos' : 'Añadir a favoritos'; ?>">
+            <i class="<?php echo $esFavorito ? 'fas' : 'far'; ?> fa-heart"></i>
+            <?php echo $esFavorito ? 'Quitar de favoritos' : 'Añadir a favoritos'; ?>
+        </button>
+        <?php else: ?>
+        <button class="btn-favorito" type="button" onclick="window.location.href='<?php echo BASE_URL; ?>/public/login.php'">
+            <i class="far fa-heart"></i> Añadir a favoritos
+        </button>
+        <?php endif; ?>
+    </div>
+    <div class="obra-comentarios">
+        <h2>Comentarios</h2>
+        <div class="obra-comentarios-lista">
+            <p>Aún no hay comentarios.</p>
+        </div>
+        <h3>Deja tu comentario</h3>
+        <form method="post" action="">
+            <textarea name="comentario" rows="3" placeholder="Escribe tu comentario..." required></textarea>
+            <button type="submit" class="btn btn-primary" style="margin-top:8px;">Enviar</button>
+        </form>
+    </div>
 </div>
-
-<h2>Comentarios</h2>
-
-<?php
-// Mostrar comentarios
-$sql_com = "SELECT u.usuario, c.contenido, c.fecha 
-            FROM comentarios c 
-            JOIN usuarios u ON u.id = c.usuario_id 
-            WHERE c.tipo_contenido = ? AND c.contenido_id = ? 
-            ORDER BY c.fecha DESC";
-$stmt_com = $conexion->prepare($sql_com);
-$stmt_com->bind_param("si", $tipo_contenido, $contenido_id);
-$stmt_com->execute();
-$resultado_com = $stmt_com->get_result();
-
-if ($resultado_com->num_rows > 0):
-    while ($comentario = $resultado_com->fetch_assoc()):
-?>
-    <div class="comentario">
-      <div class="comentario-header">
-        <span class="comentario-autor"><?= htmlspecialchars($comentario['usuario']) ?></span>
-        <span class="comentario-fecha"><?= date('d/m/Y H:i', strtotime($comentario['fecha'])) ?></span>
-      </div>
-      <p class="comentario-contenido"><?= nl2br(htmlspecialchars($comentario['contenido'])) ?></p>
-    </div>
-<?php endwhile; else: ?>
-    <p class="text-center mb-4">Aún no hay comentarios.</p>
-<?php endif; ?>
-
-<?php if (isset($_SESSION['usuario_id'])): ?>
-    <div class="mb-4">
-      <h3>Deja tu comentario</h3>
-      <form action="<?php echo BASE_URL; ?>/controllers/procesar-comentario.php" method="POST">
-          <input type="hidden" name="csrf_token" value="<?php echo generarTokenCSRF(); ?>">
-          <input type="hidden" name="contenido_id" value="<?php echo $contenido_id ?>">
-          <input type="hidden" name="tipo_contenido" value="<?php echo $tipo_contenido ?>">
-          <div class="form-group">
-            <textarea name="contenido" rows="4" required placeholder="Escribe tu comentario aquí..."></textarea>
-          </div>
-          <button type="submit" class="btn"><i class="fas fa-comment"></i> Comentar</button>
-      </form>
-    </div>
-<?php else: ?>
-    <div class="alerta alerta-info">
-      <p>Debes <a href="<?php echo BASE_URL; ?>/public/login.php">iniciar sesión</a> para comentar.</p>
-    </div>
-<?php endif; ?>
 
 <?php include '../includes/footer.php'; ?>
