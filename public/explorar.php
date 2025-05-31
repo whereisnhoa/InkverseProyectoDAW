@@ -118,7 +118,7 @@ $result_categorias = $conexion->query($sql_categorias);
 // Obtener estadísticas generales
 $sql_stats = "SELECT 
               (SELECT COUNT(*) FROM libros) + (SELECT COUNT(*) FROM comics) as total_obras,
-              (SELECT COUNT(DISTINCT autor) FROM libros) + (SELECT COUNT(DISTINCT autor) FROM comics) as total_autores,
+              (SELECT COUNT(DISTINCT usuario_id) FROM libros) + (SELECT COUNT(DISTINCT usuario_id) FROM comics) as total_autores,
               (SELECT COUNT(*) FROM categorias WHERE id IN (SELECT DISTINCT categoria_id FROM libros)) as total_categorias";
 
 $stats = $conexion->query($sql_stats)->fetch_assoc();
@@ -465,7 +465,6 @@ include_once(__DIR__ . '/../includes/header.php');
     </div>
 </div>
 
-<!-- Estilos CSS (mismos que antes) -->
 <style>
 .explorar-container {
     max-width: 1200px;
@@ -1011,97 +1010,5 @@ include_once(__DIR__ . '/../includes/header.php');
     }
 }
 </style>
-
-<!-- JavaScript para funcionalidad -->
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Manejar botones de favoritos
-    document.querySelectorAll('.btn-favorito').forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            const obraId = this.dataset.obraId;
-            const tipo = this.dataset.tipo;
-            toggleFavorito(obraId, tipo, this);
-        });
-    });
-    
-    // Función para toggle favorito
-    function toggleFavorito(obraId, tipo, button) {
-        fetch('<?php echo BASE_URL; ?>/controllers/procesar-favoritos.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: `accion=toggle&obra_id=${obraId}&tipo=${tipo}`
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                if (data.agregado) {
-                    button.style.background = '#e74c3c';
-                    button.style.color = 'white';
-                    mostrarMensaje('Obra añadida a favoritos', 'success');
-                } else {
-                    button.style.background = 'rgba(255,255,255,0.9)';
-                    button.style.color = '#333';
-                    mostrarMensaje('Obra quitada de favoritos', 'info');
-                }
-            } else {
-                mostrarMensaje(data.mensaje || 'Error al procesar favorito', 'error');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            mostrarMensaje('Error de conexión', 'error');
-        });
-    }
-    
-    // Función para mostrar mensajes
-    function mostrarMensaje(mensaje, tipo) {
-        const alerta = document.createElement('div');
-        alerta.className = `alerta alerta-${tipo}`;
-        alerta.textContent = mensaje;
-        alerta.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1000;
-            padding: 12px 20px;
-            border-radius: 6px;
-            color: white;
-            font-weight: 500;
-            animation: slideIn 0.3s ease-out;
-        `;
-        
-        switch(tipo) {
-            case 'success':
-                alerta.style.background = '#27ae60';
-                break;
-            case 'error':
-                alerta.style.background = '#e74c3c';
-                break;
-            case 'info':
-                alerta.style.background = '#3498db';
-                break;
-        }
-        
-        document.body.appendChild(alerta);
-        
-        setTimeout(() => {
-            alerta.remove();
-        }, 3000);
-    }
-});
-
-// Animaciones CSS
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes slideIn {
-        from { transform: translateX(100%); opacity: 0; }
-        to { transform: translateX(0); opacity: 1; }
-    }
-`;
-document.head.appendChild(style);
-</script>
 
 <?php include_once(__DIR__ . '/../includes/footer.php'); ?>

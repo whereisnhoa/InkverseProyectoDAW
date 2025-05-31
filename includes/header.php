@@ -1,19 +1,14 @@
 <?php
 /**
- * Header del sitio - Versión completamente funcional
+ * Header del sitio - COMPLETO, con distribución horizontal, menú de idiomas mejorado,
+ * barra de búsqueda más pequeña, y solo una flecha en menús.
  */
-
-// Iniciar sesión si aún no está iniciada
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-
-// Incluir archivos de configuración y funciones
 if (!defined('BASE_URL')) {
     require_once(__DIR__ . '/config.php');
 }
-
-// Intentar incluir conexión con manejo de errores
 if (file_exists(__DIR__ . '/conexion.php')) {
     require_once(__DIR__ . '/conexion.php');
 } else {
@@ -22,16 +17,10 @@ if (file_exists(__DIR__ . '/conexion.php')) {
         die("Error de conexión: " . $conexion->connect_error);
     }
 }
-
-// Cargar funciones si existe el archivo
 if (file_exists(__DIR__ . '/funciones.php')) {
     require_once(__DIR__ . '/funciones.php');
 }
-
-// Lógica para el idioma actual
 $idioma = isset($_GET['lang']) ? $_GET['lang'] : 'es';
-
-// Textos por defecto
 if (!isset($TEXTOS)) {
     $TEXTOS = [
         'inicio' => 'Inicio',
@@ -70,8 +59,6 @@ if (!isset($TEXTOS)) {
         'aleatorio' => 'Aleatorio'
     ];
 }
-
-// Obtener categorías para los menús desplegables
 $sql_categorias_libros = "SELECT id, nombre FROM categorias WHERE tipo = 'libro' ORDER BY nombre LIMIT 6";
 $result_categorias_libros = $conexion->query($sql_categorias_libros);
 $categorias_libros = [];
@@ -80,7 +67,6 @@ if ($result_categorias_libros && $result_categorias_libros->num_rows > 0) {
         $categorias_libros[] = $row;
     }
 }
-
 $sql_categorias_comics = "SELECT id, nombre FROM categorias WHERE tipo = 'comic' ORDER BY nombre LIMIT 6";
 $result_categorias_comics = $conexion->query($sql_categorias_comics);
 $categorias_comics = [];
@@ -89,8 +75,6 @@ if ($result_categorias_comics && $result_categorias_comics->num_rows > 0) {
         $categorias_comics[] = $row;
     }
 }
-
-// Verificar edad del usuario
 $usuario_es_mayor_edad = false;
 if (isset($_SESSION['usuario_id']) && isset($_SESSION['usuario_fecha_nacimiento'])) {
     $fecha_nacimiento = new DateTime($_SESSION['usuario_fecha_nacimiento']);
@@ -98,8 +82,6 @@ if (isset($_SESSION['usuario_id']) && isset($_SESSION['usuario_fecha_nacimiento'
     $edad = $hoy->diff($fecha_nacimiento)->y;
     $usuario_es_mayor_edad = $edad >= 18;
 }
-
-// Variables para notificaciones
 $notificaciones_no_leidas = 0;
 if (isset($_SESSION['usuario_id'])) {
     $sql_notif = "SELECT COUNT(*) as total FROM notificaciones WHERE usuario_id = ? AND leida = 0";
@@ -117,60 +99,105 @@ if (isset($_SESSION['usuario_id'])) {
 
 <!DOCTYPE html>
 <html lang="<?= htmlspecialchars($idioma) ?>">
+
 <head>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>InkVerse - Plataforma de Literatura y Cómics</title>
+
     <meta name="description" content="Descubre, lee y comparte literatura y cómics en InkVerse. La plataforma definitiva para amantes de la lectura.">
     
-    <!-- Estilos -->
+    <!-- bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <!-- estilo -->
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>/css/public.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Estilos adicionales para mejorar la funcionalidad -->
     <style>
-        /* Estilos para dropdowns */
-        .dropdown {
+        .main-header {
+            background: linear-gradient(90deg, #4361ee 0%, #4cc9f0 100%);
+            box-shadow: 0 2px 8px rgba(67,97,238,0.08);
             position: relative;
-            display: inline-block;
+            z-index: 1000;
         }
-        
-        .dropdown-content {
+        .header-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            min-height: 64px;
+            padding: 0 36px;
+        }
+        .header-bar .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.65rem;
+            font-weight: bold;
+            color: #fff;
+            letter-spacing: 1px;
+        }
+        .header-bar .logo img {
+            height: 38px;
+            border-radius: 8px;
+        }
+        .header-bar .nav-links ul {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        .header-bar .nav-link {
+            color: #fff;
+            padding: 8px 15px;
+            border-radius: 9px;
+            font-weight: 500;
+            font-size: 1.07rem;
+            transition: background .13s;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+        .header-bar .nav-link:hover, .header-bar .nav-link.active {
+            background: rgba(255,255,255,0.14);
+            color: #fff;
+        }
+        .header-bar .dropdown { position: relative; }
+        .header-bar .dropdown-content {
             display: none;
             position: absolute;
             background-color: white;
-            min-width: 200px;
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            min-width: 250px;
+            box-shadow: 0px 8px 24px 0px rgba(0,0,0,0.12);
             z-index: 1000;
-            border-radius: 8px;
-            padding: 8px 0;
+            border-radius: 10px;
+            padding: 10px 0;
             top: 100%;
             left: 0;
         }
-        
-        .dropdown.active .dropdown-content {
+        .header-bar .dropdown.active .dropdown-content {
             display: block;
         }
-        
-        .mega-dropdown {
+        .header-bar .mega-dropdown {
             min-width: 600px;
-            padding: 20px;
+            padding: 24px;
         }
-        
-        .dropdown-grid {
+        .header-bar .dropdown-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit,minmax(200px,1fr));
             gap: 20px;
         }
-        
-        .dropdown-section h4 {
+        .header-bar .dropdown-section h4 {
             margin-bottom: 10px;
             color: #333;
             font-size: 14px;
             font-weight: 600;
         }
-        
-        .dropdown-links a {
+        .header-bar .dropdown-links a {
             display: block;
             padding: 8px 12px;
             color: #666;
@@ -178,774 +205,555 @@ if (isset($_SESSION['usuario_id'])) {
             border-radius: 4px;
             transition: all 0.2s;
         }
-        
-        .dropdown-links a:hover {
+        .header-bar .dropdown-links a:hover {
             background-color: #f8f9fa;
             color: #333;
         }
-        
-        .dropdown-divider {
+        .header-bar .dropdown-divider {
             height: 1px;
             background-color: #eee;
             margin: 8px 0;
         }
-        
-        /* Estilos para menú móvil */
-        .mobile-nav-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.5);
-            z-index: 999;
+        /* Barra de búsqueda más pequeña */
+        .header-bar .search-bar {
+            flex: 1 1 210px;
+            max-width: 270px;
+            margin: 0 24px;
         }
-        
-        .mobile-nav-overlay.active {
-            display: block;
-        }
-        
-        .mobile-nav-menu {
-            position: fixed;
-            top: 0;
-            left: -100%;
-            width: 300px;
-            height: 100%;
-            background-color: white;
-            z-index: 1000;
-            transition: left 0.3s ease;
-            overflow-y: auto;
-        }
-        
-        .mobile-nav-menu.active {
-            left: 0;
-        }
-        
-        .mobile-nav-header {
-            padding: 20px;
-            border-bottom: 1px solid #eee;
+        .header-bar .search-form {
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            border-radius: 9px;
+            background: #fff;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(67,97,238,0.06);
         }
-        
-        .mobile-logo {
+        .header-bar .search-input {
+            border: none;
+            padding: 8px 13px;
+            font-size: 0.96rem;
+            outline: none;
+            background: transparent;
+            color: #333;
+            flex: 1;
+        }
+        .header-bar .search-btn {
+            border: none;
+            background: #4361ee;
+            color: #fff;
+            padding: 8px 13px;
+            cursor: pointer;
+            font-size: 1.09rem;
+            transition: background .13s;
+        }
+        .header-bar .search-btn:hover { background: #3a56d4; }
+        .header-bar .header-actions {
             display: flex;
             align-items: center;
             gap: 10px;
         }
-        
-        .mobile-logo img {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-        }
-        
-        .close-btn {
+        .header-bar .icon-btn {
             background: none;
             border: none;
-            font-size: 20px;
+            color: #4361ee;
+            font-size: 1.35rem;
+            margin: 0 3px;
+            cursor: pointer;
+            transition: color .17s, background .17s;
+            padding: 7px 8px;
+            border-radius: 7px;
+            position: relative;
+        }
+        .header-bar .icon-btn:focus, .header-bar .icon-btn:hover {
+            background: rgba(67,97,238,0.13);
+            color: #f72585;
+        }
+
+        /* Idioma dropdown mejorado */
+        .language-dropdown {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .language-dropdown .lang-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.15em;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 2px 8px;
+            border-radius: 22px;
+            outline: none;
+            transition: background 0.15s;
+            position: relative;
+        }
+        .language-dropdown .lang-btn:hover,
+        .language-dropdown .lang-btn:focus {
+            background: rgba(255,255,255,0.18);
+        }
+        .language-dropdown .flag-icon {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            display: block;
+        }
+        .language-dropdown .chevron {
+            font-size: 1.13em;
+            color: #4257e0;
+            margin-left: 2px;
+            vertical-align: middle;
+            transition: transform 0.18s;
+            display: inline-block;
+        }
+        .language-dropdown.active .chevron {
+            transform: rotate(180deg);
+        }
+        .language-dropdown .dropdown-content {
+            display: none;
+            position: absolute;
+            top: calc(100% + 9px);
+            right: 0;
+            min-width: 170px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 8px 28px 0 rgba(60,60,120,0.17);
+            padding: 10px 0;
+            z-index: 1200;
+            animation: fadeIn .18s;
+        }
+        .language-dropdown.active .dropdown-content {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity:0; transform: translateY(10px);}
+            to { opacity:1; transform: translateY(0);}
+        }
+        .language-dropdown .flag-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 7px 16px;
+            border-radius: 7px;
+            color: #23234a;
+            font-size: 1.02em;
+            text-decoration: none;
+            transition: background .12s, color .12s;
             cursor: pointer;
         }
-        
-        .mobile-nav-content {
-            padding: 20px;
+        .language-dropdown .flag-item.active,
+        .language-dropdown .flag-item:hover {
+            background: #f1f6ff;
+            color: #4361ee;
+            font-weight: 600;
         }
-        
-        .mobile-nav-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        
-        .mobile-nav-list li {
-            margin-bottom: 10px;
-        }
-        
-        .mobile-nav-list a {
-            display: block;
-            padding: 12px;
-            color: #333;
-            text-decoration: none;
-            border-radius: 6px;
-            transition: background-color 0.2s;
-        }
-        
-        .mobile-nav-list a:hover {
-            background-color: #f8f9fa;
-        }
-        
-        .dropdown-mobile-content {
-            display: none;
-            padding-left: 20px;
-            margin-top: 10px;
-        }
-        
-        .dropdown-mobile.active .dropdown-mobile-content {
+        .language-dropdown .flag-item img {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
             display: block;
         }
-        
-        /* Responsive */
-        @media (max-width: 768px) {
-            .nav-links {
-                display: none;
+        .language-dropdown .flag-item span {
+            min-width: 70px;
+        }
+        @media (max-width: 1200px) {
+            .header-bar { gap: 12px; padding: 0 10px; }
+            .header-bar .logo { font-size: 1.2rem; }
+            .header-bar .nav-links ul { gap: 10px; }
+            .header-bar .search-bar { margin: 0 10px; }
+        }
+        @media (max-width: 900px) {
+            .header-bar { flex-wrap: wrap; gap: 8px;}
+            .header-bar .nav-links ul { gap: 5px; }
+            .header-bar .search-bar { min-width: 100px; max-width: 180px;}
+        }
+        @media (max-width: 700px) {
+            .header-bar { flex-direction: column; align-items: stretch; gap: 7px;}
+            .header-bar .nav-links ul { flex-direction: column; gap: 0;}
+            .header-bar .search-bar { width: 100%; min-width: 0; max-width: none;}
+            .language-dropdown .dropdown-content {
+                right: auto;
+                left: 0;
+                min-width: 120px;
             }
-            
-            .mobile-menu-toggle {
-                display: block;
-            }
         }
-        
-        @media (min-width: 769px) {
-            .mobile-menu-toggle {
-                display: none;
-            }
+        [data-theme="dark"] .main-header {
+            background: linear-gradient(90deg, #23234a 0%, #353575 100%);
         }
-        
-        /* Tema oscuro */
-        [data-theme="dark"] {
-            background-color: #1a1a1a;
-            color: #ffffff;
+        [data-theme="dark"] .header-bar .dropdown-content,
+        [data-theme="dark"] .header-bar .mega-dropdown {
+            background: #23234a;
+            color: #fff;
         }
-        
-        [data-theme="dark"] .dropdown-content {
-            background-color: #2d2d2d;
-            color: #ffffff;
+        [data-theme="dark"] .header-bar .dropdown-links a {
+            color: #e0e0e0;
         }
-        
-        [data-theme="dark"] .dropdown-links a {
-            color: #cccccc;
-        }
-        
-        [data-theme="dark"] .dropdown-links a:hover {
-            background-color: #3d3d3d;
-            color: #ffffff;
+        [data-theme="dark"] .header-bar .dropdown-links a:hover {
+            background-color: #353575;
+            color: #fff;
         }
     </style>
-    
 </head>
 <body>
-    <header class="main-header">
-        <div class="container">
-            <div class="navbar">
-                <!-- Logo -->
-                <div class="logo">
-                    <a href="<?php echo BASE_URL; ?>/public/index.php">
-                        <img src="<?php echo BASE_URL; ?>/includes/img/inkverse3.jpg" alt="Logo InkVerse">
-                        <span>InkVerse</span>
-                    </a>
-                </div>
-                
-                <!-- Navegación principal -->
-                <nav class="nav-links">
-                    <ul>
-                        <li>
-                            <a href="<?php echo BASE_URL; ?>/public/index.php" class="nav-link">
-                                <i class="fas fa-home"></i> <?= htmlspecialchars($TEXTOS['inicio']) ?>
-                            </a>
-                        </li>
-                        
-                        <li>
-                            <a href="<?php echo BASE_URL; ?>/public/explorar.php" class="nav-link">
-                                <i class="fas fa-compass"></i> <?= htmlspecialchars($TEXTOS['explorar']) ?>
-                            </a>
-                        </li>
-                        
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle nav-link" onclick="return false;">
-                                <i class="fas fa-tags"></i> <?= htmlspecialchars($TEXTOS['categorias']) ?> 
-                                <i class="fas fa-chevron-down dropdown-arrow"></i>
-                            </a>
-                            <div class="dropdown-content mega-dropdown">
-                                <div class="dropdown-grid">
-                                    <div class="dropdown-section">
-                                        <h4><i class="fas fa-book"></i> <?= htmlspecialchars($TEXTOS['literatura']) ?></h4>
-                                        <div class="dropdown-links">
-                                            <?php foreach ($categorias_libros as $categoria): ?>
-                                                <a href="<?php echo BASE_URL; ?>/public/categoria.php?id=<?php echo $categoria['id']; ?>&tipo=libro">
-                                                    <?php echo htmlspecialchars($categoria['nombre']); ?>
-                                                </a>
-                                            <?php endforeach; ?>
-                                            <div class="dropdown-divider"></div>
-                                            <a href="<?php echo BASE_URL; ?>/public/literatura.php" class="ver-todas">
-                                                <i class="fas fa-th-large"></i> <?= htmlspecialchars($TEXTOS['ver_todas_obras']) ?>
-                                            </a>
-                                            <a href="<?php echo BASE_URL; ?>/public/categorias.php" class="ver-todas">
-                                                <i class="fas fa-list"></i> <?= htmlspecialchars($TEXTOS['ver_todas_categorias']) ?>
-                                            </a>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="dropdown-section">
-                                        <h4><i class="fas fa-book-open"></i> <?= htmlspecialchars($TEXTOS['comic_manga']) ?></h4>
-                                        <div class="dropdown-links">
-                                            <?php foreach ($categorias_comics as $categoria): ?>
-                                                <a href="<?php echo BASE_URL; ?>/public/categoria.php?id=<?php echo $categoria['id']; ?>&tipo=comic">
-                                                    <?php echo htmlspecialchars($categoria['nombre']); ?>
-                                                </a>
-                                            <?php endforeach; ?>
-                                            <div class="dropdown-divider"></div>
-                                            <a href="<?php echo BASE_URL; ?>/public/comics.php" class="ver-todas">
-                                                <i class="fas fa-th-large"></i> <?= htmlspecialchars($TEXTOS['ver_todas_obras']) ?>
-                                            </a>
-                                            <a href="<?php echo BASE_URL; ?>/public/categorias.php" class="ver-todas">
-                                                <i class="fas fa-list"></i> <?= htmlspecialchars($TEXTOS['ver_todas_categorias']) ?>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
-                        
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle nav-link" onclick="return false;">
-                                <i class="fas fa-users"></i> <?= htmlspecialchars($TEXTOS['comunidad']) ?> 
-                                <i class="fas fa-chevron-down dropdown-arrow"></i>
-                            </a>
-                            <div class="dropdown-content mega-dropdown">
-                                <div class="dropdown-grid">
-                                    <div class="dropdown-section">
-                                        <h4><?= htmlspecialchars($TEXTOS['participar']) ?></h4>
-                                        <div class="dropdown-links">
-                                            <a href="<?php echo BASE_URL; ?>/comunidad/foros.php">
-                                                <i class="fas fa-comments"></i> <?= htmlspecialchars($TEXTOS['foros_discusion']) ?>
-                                            </a>
-                                            <a href="<?php echo BASE_URL; ?>/comunidad/grupos.php">
-                                                <i class="fas fa-user-friends"></i> <?= htmlspecialchars($TEXTOS['grupos_lectura']) ?>
-                                            </a>
-                                            <a href="<?php echo BASE_URL; ?>/comunidad/eventos.php">
-                                                <i class="fas fa-calendar-alt"></i> <?= htmlspecialchars($TEXTOS['eventos']) ?>
-                                            </a>
-                                        </div>
-                                    </div>
-
-                                    <div class="dropdown-section">
-                                        <h4><?= htmlspecialchars($TEXTOS['contenido']) ?></h4>
-                                        <div class="dropdown-links">
-                                            <a href="<?php echo BASE_URL; ?>/comunidad/arte.php">
-                                                <i class="fas fa-palette"></i> <?= htmlspecialchars($TEXTOS['galeria_arte']) ?>
-                                            </a>
-                                            <a href="<?php echo BASE_URL; ?>/comunidad/recomendaciones.php">
-                                                <i class="fas fa-thumbs-up"></i> <?= htmlspecialchars($TEXTOS['recomendaciones']) ?>
-                                            </a>
-                                            <a href="<?php echo BASE_URL; ?>/comunidad/noticias.php">
-                                                <i class="fas fa-newspaper"></i> <?= htmlspecialchars($TEXTOS['noticias_novedades']) ?>
-                                            </a>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="dropdown-section">
-                                        <h4>Información</h4>
-                                        <div class="dropdown-links">
-                                            <a href="<?php echo BASE_URL; ?>/public/acerca.php">
-                                                <i class="fas fa-info-circle"></i> <?= htmlspecialchars($TEXTOS['acerca_de']) ?>
-                                            </a>
-                                            <a href="<?php echo BASE_URL; ?>/public/contacto.php">
-                                                <i class="fas fa-envelope"></i> <?= htmlspecialchars($TEXTOS['contacto']) ?>
-                                            </a>
-                                            <a href="<?php echo BASE_URL; ?>/public/aleatorio.php">
-                                                <i class="fas fa-random"></i> <?= htmlspecialchars($TEXTOS['aleatorio']) ?>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
-                    </ul>
-                </nav>
-                
-                <!-- Acciones del header -->
-                <div class="header-right">
-                    <!-- Barra de búsqueda -->
-                    <div class="search-bar">
-                        <form action="<?php echo BASE_URL; ?>/public/buscar.php" method="GET" class="search-form">
-                            <input type="text" name="q" placeholder="<?= htmlspecialchars($TEXTOS['buscar_obras']) ?>" 
-                                   aria-label="Buscar" class="search-input">
-                            <button type="submit" class="search-btn">
-                                <i class="fas fa-search"></i>
-                            </button>
-                        </form>
-                    </div>
-                    
-                    <!-- Acciones de usuario -->
-                    <div class="user-actions">
-                        <!-- Selector de idioma -->
-                        <div class="dropdown language-dropdown">
-                            <button class="dropdown-toggle icon-btn" aria-label="Seleccionar idioma" onclick="return false;">
-                                <img src="<?php echo BASE_URL; ?>/includes/img/<?php echo htmlspecialchars($idioma); ?>.png" 
-                                     alt="<?php echo htmlspecialchars($idioma); ?>" class="flag-icon">
-                                <i class="fas fa-chevron-down"></i>
-                            </button>
-                            <div class="dropdown-content language-dropdown-content">
-                                <a href="?lang=es" class="flag-item <?php echo ($idioma == 'es') ? 'active' : ''; ?>">
-                                    <img src="<?php echo BASE_URL; ?>/includes/img/es.png" alt="Español">
-                                    <span>Español</span>
-                                </a>
-                                <a href="?lang=en" class="flag-item <?php echo ($idioma == 'en') ? 'active' : ''; ?>">
-                                    <img src="<?php echo BASE_URL; ?>/includes/img/en.png" alt="English">
-                                    <span>English</span>
-                                </a>
-                                <a href="?lang=fr" class="flag-item <?php echo ($idioma == 'fr') ? 'active' : ''; ?>">
-                                    <img src="<?php echo BASE_URL; ?>/includes/img/fr.png" alt="Français">
-                                    <span>Français</span>
-                                </a>
-                                <a href="?lang=ca" class="flag-item <?php echo ($idioma == 'ca') ? 'active' : ''; ?>">
-                                    <img src="<?php echo BASE_URL; ?>/includes/img/ca.png" alt="Catalá">
-                                    <span>Catalá</span>
-                                </a>
-                            </div>
-                        </div>
-                        
-                        <?php if (isset($_SESSION['usuario_id'])): ?>
-                            <!-- Favoritos -->
-                            <a href="<?php echo BASE_URL; ?>/usuario/favoritos.php" 
-                               title="<?= htmlspecialchars($TEXTOS['mis_favoritos']) ?>" 
-                               class="icon-btn favorites-btn">
-                                <i class="fas fa-heart"></i>
-                            </a>
-                            
-                            <!-- Notificaciones -->
-                            <div class="dropdown notification-dropdown">
-                                <button class="dropdown-toggle icon-btn" 
-                                        title="<?= htmlspecialchars($TEXTOS['notificaciones']) ?>"
-                                        onclick="return false;">
-                                    <i class="fas fa-bell"></i>
-                                    <?php if ($notificaciones_no_leidas > 0): ?>
-                                        <span class="notification-badge"><?php echo $notificaciones_no_leidas; ?></span>
-                                    <?php endif; ?>
-                                </button>
-                                <div class="dropdown-content notification-dropdown-content">
-                                    <div class="notification-header">
-                                        <h4><?= htmlspecialchars($TEXTOS['notificaciones']) ?></h4>
-                                        <?php if ($notificaciones_no_leidas > 0): ?>
-                                            <a href="<?php echo BASE_URL; ?>/controllers/procesar-notificaciones.php?accion=marcar_todas_leidas" 
-                                               class="notification-mark-all">
-                                                <?= htmlspecialchars($TEXTOS['marcar_todas_leidas']) ?>
-                                            </a>
-                                        <?php endif; ?>
-                                    </div>
-                                    
-                                    <div class="notification-list">
-                                        <?php
-                                        if (isset($_SESSION['usuario_id'])) {
-                                            $sql_notif_list = "SELECT * FROM notificaciones WHERE usuario_id = ? ORDER BY fecha_creacion DESC LIMIT 5";
-                                            $stmt_notif_list = $conexion->prepare($sql_notif_list);
-                                            if ($stmt_notif_list) {
-                                                $stmt_notif_list->bind_param("i", $_SESSION['usuario_id']);
-                                                $stmt_notif_list->execute();
-                                                $notificaciones = $stmt_notif_list->get_result();
-                                                
-                                                if ($notificaciones && $notificaciones->num_rows > 0):
-                                                    while ($notificacion = $notificaciones->fetch_assoc()):
-                                        ?>
-                                            <a href="<?php echo htmlspecialchars($notificacion['url'] ?? '#'); ?>" 
-                                               class="notification-item <?php echo $notificacion['leida'] ? '' : 'unread'; ?>">
-                                                <div class="notification-icon">
-                                                    <?php
-                                                    $icon = 'bell';
-                                                    switch ($notificacion['tipo']) {
-                                                        case 'comentario': $icon = 'comment'; break;
-                                                        case 'like': $icon = 'heart'; break;
-                                                        case 'respuesta_foro': $icon = 'reply'; break;
-                                                        case 'nueva_obra': $icon = 'book'; break;
-                                                        case 'sistema': $icon = 'info-circle'; break;
-                                                    }
-                                                    ?>
-                                                    <i class="fas fa-<?php echo $icon; ?>"></i>
-                                                </div>
-                                                <div class="notification-content">
-                                                    <p><?= htmlspecialchars($notificacion['mensaje']); ?></p> 
-                                                    <span class="notification-time">
-                                                        <?php echo date('d/m/Y H:i', strtotime($notificacion['fecha_creacion'])); ?>
-                                                    </span>
-                                                </div>
-                                            </a>
-                                        <?php
-                                                    endwhile;
-                                                else:
-                                        ?>
-                                            <div class="notification-empty">
-                                                <p><?= htmlspecialchars($TEXTOS['no_notificaciones']) ?></p>
-                                            </div>
-                                        <?php 
-                                                endif;
-                                            }
-                                        }
-                                        ?>
-                                    </div>
-                                    
-                                    <div class="notification-footer">
-                                        <a href="<?php echo BASE_URL; ?>/usuario/notificaciones.php">
-                                            <?= htmlspecialchars($TEXTOS['ver_todas']) ?>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        <?php endif; ?>
-                        
-                        <!-- Toggle modo oscuro -->
-                        <button class="dark-mode-toggle icon-btn" 
-                                title="<?= htmlspecialchars($TEXTOS['cambiar_modo']) ?>"
-                                onclick="toggleTheme()">
-                            <i class="fas fa-moon"></i>
-                        </button>
-                        
-                        <!-- Menú de usuario -->
-                        <div class="dropdown user-dropdown">
-                            <button class="dropdown-toggle icon-btn user-menu-btn" onclick="return false;">
-                                <i class="fas fa-user-circle"></i>
-                            </button>
-                            <div class="dropdown-content user-dropdown-content">
-                                <?php if (isset($_SESSION['usuario_id'])): ?>
-                                    <div class="user-info">
-                                        <span class="user-name"><?php echo htmlspecialchars($_SESSION['usuario']); ?></span>
-                                        <?php if (isset($_SESSION['usuario_fecha_nacimiento'])): ?>
-                                            <span class="user-age">
-                                                <?php 
-                                                $fecha_nacimiento = new DateTime($_SESSION['usuario_fecha_nacimiento']);
-                                                $hoy = new DateTime();
-                                                $edad = $hoy->diff($fecha_nacimiento)->y;
-                                                echo htmlspecialchars($edad) . ' ' . $TEXTOS['años']; 
-                                                ?>
-                                            </span>
-                                        <?php endif; ?>
-                                    </div>
-                                    <div class="dropdown-divider"></div>
-                                    <a href="<?php echo BASE_URL; ?>/usuario/perfil.php">
-                                        <i class="fas fa-user"></i> <?= htmlspecialchars($TEXTOS['mi_perfil']) ?>
-                                    </a>
-                                    <a href="<?php echo BASE_URL; ?>/usuario/mis_obras.php">
-                                        <i class="fas fa-book"></i> <?= htmlspecialchars($TEXTOS['mis_obras']) ?>
-                                    </a>
-                                    <a href="<?php echo BASE_URL; ?>/usuario/favoritos.php">
-                                        <i class="fas fa-heart"></i> <?= htmlspecialchars($TEXTOS['favoritos']) ?>
-                                    </a>
-                                    <a href="<?php echo BASE_URL; ?>/usuario/nueva_obra.php">
-                                        <i class="fas fa-plus-circle"></i> <?= htmlspecialchars($TEXTOS['nueva_obra']) ?>
-                                    </a>
-                                    <div class="dropdown-divider"></div>
-                                    <a href="<?php echo BASE_URL; ?>/public/logout.php" class="logout-link">
-                                        <i class="fas fa-sign-out-alt"></i> <?= htmlspecialchars($TEXTOS['cerrar_sesion']) ?>
-                                    </a>
-                                <?php else: ?>
-                                    <a href="<?php echo BASE_URL; ?>/public/login.php">
-                                        <i class="fas fa-sign-in-alt"></i> <?= htmlspecialchars($TEXTOS['iniciar_sesion']) ?>
-                                    </a>
-                                    <a href="<?php echo BASE_URL; ?>/public/register.php">
-                                        <i class="fas fa-user-plus"></i> <?= htmlspecialchars($TEXTOS['registrarse']) ?>
-                                    </a>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-                        
-                        <!-- Botón menú móvil -->
-                        <button class="mobile-menu-toggle icon-btn" onclick="toggleMobileMenu()">
-                            <i class="fas fa-bars"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </header>
-    
-    <!-- Menú móvil -->
-    <div class="mobile-nav-overlay" onclick="closeMobileMenu()"></div>
-    <div class="mobile-nav-menu">
-        <div class="mobile-nav-header">
-            <div class="mobile-logo">
-                <img src="<?php echo BASE_URL; ?>/includes/img/inkverse3.jpg" alt="InkVerse">
+<header class="main-header">
+    <div class="header-bar">
+        <!-- LOGO -->
+        <div class="logo">
+            <a href="<?php echo BASE_URL; ?>/public/index.php">
+                <img src="<?php echo BASE_URL; ?>/includes/img/inkverse3.jpg" alt="Logo InkVerse">
                 <span>InkVerse</span>
-            </div>
-            <button class="close-btn" onclick="closeMobileMenu()"><i class="fas fa-times"></i></button>
+            </a>
         </div>
-        
-        <div class="mobile-nav-content">
-            <ul class="mobile-nav-list">
-                <li><a href="<?php echo BASE_URL; ?>/public/index.php"><i class="fas fa-home"></i> <?= htmlspecialchars($TEXTOS['inicio']) ?></a></li>
-                <li><a href="<?php echo BASE_URL; ?>/public/explorar.php"><i class="fas fa-compass"></i> <?= htmlspecialchars($TEXTOS['explorar']) ?></a></li>
-                
-                <li class="dropdown-mobile">
-                    <button class="dropdown-toggle" onclick="toggleMobileDropdown(this)">
-                        <i class="fas fa-tags"></i> <?= htmlspecialchars($TEXTOS['categorias']) ?> 
-                        <i class="fas fa-chevron-down"></i>
-                    </button>
-                    <div class="dropdown-mobile-content">
-                        <h4><i class="fas fa-book"></i> <?= htmlspecialchars($TEXTOS['literatura']) ?></h4>
-                        <?php foreach ($categorias_libros as $categoria): ?>
-                            <a href="<?php echo BASE_URL; ?>/public/categoria.php?id=<?php echo $categoria['id']; ?>&tipo=libro">
-                                <?php echo htmlspecialchars($categoria['nombre']); ?>
-                            </a>
-                        <?php endforeach; ?>
-                        <a href="<?php echo BASE_URL; ?>/public/literatura.php" class="ver-todas">
-                            <i class="fas fa-th-large"></i> <?= htmlspecialchars($TEXTOS['ver_todas_obras']) ?>
-                        </a>
-                        
-                        <h4><i class="fas fa-book-open"></i> <?= htmlspecialchars($TEXTOS['comic_manga']) ?></h4>
-                        <?php foreach ($categorias_comics as $categoria): ?>
-                            <a href="<?php echo BASE_URL; ?>/public/categoria.php?id=<?php echo $categoria['id']; ?>&tipo=comic">
-                                <?php echo htmlspecialchars($categoria['nombre']); ?>
-                            </a>
-                        <?php endforeach; ?>
-                        <a href="<?php echo BASE_URL; ?>/public/comics.php" class="ver-todas">
-                            <i class="fas fa-th-large"></i> <?= htmlspecialchars($TEXTOS['ver_todas_obras']) ?>
-                        </a>
+        <!-- NAV MENU -->
+        <nav class="nav-links">
+            <ul>
+                <li>
+                    <a href="<?php echo BASE_URL; ?>/public/index.php" class="nav-link">
+                        <i class="fas fa-home"></i> <?= htmlspecialchars($TEXTOS['inicio']) ?>
+                    </a>
+                </li>
+                <li>
+                    <a href="<?php echo BASE_URL; ?>/public/explorar.php" class="nav-link">
+                        <i class="fas fa-compass"></i> <?= htmlspecialchars($TEXTOS['explorar']) ?>
+                    </a>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle nav-link" onclick="return false;">
+                        <i class="fas fa-tags"></i> <?= htmlspecialchars($TEXTOS['categorias']) ?> <i class="fas fa-chevron-down"></i>
+                    </a>
+                    <div class="dropdown-content mega-dropdown">
+                        <div class="dropdown-grid">
+                            <div class="dropdown-section">
+                                <h4><i class="fas fa-book"></i> <?= htmlspecialchars($TEXTOS['literatura']) ?></h4>
+                                <div class="dropdown-links">
+                                    <?php foreach ($categorias_libros as $categoria): ?>
+                                        <a href="<?php echo BASE_URL; ?>/public/categoria.php?id=<?php echo $categoria['id']; ?>&tipo=libro">
+                                            <?php echo htmlspecialchars($categoria['nombre']); ?>
+                                        </a>
+                                    <?php endforeach; ?>
+                                    <div class="dropdown-divider"></div>
+                                    <a href="<?php echo BASE_URL; ?>/public/literatura.php" class="ver-todas">
+                                        <i class="fas fa-th-large"></i> <?= htmlspecialchars($TEXTOS['ver_todas_obras']) ?>
+                                    </a>
+                                    <a href="<?php echo BASE_URL; ?>/public/categorias.php" class="ver-todas">
+                                        <i class="fas fa-list"></i> <?= htmlspecialchars($TEXTOS['ver_todas_categorias']) ?>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="dropdown-section">
+                                <h4><i class="fas fa-book-open"></i> <?= htmlspecialchars($TEXTOS['comic_manga']) ?></h4>
+                                <div class="dropdown-links">
+                                    <?php foreach ($categorias_comics as $categoria): ?>
+                                        <a href="<?php echo BASE_URL; ?>/public/categoria.php?id=<?php echo $categoria['id']; ?>&tipo=comic">
+                                            <?php echo htmlspecialchars($categoria['nombre']); ?>
+                                        </a>
+                                    <?php endforeach; ?>
+                                    <div class="dropdown-divider"></div>
+                                    <a href="<?php echo BASE_URL; ?>/public/comics.php" class="ver-todas">
+                                        <i class="fas fa-th-large"></i> <?= htmlspecialchars($TEXTOS['ver_todas_obras']) ?>
+                                    </a>
+                                    <a href="<?php echo BASE_URL; ?>/public/categorias.php" class="ver-todas">
+                                        <i class="fas fa-list"></i> <?= htmlspecialchars($TEXTOS['ver_todas_categorias']) ?>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </li>
-                
-                <li class="dropdown-mobile">
-                    <button class="dropdown-toggle" onclick="toggleMobileDropdown(this)">
-                        <i class="fas fa-users"></i> <?= htmlspecialchars($TEXTOS['comunidad']) ?> 
-                        <i class="fas fa-chevron-down"></i>
-                    </button>
-                    <div class="dropdown-mobile-content">
-                        <a href="<?php echo BASE_URL; ?>/comunidad/foros.php">
-                            <i class="fas fa-comments"></i> <?= htmlspecialchars($TEXTOS['foros_discusion']) ?>
-                        </a>
-                        <a href="<?php echo BASE_URL; ?>/comunidad/grupos.php">
-                            <i class="fas fa-user-friends"></i> <?= htmlspecialchars($TEXTOS['grupos_lectura']) ?>
-                        </a>
-                        <a href="<?php echo BASE_URL; ?>/comunidad/eventos.php">
-                            <i class="fas fa-calendar-alt"></i> <?= htmlspecialchars($TEXTOS['eventos']) ?>
-                        </a>
-                        <a href="<?php echo BASE_URL; ?>/comunidad/arte.php">
-                            <i class="fas fa-palette"></i> <?= htmlspecialchars($TEXTOS['galeria_arte']) ?>
-                        </a>
-                        <a href="<?php echo BASE_URL; ?>/comunidad/noticias.php">
-                            <i class="fas fa-newspaper"></i> <?= htmlspecialchars($TEXTOS['noticias_novedades']) ?>
-                        </a>
-                        <a href="<?php echo BASE_URL; ?>/public/acerca-de.php">
-                            <i class="fas fa-info-circle"></i> <?= htmlspecialchars($TEXTOS['acerca_de']) ?>
-                        </a>
-                        <a href="<?php echo BASE_URL; ?>/public/contacto.php">
-                            <i class="fas fa-envelope"></i> <?= htmlspecialchars($TEXTOS['contacto']) ?>
-                        </a>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle nav-link" onclick="return false;">
+                        <i class="fas fa-users"></i> <?= htmlspecialchars($TEXTOS['comunidad']) ?> <i class="fas fa-chevron-down"></i>
+                    </a>
+                    <div class="dropdown-content mega-dropdown">
+                        <div class="dropdown-grid">
+                            <div class="dropdown-section">
+                                <h4><?= htmlspecialchars($TEXTOS['participar']) ?></h4>
+                                <div class="dropdown-links">
+                                    <a href="<?php echo BASE_URL; ?>/comunidad/foros.php">
+                                        <i class="fas fa-comments"></i> <?= htmlspecialchars($TEXTOS['foros_discusion']) ?>
+                                    </a>
+                                    <a href="<?php echo BASE_URL; ?>/comunidad/grupos.php">
+                                        <i class="fas fa-user-friends"></i> <?= htmlspecialchars($TEXTOS['grupos_lectura']) ?>
+                                    </a>
+                                    <a href="<?php echo BASE_URL; ?>/comunidad/eventos.php">
+                                        <i class="fas fa-calendar-alt"></i> <?= htmlspecialchars($TEXTOS['eventos']) ?>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="dropdown-section">
+                                <h4><?= htmlspecialchars($TEXTOS['contenido']) ?></h4>
+                                <div class="dropdown-links">
+                                    <a href="<?php echo BASE_URL; ?>/comunidad/arte.php">
+                                        <i class="fas fa-palette"></i> <?= htmlspecialchars($TEXTOS['galeria_arte']) ?>
+                                    </a>
+                                    <a href="<?php echo BASE_URL; ?>/comunidad/recomendaciones.php">
+                                        <i class="fas fa-thumbs-up"></i> <?= htmlspecialchars($TEXTOS['recomendaciones']) ?>
+                                    </a>
+                                    <a href="<?php echo BASE_URL; ?>/comunidad/noticias.php">
+                                        <i class="fas fa-newspaper"></i> <?= htmlspecialchars($TEXTOS['noticias_novedades']) ?>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="dropdown-section">
+                                <h4>Información</h4>
+                                <div class="dropdown-links">
+                                    <a href="<?php echo BASE_URL; ?>/public/acerca.php">
+                                        <i class="fas fa-info-circle"></i> <?= htmlspecialchars($TEXTOS['acerca_de']) ?>
+                                    </a>
+                                    <a href="<?php echo BASE_URL; ?>/public/contacto.php">
+                                        <i class="fas fa-envelope"></i> <?= htmlspecialchars($TEXTOS['contacto']) ?>
+                                    </a>
+                                    <a href="<?php echo BASE_URL; ?>/public/aleatorio.php">
+                                        <i class="fas fa-random"></i> <?= htmlspecialchars($TEXTOS['aleatorio']) ?>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </li>
             </ul>
-            
-            <div class="mobile-user-actions">
-                <?php if (isset($_SESSION['usuario_id'])): ?>
-                    <div class="user-info">
-                        <span class="user-name"><?php echo htmlspecialchars($_SESSION['usuario']); ?></span>
-                    </div>
-                    <a href="<?php echo BASE_URL; ?>/usuario/perfil.php" class="btn btn-outline">
-                        <i class="fas fa-user"></i> <?= htmlspecialchars($TEXTOS['mi_perfil']) ?>
-                    </a>
-                    <a href="<?php echo BASE_URL; ?>/usuario/mis_obras.php" class="btn btn-outline">
-                        <i class="fas fa-book"></i> <?= htmlspecialchars($TEXTOS['mis_obras']) ?>
-                    </a>
-                    <a href="<?php echo BASE_URL; ?>/usuario/favoritos.php" class="btn btn-outline">
-                        <i class="fas fa-heart"></i> <?= htmlspecialchars($TEXTOS['favoritos']) ?>
-                    </a>
-                    <a href="<?php echo BASE_URL; ?>/usuario/nueva_obra.php" class="btn btn-accent">
-                        <i class="fas fa-plus-circle"></i> <?= htmlspecialchars($TEXTOS['nueva_obra']) ?>
-                    </a>
-                    <a href="<?php echo BASE_URL; ?>/public/logout.php" class="btn btn-outline logout-btn">
-                        <i class="fas fa-sign-out-alt"></i> <?= htmlspecialchars($TEXTOS['cerrar_sesion']) ?>
-                    </a>
-                <?php else: ?>
-                    <a href="<?php echo BASE_URL; ?>/public/login.php" class="btn btn-outline">
-                        <i class="fas fa-sign-in-alt"></i> <?= htmlspecialchars($TEXTOS['iniciar_sesion']) ?>
-                    </a>
-                    <a href="<?php echo BASE_URL; ?>/public/register.php" class="btn btn-accent">
-                        <i class="fas fa-user-plus"></i> <?= htmlspecialchars($TEXTOS['registrarse']) ?>
-                    </a>
-                <?php endif; ?>
-            </div>
-            
-            <div class="language-switcher">
-                <h4>Idioma</h4>
-                <div class="language-options">
+        </nav>
+        <!-- BÚSQUEDA -->
+        <div class="search-bar">
+            <form action="<?php echo BASE_URL; ?>/public/buscar.php" method="GET" class="search-form">
+                <input type="text" name="q" placeholder="<?= htmlspecialchars($TEXTOS['buscar_obras']) ?>"
+                       aria-label="Buscar" class="search-input">
+                <button type="submit" class="search-btn">
+                    <i class="fas fa-search"></i>
+                </button>
+            </form>
+        </div>
+        <!-- ACCIONES USUARIO -->
+        <div class="header-actions">
+            <!-- Idioma -->
+            <div class="dropdown language-dropdown">
+                <button class="lang-btn dropdown-toggle icon-btn" aria-label="Seleccionar idioma" onclick="return false;">
+                    <img src="<?php echo BASE_URL; ?>/includes/img/<?php echo htmlspecialchars($idioma); ?>.png"
+                         alt="<?php echo htmlspecialchars($idioma); ?>" class="flag-icon">
+                    <i class="fas fa-chevron-down chevron"></i>
+                </button>
+                <div class="dropdown-content language-dropdown-content">
                     <a href="?lang=es" class="flag-item <?php echo ($idioma == 'es') ? 'active' : ''; ?>">
-                        <img src="<?php echo BASE_URL; ?>/includes/img/es.png" alt="Español">
-                        <span>Español</span>
+                        <img src="<?php echo BASE_URL; ?>/includes/img/es.png" alt="Español"><span>Español</span>
                     </a>
                     <a href="?lang=en" class="flag-item <?php echo ($idioma == 'en') ? 'active' : ''; ?>">
-                        <img src="<?php echo BASE_URL; ?>/includes/img/en.png" alt="English">
-                        <span>English</span>
+                        <img src="<?php echo BASE_URL; ?>/includes/img/en.png" alt="English"><span>English</span>
                     </a>
                     <a href="?lang=fr" class="flag-item <?php echo ($idioma == 'fr') ? 'active' : ''; ?>">
-                        <img src="<?php echo BASE_URL; ?>/includes/img/fr.png" alt="Français">
-                        <span>Français</span>
+                        <img src="<?php echo BASE_URL; ?>/includes/img/fr.png" alt="Français"><span>Français</span>
                     </a>
                     <a href="?lang=ca" class="flag-item <?php echo ($idioma == 'ca') ? 'active' : ''; ?>">
-                        <img src="<?php echo BASE_URL; ?>/includes/img/ca.png" alt="Catalá">
-                        <span>Catalá</span>
+                        <img src="<?php echo BASE_URL; ?>/includes/img/ca.png" alt="Catalá"><span>Catalá</span>
                     </a>
+                </div>
+            </div>
+            <?php if (isset($_SESSION['usuario_id'])): ?>
+                <a href="<?php echo BASE_URL; ?>/usuario/favoritos.php"
+                   title="<?= htmlspecialchars($TEXTOS['mis_favoritos']) ?>"
+                   class="icon-btn favorites-btn">
+                    <i class="fas fa-heart"></i>
+                </a>
+                <div class="dropdown notification-dropdown">
+                    <button class="dropdown-toggle icon-btn"
+                            title="<?= htmlspecialchars($TEXTOS['notificaciones']) ?>"
+                            onclick="return false;">
+                        <i class="fas fa-bell"></i>
+                        <?php if ($notificaciones_no_leidas > 0): ?>
+                            <span class="notification-badge"><?php echo $notificaciones_no_leidas; ?></span>
+                        <?php endif; ?>
+                    </button>
+                    <div class="dropdown-content notification-dropdown-content">
+                        <div class="notification-header">
+                            <h4><?= htmlspecialchars($TEXTOS['notificaciones']) ?></h4>
+                            <?php if ($notificaciones_no_leidas > 0): ?>
+                                <a href="<?php echo BASE_URL; ?>/controllers/procesar-notificaciones.php?accion=marcar_todas_leidas"
+                                   class="notification-mark-all">
+                                    <?= htmlspecialchars($TEXTOS['marcar_todas_leidas']) ?>
+                                </a>
+                            <?php endif; ?>
+                        </div>
+                        <div class="notification-list">
+                            <?php
+                            if (isset($_SESSION['usuario_id'])) {
+                                $sql_notif_list = "SELECT * FROM notificaciones WHERE usuario_id = ? ORDER BY fecha_creacion DESC LIMIT 5";
+                                $stmt_notif_list = $conexion->prepare($sql_notif_list);
+                                if ($stmt_notif_list) {
+                                    $stmt_notif_list->bind_param("i", $_SESSION['usuario_id']);
+                                    $stmt_notif_list->execute();
+                                    $notificaciones = $stmt_notif_list->get_result();
+                                    if ($notificaciones && $notificaciones->num_rows > 0):
+                                        while ($notificacion = $notificaciones->fetch_assoc()):
+                            ?>
+                                <a href="<?php echo htmlspecialchars($notificacion['url'] ?? '#'); ?>"
+                                   class="notification-item <?php echo $notificacion['leida'] ? '' : 'unread'; ?>">
+                                    <div class="notification-icon">
+                                        <?php
+                                        $icon = 'bell';
+                                        switch ($notificacion['tipo']) {
+                                            case 'comentario': $icon = 'comment'; break;
+                                            case 'like': $icon = 'heart'; break;
+                                            case 'respuesta_foro': $icon = 'reply'; break;
+                                            case 'nueva_obra': $icon = 'book'; break;
+                                            case 'sistema': $icon = 'info-circle'; break;
+                                        }
+                                        ?>
+                                        <i class="fas fa-<?php echo $icon; ?>"></i>
+                                    </div>
+                                    <div class="notification-content">
+                                        <p><?= htmlspecialchars($notificacion['mensaje']); ?></p>
+                                        <span class="notification-time">
+                                            <?php echo date('d/m/Y H:i', strtotime($notificacion['fecha_creacion'])); ?>
+                                        </span>
+                                    </div>
+                                </a>
+                            <?php
+                                        endwhile;
+                                    else:
+                            ?>
+                                <div class="notification-empty">
+                                    <p><?= htmlspecialchars($TEXTOS['no_notificaciones']) ?></p>
+                                </div>
+                            <?php
+                                    endif;
+                                }
+                            }
+                            ?>
+                        </div>
+                        <div class="notification-footer">
+                            <a href="<?php echo BASE_URL; ?>/usuario/notificaciones.php">
+                                <?= htmlspecialchars($TEXTOS['ver_todas']) ?>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            <?php endif; ?>
+            <button class="dark-mode-toggle icon-btn"
+                    title="<?= htmlspecialchars($TEXTOS['cambiar_modo']) ?>"
+                    onclick="toggleTheme()">
+                <i class="fas fa-moon"></i>
+            </button>
+            <div class="dropdown user-dropdown">
+                <button class="dropdown-toggle icon-btn user-menu-btn" onclick="return false;">
+                    <i class="fas fa-user-circle"></i>
+                </button>
+                <div class="dropdown-content user-dropdown-content">
+                    <?php if (isset($_SESSION['usuario_id'])): ?>
+                        <div class="user-info">
+                            <span class="user-name"><?php echo htmlspecialchars($_SESSION['usuario']); ?></span>
+                            <?php if (isset($_SESSION['usuario_fecha_nacimiento'])): ?>
+                                <span class="user-age">
+                                    <?php
+                                    $fecha_nacimiento = new DateTime($_SESSION['usuario_fecha_nacimiento']);
+                                    $hoy = new DateTime();
+                                    $edad = $hoy->diff($fecha_nacimiento)->y;
+                                    echo htmlspecialchars($edad) . ' ' . $TEXTOS['años'];
+                                    ?>
+                                </span>
+                            <?php endif; ?>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <a href="<?php echo BASE_URL; ?>/usuario/perfil.php">
+                            <i class="fas fa-user"></i> <?= htmlspecialchars($TEXTOS['mi_perfil']) ?>
+                        </a>
+                        <a href="<?php echo BASE_URL; ?>/usuario/mis_obras.php">
+                            <i class="fas fa-book"></i> <?= htmlspecialchars($TEXTOS['mis_obras']) ?>
+                        </a>
+                        <a href="<?php echo BASE_URL; ?>/usuario/favoritos.php">
+                            <i class="fas fa-heart"></i> <?= htmlspecialchars($TEXTOS['favoritos']) ?>
+                        </a>
+                        <a href="<?php echo BASE_URL; ?>/usuario/nueva_obra.php">
+                            <i class="fas fa-plus-circle"></i> <?= htmlspecialchars($TEXTOS['nueva_obra']) ?>
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="<?php echo BASE_URL; ?>/public/logout.php" class="logout-link">
+                            <i class="fas fa-sign-out-alt"></i> <?= htmlspecialchars($TEXTOS['cerrar_sesion']) ?>
+                        </a>
+                    <?php else: ?>
+                        <a href="<?php echo BASE_URL; ?>/public/login.php">
+                            <i class="fas fa-sign-in-alt"></i> <?= htmlspecialchars($TEXTOS['iniciar_sesion']) ?>
+                        </a>
+                        <a href="<?php echo BASE_URL; ?>/public/register.php">
+                            <i class="fas fa-user-plus"></i> <?= htmlspecialchars($TEXTOS['registrarse']) ?>
+                        </a>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
     </div>
-    
-    <!-- Variables JavaScript -->
-    <script>
-        const IS_USER_MINOR = <?php echo ($usuario_es_mayor_edad ? 'false' : 'true'); ?>;
-        const BASE_URL = '<?php echo BASE_URL; ?>';
-        const TEXTOS_JS = <?php echo json_encode($TEXTOS); ?>;
-    </script>
-    
-    <!-- JavaScript funcional -->
-    <script>
-        // Variables globales
-        let currentTheme = localStorage.getItem('theme') || 'light';
-        
-        // Aplicar tema al cargar
-        document.addEventListener('DOMContentLoaded', function() {
-            if (currentTheme === 'dark') {
-                document.body.setAttribute('data-theme', 'dark');
-                const themeToggle = document.querySelector('.dark-mode-toggle i');
-                if (themeToggle) {
-                    themeToggle.className = 'fas fa-sun';
-                }
-            }
-        });
-        
-        // Función para toggle de tema
-        function toggleTheme() {
-            const body = document.body;
+</header>
+
+<main>
+<?php
+// Mostrar mensajes de éxito o error si existen
+if (isset($_SESSION['mensaje'])) {
+    $tipo = isset($_SESSION['tipo_mensaje']) ? $_SESSION['tipo_mensaje'] : 'info';
+    $mensaje_clave = $_SESSION['mensaje'];
+    $mensaje_traducido = $TEXTOS[$mensaje_clave] ?? $mensaje_clave;
+    echo '<div class="alerta alerta-' . $tipo . '">' . htmlspecialchars($mensaje_traducido) . '</div>';
+    unset($_SESSION['mensaje']);
+    unset($_SESSION['tipo_mensaje']);
+}
+?>
+
+<script>
+    let currentTheme = localStorage.getItem('theme') || 'light';
+
+    document.addEventListener('DOMContentLoaded', function() {
+        if (currentTheme === 'dark') {
+            document.body.setAttribute('data-theme', 'dark');
             const themeToggle = document.querySelector('.dark-mode-toggle i');
-            
-            if (currentTheme === 'light') {
-                currentTheme = 'dark';
-                body.setAttribute('data-theme', 'dark');
-                if (themeToggle) themeToggle.className = 'fas fa-sun';
-            } else {
-                currentTheme = 'light';
-                body.removeAttribute('data-theme');
-                if (themeToggle) themeToggle.className = 'fas fa-moon';
+            if (themeToggle) {
+                themeToggle.className = 'fas fa-sun';
             }
-            
-            localStorage.setItem('theme', currentTheme);
         }
-        
-        // Función para toggle de menú móvil
-        function toggleMobileMenu() {
-            const mobileMenu = document.querySelector('.mobile-nav-menu');
-            const overlay = document.querySelector('.mobile-nav-overlay');
-            
-            mobileMenu.classList.add('active');
-            overlay.classList.add('active');
-            document.body.style.overflow = 'hidden';
+    });
+
+    function toggleTheme() {
+        const body = document.body;
+        const themeToggle = document.querySelector('.dark-mode-toggle i');
+        if (currentTheme === 'light') {
+            currentTheme = 'dark';
+            body.setAttribute('data-theme', 'dark');
+            if (themeToggle) themeToggle.className = 'fas fa-sun';
+        } else {
+            currentTheme = 'light';
+            body.removeAttribute('data-theme');
+            if (themeToggle) themeToggle.className = 'fas fa-moon';
         }
-        
-        function closeMobileMenu() {
-            const mobileMenu = document.querySelector('.mobile-nav-menu');
-            const overlay = document.querySelector('.mobile-nav-overlay');
-            
-            mobileMenu.classList.remove('active');
-            overlay.classList.remove('active');
-            document.body.style.overflow = '';
-        }
-        
-        // Función para dropdowns móviles
-        function toggleMobileDropdown(button) {
-            const dropdown = button.parentElement;
-            dropdown.classList.toggle('active');
-        }
-        
-        // Inicializar dropdowns de escritorio
-        document.addEventListener('DOMContentLoaded', function() {
-            const dropdowns = document.querySelectorAll('.dropdown');
-            
-            dropdowns.forEach(dropdown => {
-                const toggle = dropdown.querySelector('.dropdown-toggle');
-                
-                if (toggle) {
-                    toggle.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        
-                        // Cerrar otros dropdowns
-                        dropdowns.forEach(otherDropdown => {
-                            if (otherDropdown !== dropdown) {
-                                otherDropdown.classList.remove('active');
-                            }
-                        });
-                        
-                        // Toggle current dropdown
-                        dropdown.classList.toggle('active');
+        localStorage.setItem('theme', currentTheme);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const dropdowns = document.querySelectorAll('.dropdown');
+        dropdowns.forEach(dropdown => {
+            const toggle = dropdown.querySelector('.dropdown-toggle');
+            if (toggle) {
+                toggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dropdowns.forEach(otherDropdown => {
+                        if (otherDropdown !== dropdown) {
+                            otherDropdown.classList.remove('active');
+                        }
                     });
-                }
-            });
-            
-            // Cerrar dropdowns al hacer click fuera
-            document.addEventListener('click', function(e) {
-                if (!e.target.closest('.dropdown')) {
-                    dropdowns.forEach(dropdown => {
-                        dropdown.classList.remove('active');
-                    });
-                }
-            });
-            
-            // Cerrar dropdowns con Escape
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') {
-                    dropdowns.forEach(dropdown => {
-                        dropdown.classList.remove('active');
-                    });
-                }
-            });
+                    dropdown.classList.toggle('active');
+                });
+            }
         });
-        
-        // Función para mostrar alertas
-        function showAlert(message, type = 'info') {
-            const existingAlerts = document.querySelectorAll('.alerta');
-            existingAlerts.forEach(alert => alert.remove());
-            
-            const alert = document.createElement('div');
-            alert.className = `alerta alerta-${type}`;
-            alert.textContent = message;
-            alert.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                z-index: 1000;
-                padding: 12px 20px;
-                border-radius: 6px;
-                color: white;
-                font-weight: 500;
-                max-width: 300px;
-                word-wrap: break-word;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            `;
-            
-            switch(type) {
-                case 'success':
-                    alert.style.background = '#27ae60';
-                    break;
-                case 'error':
-                    alert.style.background = '#e74c3c';
-                    break;
-                case 'info':
-                    alert.style.background = '#3498db';
-                    break;
-                case 'warning':
-                    alert.style.background = '#f39c12';
-                    break;
-                default:
-                    alert.style.background = '#6c757d';
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.dropdown')) {
+                dropdowns.forEach(dropdown => {
+                    dropdown.classList.remove('active');
+                });
             }
-            
-            document.body.appendChild(alert);
-            
-            setTimeout(() => {
-                if (alert.parentNode) {
-                    alert.parentNode.removeChild(alert);
-                }
-            }, 4000);
-        }
-    </script>
-    
-    <main>
-        <?php 
-        // Mostrar mensajes de éxito o error si existen
-        if (isset($_SESSION['mensaje'])) {
-            $tipo = isset($_SESSION['tipo_mensaje']) ? $_SESSION['tipo_mensaje'] : 'info';
-            $mensaje_clave = $_SESSION['mensaje'];
-            $mensaje_traducido = $TEXTOS[$mensaje_clave] ?? $mensaje_clave; 
-            echo '<div class="alerta alerta-' . $tipo . '">' . htmlspecialchars($mensaje_traducido) . '</div>';
-            unset($_SESSION['mensaje']);
-            unset($_SESSION['tipo_mensaje']);
-        }
-        ?>
+        });
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                dropdowns.forEach(dropdown => {
+                    dropdown.classList.remove('active');
+                });
+            }
+        });
+    });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
