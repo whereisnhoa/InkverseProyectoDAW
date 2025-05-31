@@ -21,7 +21,7 @@ definir_constante('BASE_URL', $project_folder);
 definir_constante('DB_HOST', 'localhost');
 definir_constante('DB_USER', 'root');
 definir_constante('DB_PASS', '');
-definir_constante('DB_NAME', 'proyecto_db');
+definir_constante('DB_NAME', 'db_proyecto');
 
 // Configuración adicional
 definir_constante('DB_CHARSET', 'utf8mb4');
