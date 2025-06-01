@@ -1,8 +1,9 @@
+
 <?php
 /**
- * Header del sitio - COMPLETO, con distribución horizontal, menú de idiomas mejorado,
- * barra de búsqueda más pequeña, y solo una flecha en menús.
+ * Header del sitio 
  */
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -95,6 +96,13 @@ if (isset($_SESSION['usuario_id'])) {
         }
     }
 }
+
+$current_script = basename($_SERVER['SCRIPT_NAME']);
+$body_class = '';
+if ($current_script === 'login.php' || $current_script === 'register.php') {
+    $body_class = 'auth-bg';
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -108,295 +116,20 @@ if (isset($_SESSION['usuario_id'])) {
     <title>InkVerse - Plataforma de Literatura y Cómics</title>
 
     <meta name="description" content="Descubre, lee y comparte literatura y cómics en InkVerse. La plataforma definitiva para amantes de la lectura.">
-    
+
     <!-- bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
     <!-- estilo -->
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>/css/public.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        .main-header {
-            background: linear-gradient(90deg, #4361ee 0%, #4cc9f0 100%);
-            box-shadow: 0 2px 8px rgba(67,97,238,0.08);
-            position: relative;
-            z-index: 1000;
-        }
-        .header-bar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 20px;
-            min-height: 64px;
-            padding: 0 36px;
-        }
-        .header-bar .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 1.65rem;
-            font-weight: bold;
-            color: #fff;
-            letter-spacing: 1px;
-        }
-        .header-bar .logo img {
-            height: 38px;
-            border-radius: 8px;
-        }
-        .header-bar .nav-links ul {
-            display: flex;
-            gap: 20px;
-            align-items: center;
-            margin: 0;
-            padding: 0;
-            list-style: none;
-        }
-        .header-bar .nav-link {
-            color: #fff;
-            padding: 8px 15px;
-            border-radius: 9px;
-            font-weight: 500;
-            font-size: 1.07rem;
-            transition: background .13s;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 7px;
-        }
-        .header-bar .nav-link:hover, .header-bar .nav-link.active {
-            background: rgba(255,255,255,0.14);
-            color: #fff;
-        }
-        .header-bar .dropdown { position: relative; }
-        .header-bar .dropdown-content {
-            display: none;
-            position: absolute;
-            background-color: white;
-            min-width: 250px;
-            box-shadow: 0px 8px 24px 0px rgba(0,0,0,0.12);
-            z-index: 1000;
-            border-radius: 10px;
-            padding: 10px 0;
-            top: 100%;
-            left: 0;
-        }
-        .header-bar .dropdown.active .dropdown-content {
-            display: block;
-        }
-        .header-bar .mega-dropdown {
-            min-width: 600px;
-            padding: 24px;
-        }
-        .header-bar .dropdown-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit,minmax(200px,1fr));
-            gap: 20px;
-        }
-        .header-bar .dropdown-section h4 {
-            margin-bottom: 10px;
-            color: #333;
-            font-size: 14px;
-            font-weight: 600;
-        }
-        .header-bar .dropdown-links a {
-            display: block;
-            padding: 8px 12px;
-            color: #666;
-            text-decoration: none;
-            border-radius: 4px;
-            transition: all 0.2s;
-        }
-        .header-bar .dropdown-links a:hover {
-            background-color: #f8f9fa;
-            color: #333;
-        }
-        .header-bar .dropdown-divider {
-            height: 1px;
-            background-color: #eee;
-            margin: 8px 0;
-        }
-        /* Barra de búsqueda más pequeña */
-        .header-bar .search-bar {
-            flex: 1 1 210px;
-            max-width: 270px;
-            margin: 0 24px;
-        }
-        .header-bar .search-form {
-            display: flex;
-            align-items: center;
-            border-radius: 9px;
-            background: #fff;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(67,97,238,0.06);
-        }
-        .header-bar .search-input {
-            border: none;
-            padding: 8px 13px;
-            font-size: 0.96rem;
-            outline: none;
-            background: transparent;
-            color: #333;
-            flex: 1;
-        }
-        .header-bar .search-btn {
-            border: none;
-            background: #4361ee;
-            color: #fff;
-            padding: 8px 13px;
-            cursor: pointer;
-            font-size: 1.09rem;
-            transition: background .13s;
-        }
-        .header-bar .search-btn:hover { background: #3a56d4; }
-        .header-bar .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .header-bar .icon-btn {
-            background: none;
-            border: none;
-            color: #4361ee;
-            font-size: 1.35rem;
-            margin: 0 3px;
-            cursor: pointer;
-            transition: color .17s, background .17s;
-            padding: 7px 8px;
-            border-radius: 7px;
-            position: relative;
-        }
-        .header-bar .icon-btn:focus, .header-bar .icon-btn:hover {
-            background: rgba(67,97,238,0.13);
-            color: #f72585;
-        }
 
-        /* Idioma dropdown mejorado */
-        .language-dropdown {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-        .language-dropdown .lang-btn {
-            display: flex;
-            align-items: center;
-            gap: 0.15em;
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 2px 8px;
-            border-radius: 22px;
-            outline: none;
-            transition: background 0.15s;
-            position: relative;
-        }
-        .language-dropdown .lang-btn:hover,
-        .language-dropdown .lang-btn:focus {
-            background: rgba(255,255,255,0.18);
-        }
-        .language-dropdown .flag-icon {
-            width: 26px;
-            height: 26px;
-            border-radius: 50%;
-            display: block;
-        }
-        .language-dropdown .chevron {
-            font-size: 1.13em;
-            color: #4257e0;
-            margin-left: 2px;
-            vertical-align: middle;
-            transition: transform 0.18s;
-            display: inline-block;
-        }
-        .language-dropdown.active .chevron {
-            transform: rotate(180deg);
-        }
-        .language-dropdown .dropdown-content {
-            display: none;
-            position: absolute;
-            top: calc(100% + 9px);
-            right: 0;
-            min-width: 170px;
-            background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 8px 28px 0 rgba(60,60,120,0.17);
-            padding: 10px 0;
-            z-index: 1200;
-            animation: fadeIn .18s;
-        }
-        .language-dropdown.active .dropdown-content {
-            display: block;
-        }
-        @keyframes fadeIn {
-            from { opacity:0; transform: translateY(10px);}
-            to { opacity:1; transform: translateY(0);}
-        }
-        .language-dropdown .flag-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 7px 16px;
-            border-radius: 7px;
-            color: #23234a;
-            font-size: 1.02em;
-            text-decoration: none;
-            transition: background .12s, color .12s;
-            cursor: pointer;
-        }
-        .language-dropdown .flag-item.active,
-        .language-dropdown .flag-item:hover {
-            background: #f1f6ff;
-            color: #4361ee;
-            font-weight: 600;
-        }
-        .language-dropdown .flag-item img {
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            display: block;
-        }
-        .language-dropdown .flag-item span {
-            min-width: 70px;
-        }
-        @media (max-width: 1200px) {
-            .header-bar { gap: 12px; padding: 0 10px; }
-            .header-bar .logo { font-size: 1.2rem; }
-            .header-bar .nav-links ul { gap: 10px; }
-            .header-bar .search-bar { margin: 0 10px; }
-        }
-        @media (max-width: 900px) {
-            .header-bar { flex-wrap: wrap; gap: 8px;}
-            .header-bar .nav-links ul { gap: 5px; }
-            .header-bar .search-bar { min-width: 100px; max-width: 180px;}
-        }
-        @media (max-width: 700px) {
-            .header-bar { flex-direction: column; align-items: stretch; gap: 7px;}
-            .header-bar .nav-links ul { flex-direction: column; gap: 0;}
-            .header-bar .search-bar { width: 100%; min-width: 0; max-width: none;}
-            .language-dropdown .dropdown-content {
-                right: auto;
-                left: 0;
-                min-width: 120px;
-            }
-        }
-        [data-theme="dark"] .main-header {
-            background: linear-gradient(90deg, #23234a 0%, #353575 100%);
-        }
-        [data-theme="dark"] .header-bar .dropdown-content,
-        [data-theme="dark"] .header-bar .mega-dropdown {
-            background: #23234a;
-            color: #fff;
-        }
-        [data-theme="dark"] .header-bar .dropdown-links a {
-            color: #e0e0e0;
-        }
-        [data-theme="dark"] .header-bar .dropdown-links a:hover {
-            background-color: #353575;
-            color: #fff;
-        }
-    </style>
 </head>
-<body>
+
+<body<?php echo $body_class ? ' class="' . $body_class . '"' : ''; ?>>
+
 <header class="main-header">
     <div class="header-bar">
+
         <!-- LOGO -->
         <div class="logo">
             <a href="<?php echo BASE_URL; ?>/public/index.php">
@@ -404,6 +137,7 @@ if (isset($_SESSION['usuario_id'])) {
                 <span>InkVerse</span>
             </a>
         </div>
+
         <!-- NAV MENU -->
         <nav class="nav-links">
             <ul>
@@ -513,6 +247,7 @@ if (isset($_SESSION['usuario_id'])) {
                 </li>
             </ul>
         </nav>
+
         <!-- BÚSQUEDA -->
         <div class="search-bar">
             <form action="<?php echo BASE_URL; ?>/public/buscar.php" method="GET" class="search-form">
@@ -523,6 +258,7 @@ if (isset($_SESSION['usuario_id'])) {
                 </button>
             </form>
         </div>
+
         <!-- ACCIONES USUARIO -->
         <div class="header-actions">
             <!-- Idioma -->
@@ -634,7 +370,7 @@ if (isset($_SESSION['usuario_id'])) {
             </button>
             <div class="dropdown user-dropdown">
                 <button class="dropdown-toggle icon-btn user-menu-btn" onclick="return false;">
-                    <i class="fas fa-user-circle"></i>
+                    <i class="fas fa-user-circle"></i> <i class="fas fa-chevron-down"></i>
                 </button>
                 <div class="dropdown-content user-dropdown-content">
                     <?php if (isset($_SESSION['usuario_id'])): ?>
@@ -683,6 +419,7 @@ if (isset($_SESSION['usuario_id'])) {
 </header>
 
 <main>
+
 <?php
 // Mostrar mensajes de éxito o error si existen
 if (isset($_SESSION['mensaje'])) {
@@ -756,4 +493,5 @@ if (isset($_SESSION['mensaje'])) {
         });
     });
 </script>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>

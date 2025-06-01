@@ -55,6 +55,14 @@ $result = $stmt->get_result();
 if ($result->num_rows === 1) {
     $fila = $result->fetch_assoc();
 
+    // NUEVO: comprobar si el email está verificado
+    if (!$fila['email_verificado']) {
+        $_SESSION['mensaje'] = "Debes verificar tu correo electrónico antes de iniciar sesión.";
+        $_SESSION['tipo_mensaje'] = "error";
+        header("Location: " . BASE_URL . "/public/login.php");
+        exit();
+    }
+
     // Verificar la contraseña
     if (password_verify($password, $fila['password'])) {
         // Guardar información en sesión
