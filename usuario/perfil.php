@@ -13,8 +13,8 @@ $usuario_nombre = $_SESSION['usuario'];
 
 // Consulta para obtener datos del usuario
 $sql_usuario = "SELECT u.*, 
-                (SELECT COUNT(*) FROM libros WHERE autor = ?) as total_libros,
-                (SELECT COUNT(*) FROM comics WHERE autor = ?) as total_comics,
+                (SELECT COUNT(*) FROM libros WHERE usuario_id = u.id) as total_libros,
+                (SELECT COUNT(*) FROM comics WHERE usuario_id = u.id) as total_comics,
                 (SELECT COUNT(*) FROM seguidores WHERE seguido_id = u.id) as total_seguidores,
                 (SELECT COUNT(*) FROM seguidores WHERE seguidor_id = u.id) as total_seguidos,
                 (SELECT COUNT(*) FROM favoritos WHERE usuario_id = u.id) as total_favoritos
@@ -22,7 +22,7 @@ $sql_usuario = "SELECT u.*,
                 WHERE u.id = ?";
 
 $stmt_usuario = $conexion->prepare($sql_usuario);
-$stmt_usuario->bind_param("ssi", $usuario_nombre, $usuario_nombre, $usuario_id);
+$stmt_usuario->bind_param("i", $usuario_id);
 $stmt_usuario->execute();
 $usuario = $stmt_usuario->get_result()->fetch_assoc();
 $stmt_usuario->close();
@@ -36,22 +36,22 @@ if (!$usuario) {
 // Obtener libros del usuario
 $sql_libros = "SELECT id, titulo, portada, descripcion, categoria_id, fecha_subida 
                FROM libros 
-               WHERE autor = ? 
+               WHERE usuario_id = ? 
                ORDER BY fecha_subida DESC 
                LIMIT 3";
 $stmt_libros = $conexion->prepare($sql_libros);
-$stmt_libros->bind_param("s", $usuario_nombre);
+$stmt_libros->bind_param("i", $usuario_id);
 $stmt_libros->execute();
 $libros = $stmt_libros->get_result();
 
 // Obtener cómics del usuario
 $sql_comics = "SELECT id, titulo, portada, descripcion, categoria_id, fecha_subida 
                FROM comics 
-               WHERE autor = ? 
+               WHERE usuario_id = ? 
                ORDER BY fecha_subida DESC 
                LIMIT 3";
 $stmt_comics = $conexion->prepare($sql_comics);
-$stmt_comics->bind_param("s", $usuario_nombre);
+$stmt_comics->bind_param("i", $usuario_id);
 $stmt_comics->execute();
 $comics = $stmt_comics->get_result();
 

@@ -1497,3 +1497,80 @@ footer .btn, .footer-section .btn, .main-header .btn {
         margin: 0 auto 8px auto;
     }
 }
+
+/* --- Páginas Legales & cookies banner --- */
+
+.legal-page { max-width: 900px; margin: 0 auto; padding: 32px 16px 64px 16px; }
+.legal-header { border-bottom: 1px solid #eee; margin-bottom: 24px; }
+.legal-header h1 { margin-bottom: 6px; }
+.legal-updated { color: #666; font-size: 0.97rem; }
+.legal-nav { margin-bottom: 28px; }
+.legal-nav ol { padding-left: 18px; }
+.legal-nav li { margin-bottom: 4px; }
+.legal-section { margin-bottom: 30px; }
+.legal-section h2 { margin-top: 18px; }
+.legal-list { margin: 10px 0 0 16px; }
+.legal-list li { margin-bottom: 4px; }
+.legal-footer { border-top:1px solid #eee; padding-top:16px; margin-top:32px; color:#888; font-size:0.98rem;}
+.legal-contact { margin-left: 16px; }
+.legal-contact li { margin-bottom: 4px; }
+.legal-section h3 { margin-top: 14px; }
+@media (max-width: 600px) {
+    .legal-page { padding: 20px 4vw 80px 4vw; }
+}
+.cookie-banner {
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    background: #212529;
+    color: #fff;
+    z-index: 9999;
+    box-shadow: 0 -2px 16px 0 rgba(0,0,0,0.08);
+    padding: 0;
+    font-size: 1rem;
+    animation: slideup 0.5s;
+}
+.cookie-banner-content {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 18px 12px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+}
+.cookie-banner-text {
+    flex: 1 1 300px;
+    margin-right: 16px;
+}
+.cookie-banner-actions {
+    flex: 0 0 auto;
+    display: flex;
+    gap: 8px;
+}
+.cookie-btn {
+    border: 0;
+    border-radius: 4px;
+    padding: 8px 18px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.2s, color 0.2s;
+}
+.cookie-btn-accept {
+    background: #3ac569;
+    color: #fff;
+}
+.cookie-btn-accept:hover { background: #319e55; }
+.cookie-btn-reject {
+    background: #e1e1e1;
+    color: #222;
+}
+.cookie-btn-reject:hover { background: #c0c0c0; }
+@media(max-width:600px){
+    .cookie-banner-content { flex-direction: column; gap:8px; align-items:flex-start;}
+    .cookie-banner-text { margin-right:0;}
+}
+@keyframes slideup {
+    from { transform: translateY(120%);}
+    to { transform: translateY(0);}
+}

@@ -1,105 +1,128 @@
-
 <?php
 /**
  * Página de Política de Privacidad
  */
-
 require_once(__DIR__ . '/../includes/header.php');
 ?>
-
 <div class="container legal-page">
+
     <div class="legal-header">
         <h1>Política de Privacidad</h1>
         <p class="legal-updated">Última actualización: <?php echo date('d/m/Y'); ?></p>
     </div>
-    
+
+    <nav class="legal-nav">
+        <ol>
+            <li><a href="#introduccion">1. Introducción</a></li>
+            <li><a href="#datos">2. Datos que Recopilamos</a></li>
+            <li><a href="#recopilacion">3. Cómo Recopilamos Datos</a></li>
+            <li><a href="#uso">4. Cómo Usamos Sus Datos</a></li>
+            <li><a href="#divulgacion">5. Divulgación de Datos</a></li>
+            <li><a href="#seguridad">6. Seguridad</a></li>
+            <li><a href="#retencion">7. Retención de Datos</a></li>
+            <li><a href="#derechos">8. Sus Derechos</a></li>
+            <li><a href="#cookies">9. Cookies</a></li>
+            <li><a href="#cambios">10. Cambios a esta Política</a></li>
+        </ol>
+    </nav>
+
     <div class="legal-content">
-        <section class="legal-section">
+        <section class="legal-section" id="introduccion">
             <h2>1. Introducción</h2>
-            <p>Respetamos su privacidad y nos comprometemos a proteger sus datos personales. Esta política de privacidad le informará sobre cómo cuidamos sus datos personales cuando visita nuestra plataforma y le informará sobre sus derechos de privacidad y cómo la ley le protege.</p>
+            <p>
+                Respetamos su privacidad y nos comprometemos a proteger sus datos personales. Esta política explica cómo recogemos, usamos y protegemos su información.
+            </p>
         </section>
-        
-        <section class="legal-section">
-            <h2>2. Datos que recopilamos</h2>
-            <p>Podemos recopilar, usar, almacenar y transferir diferentes tipos de datos personales sobre usted, que hemos agrupado de la siguiente manera:</p>
+
+        <section class="legal-section" id="datos">
+            <h2>2. Datos que Recopilamos</h2>
+
             <ul class="legal-list">
-                <li><strong>Datos de identidad:</strong> incluye nombre, apellido, nombre de usuario o identificador similar.</li>
-                <li><strong>Datos de contacto:</strong> incluye dirección de correo electrónico y números de teléfono.</li>
-                <li><strong>Datos técnicos:</strong> incluye dirección de protocolo de Internet (IP), datos de inicio de sesión, tipo y versión del navegador, configuración de zona horaria y ubicación, tipos y versiones de complementos del navegador, sistema operativo y plataforma.</li>
-                <li><strong>Datos de perfil:</strong> incluye su nombre de usuario y contraseña, sus intereses, preferencias, comentarios y respuestas a encuestas.</li>
-                <li><strong>Datos de uso:</strong> incluye información sobre cómo utiliza nuestra plataforma y servicios.</li>
+                <li><strong>Identidad:</strong> nombre, usuario, identificador.</li>
+                <li><strong>Contacto:</strong> correo electrónico, teléfono.</li>
+                <li><strong>Técnicos:</strong> IP, navegador, dispositivo, sistema operativo.</li>
+                <li><strong>Perfil:</strong> intereses, preferencias, comentarios.</li>
+                <li><strong>Uso:</strong> páginas visitadas, acciones realizadas.</li>
             </ul>
+
         </section>
-        
-        <section class="legal-section">
-            <h2>3. Cómo recopilamos sus datos</h2>
-            <p>Utilizamos diferentes métodos para recopilar datos de y sobre usted, incluyendo:</p>
+
+        <section class="legal-section" id="recopilacion">
+            <h2>3. Cómo Recopilamos Sus Datos</h2>
+
             <ul class="legal-list">
-                <li><strong>Interacción directa:</strong> Puede proporcionarnos sus datos de identidad, contacto y perfil completando formularios o comunicándose con nosotros.</li>
-                <li><strong>Tecnologías automatizadas:</strong> A medida que interactúa con nuestra plataforma, podemos recopilar automáticamente datos técnicos sobre su equipo, acciones de navegación y patrones.</li>
-                <li><strong>Terceros:</strong> Podemos recibir datos personales sobre usted de varios terceros, como proveedores de análisis o redes sociales.</li>
+                <li><strong>Directamente:</strong> cuando se registra o rellena formularios.</li>
+                <li><strong>Automáticamente:</strong> mediante cookies y tecnologías similares al navegar.</li>
+                <li><strong>Terceros:</strong> como Google Analytics o redes sociales.</li>
             </ul>
+
         </section>
-        
-        <section class="legal-section">
-            <h2>4. Cómo utilizamos sus datos</h2>
-            <p>Solo utilizaremos sus datos personales cuando la ley nos lo permita. Más comúnmente, utilizaremos sus datos personales en las siguientes circunstancias:</p>
+
+        <section class="legal-section" id="uso">
+            <h2>4. Cómo Usamos Sus Datos</h2>
+
             <ul class="legal-list">
-                <li>Para registrar su cuenta y gestionar nuestra relación con usted.</li>
-                <li>Para proporcionarle contenido personalizado y recomendaciones.</li>
-                <li>Para mejorar nuestra plataforma, productos/servicios y experiencia del usuario.</li>
-                <li>Para comunicarnos con usted, incluyendo notificaciones sobre cambios en nuestros términos o políticas.</li>
-                <li>Para administrar y proteger nuestro negocio y esta plataforma.</li>
+                <li>Para crear y gestionar su cuenta.</li>
+                <li>Para personalizar su experiencia y mostrar contenido relevante.</li>
+                <li>Para mejorar nuestra plataforma y prevenir fraudes.</li>
+                <li>Para enviarle comunicaciones importantes.</li>
             </ul>
+
         </section>
-        
-        <section class="legal-section">
-            <h2>5. Divulgación de sus datos personales</h2>
-            <p>Podemos compartir sus datos personales con las partes establecidas a continuación:</p>
+
+        <section class="legal-section" id="divulgacion">
+            <h2>5. Divulgación de Sus Datos</h2>
+
             <ul class="legal-list">
-                <li>Proveedores de servicios que nos proporcionan servicios de TI y administración de sistemas.</li>
-                <li>Asesores profesionales, incluidos abogados, banqueros, auditores y aseguradores.</li>
-                <li>Autoridades fiscales, reguladoras y otras autoridades.</li>
-                <li>Terceros a quienes podemos elegir vender, transferir o fusionar partes de nuestro negocio o nuestros activos.</li>
+                <li>Proveedores de servicios de hosting, TI y soporte.</li>
+                <li>Asesores legales, auditores y autoridades.</li>
+                <li>Empresas en caso de fusión o adquisición.</li>
             </ul>
-            <p>Exigimos a todos los terceros que respeten la seguridad de sus datos personales y los traten de acuerdo con la ley.</p>
+
+            <p>Requerimos a todos los terceros que respeten la confidencialidad y protejan sus datos.</p>
         </section>
-        
-        <section class="legal-section">
-            <h2>6. Seguridad de datos</h2>
-            <p>Hemos implementado medidas de seguridad apropiadas para evitar que sus datos personales se pierdan, usen o accedan accidentalmente de manera no autorizada, se alteren o divulguen. Además, limitamos el acceso a sus datos personales a aquellos empleados, agentes, contratistas y otros terceros que tienen una necesidad comercial de conocerlos.</p>
+
+        <section class="legal-section" id="seguridad">
+            <h2>6. Seguridad de Datos</h2>
+            <p>
+                Adoptamos medidas técnicas y organizativas para proteger su información contra pérdida, uso indebido o acceso no autorizado.
+            </p>
         </section>
-        
-        <section class="legal-section">
-            <h2>7. Retención de datos</h2>
-            <p>Solo conservaremos sus datos personales durante el tiempo necesario para cumplir con los fines para los que los recopilamos, incluyendo para satisfacer cualquier requisito legal, contable o de informes.</p>
+
+        <section class="legal-section" id="retencion">
+            <h2>7. Retención de Datos</h2>
+            <p>
+                Conservamos sus datos solo el tiempo necesario para cumplir las finalidades para las que se recogieron, o mientras la ley lo exija.
+            </p>
         </section>
-        
-        <section class="legal-section">
-            <h2>8. Sus derechos legales</h2>
-            <p>Bajo ciertas circunstancias, usted tiene derechos bajo las leyes de protección de datos en relación con sus datos personales, incluyendo el derecho a:</p>
+
+        <section class="legal-section" id="derechos">
+            <h2>8. Sus Derechos</h2>
+
             <ul class="legal-list">
-                <li>Solicitar acceso a sus datos personales.</li>
-                <li>Solicitar la corrección de sus datos personales.</li>
-                <li>Solicitar la eliminación de sus datos personales.</li>
-                <li>Oponerse al procesamiento de sus datos personales.</li>
-                <li>Solicitar la restricción del procesamiento de sus datos personales.</li>
-                <li>Solicitar la transferencia de sus datos personales.</li>
-                <li>Retirar el consentimiento.</li>
+                <li>Acceder, corregir o eliminar sus datos.</li>
+                <li>Oponerse o restringir su tratamiento.</li>
+                <li>Solicitar portabilidad o retirar consentimiento.</li>
             </ul>
+
         </section>
-        
-        <section class="legal-section">
+
+        <section class="legal-section" id="cookies">
             <h2>9. Cookies</h2>
-            <p>Nuestra plataforma utiliza cookies para distinguirlo de otros usuarios. Esto nos ayuda a proporcionarle una buena experiencia cuando navega por nuestra plataforma y también nos permite mejorarla. Para obtener información detallada sobre las cookies que utilizamos, consulte nuestra <a href="<?php echo BASE_URL; ?>/public/cookies.php">Política de Cookies</a>.</p>
+            <p>
+                Usamos cookies para distinguirle de otros usuarios y mejorar su experiencia. Más información en nuestra <a href="cookies.php">Política de Cookies</a>.
+            </p>
         </section>
-        
-        <section class="legal-section">
-            <h2>10. Cambios a esta política de privacidad</h2>
-            <p>Cualquier cambio que podamos hacer a nuestra política de privacidad en el futuro se publicará en esta página. Por favor, revise esta página con frecuencia para ver cualquier actualización o cambio en nuestra política de privacidad.</p>
+
+        <section class="legal-section" id="cambios">
+            <h2>10. Cambios a esta Política</h2>
+            <p>
+                Nos reservamos el derecho de modificar esta política. Los cambios se publicarán en esta página. Revísela periódicamente.
+            </p>
         </section>
-        
+
     </div>
+
 </div>
 
 <?php include_once(__DIR__ . '/../includes/footer.php'); ?>
