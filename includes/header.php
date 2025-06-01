@@ -1,4 +1,3 @@
-
 <?php
 /**
  * Header del sitio 
@@ -85,7 +84,7 @@ if (isset($_SESSION['usuario_id']) && isset($_SESSION['usuario_fecha_nacimiento'
 }
 $notificaciones_no_leidas = 0;
 if (isset($_SESSION['usuario_id'])) {
-    $sql_notif = "SELECT COUNT(*) as total FROM notificaciones WHERE usuario_id = ? AND leida = 0";
+    $sql_notif = "SELECT COUNT(*) as total FROM notificaciones WHERE usuario_id = ? AND leido = 0";
     $stmt_notif = $conexion->prepare($sql_notif);
     if ($stmt_notif) {
         $stmt_notif->bind_param("i", $_SESSION['usuario_id']);
@@ -94,6 +93,7 @@ if (isset($_SESSION['usuario_id'])) {
         if ($result_notif) {
             $notificaciones_no_leidas = $result_notif->fetch_assoc()['total'];
         }
+        $stmt_notif->close();
     }
 }
 
@@ -109,20 +109,15 @@ if ($current_script === 'login.php' || $current_script === 'register.php') {
 <html lang="<?= htmlspecialchars($idioma) ?>">
 
 <head>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>InkVerse - Plataforma de Literatura y Cómics</title>
-
     <meta name="description" content="Descubre, lee y comparte literatura y cómics en InkVerse. La plataforma definitiva para amantes de la lectura.">
-
     <!-- bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
     <!-- estilo -->
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>/css/public.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
 </head>
 
 <body<?php echo $body_class ? ' class="' . $body_class . '"' : ''; ?>>
@@ -311,7 +306,7 @@ if ($current_script === 'login.php' || $current_script === 'register.php') {
                         <div class="notification-list">
                             <?php
                             if (isset($_SESSION['usuario_id'])) {
-                                $sql_notif_list = "SELECT * FROM notificaciones WHERE usuario_id = ? ORDER BY fecha_creacion DESC LIMIT 5";
+                                $sql_notif_list = "SELECT * FROM notificaciones WHERE usuario_id = ? ORDER BY fecha DESC LIMIT 5";
                                 $stmt_notif_list = $conexion->prepare($sql_notif_list);
                                 if ($stmt_notif_list) {
                                     $stmt_notif_list->bind_param("i", $_SESSION['usuario_id']);
@@ -319,26 +314,25 @@ if ($current_script === 'login.php' || $current_script === 'register.php') {
                                     $notificaciones = $stmt_notif_list->get_result();
                                     if ($notificaciones && $notificaciones->num_rows > 0):
                                         while ($notificacion = $notificaciones->fetch_assoc()):
+                                            // Selección de icono por tipo
+                                            switch ($notificacion['tipo']) {
+                                                case 'comentario': $icon = 'comment'; break;
+                                                case 'like': $icon = 'heart'; break;
+                                                case 'respuesta_foro': $icon = 'reply'; break;
+                                                case 'nueva_obra': $icon = 'book'; break;
+                                                case 'sistema': default: $icon = 'bell'; break;
+                                            }
+                                            // URL personalizada si existe
+                                            $url = !empty($notificacion['url']) ? htmlspecialchars($notificacion['url']) : '#';
                             ?>
-                                <a href="<?php echo htmlspecialchars($notificacion['url'] ?? '#'); ?>"
-                                   class="notification-item <?php echo $notificacion['leida'] ? '' : 'unread'; ?>">
+                                <a href="<?php echo $url; ?>" class="notification-item <?php echo $notificacion['leido'] ? '' : 'unread'; ?>">
                                     <div class="notification-icon">
-                                        <?php
-                                        $icon = 'bell';
-                                        switch ($notificacion['tipo']) {
-                                            case 'comentario': $icon = 'comment'; break;
-                                            case 'like': $icon = 'heart'; break;
-                                            case 'respuesta_foro': $icon = 'reply'; break;
-                                            case 'nueva_obra': $icon = 'book'; break;
-                                            case 'sistema': $icon = 'info-circle'; break;
-                                        }
-                                        ?>
                                         <i class="fas fa-<?php echo $icon; ?>"></i>
                                     </div>
                                     <div class="notification-content">
                                         <p><?= htmlspecialchars($notificacion['mensaje']); ?></p>
                                         <span class="notification-time">
-                                            <?php echo date('d/m/Y H:i', strtotime($notificacion['fecha_creacion'])); ?>
+                                            <?php echo date('d/m/Y H:i', strtotime($notificacion['fecha'])); ?>
                                         </span>
                                     </div>
                                 </a>
@@ -351,6 +345,7 @@ if ($current_script === 'login.php' || $current_script === 'register.php') {
                                 </div>
                             <?php
                                     endif;
+                                    $stmt_notif_list->close();
                                 }
                             }
                             ?>

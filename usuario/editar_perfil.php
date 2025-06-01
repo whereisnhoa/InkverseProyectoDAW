@@ -1,26 +1,15 @@
 <?php
-// Iniciar sesión
 session_start();
-
-// Incluir configuración primero
 require_once(__DIR__ . '/../includes/config.php');
-
-// Incluir archivos necesarios
 require_once(__DIR__ . '/../includes/funciones.php');
 require_once(__DIR__ . '/../includes/conexion.php');
-
-// Verificar que el usuario esté logueado
 verificarLogin();
-
-// Obtener información del usuario
 $usuario_id = $_SESSION['usuario_id'];
 $sql = "SELECT * FROM usuarios WHERE id = ?";
 $stmt = $conexion->prepare($sql);
 $stmt->bind_param("i", $usuario_id);
 $stmt->execute();
 $usuario = $stmt->get_result()->fetch_assoc();
-
-// Incluir header
 include_once(__DIR__ . '/../includes/header.php');
 ?>
 
@@ -44,7 +33,7 @@ include_once(__DIR__ . '/../includes/header.php');
                         <label>Avatar</label>
                         <div class="preview-container">
                             <div id="preview-avatar">
-                                <img src="<?php echo htmlspecialchars($usuario['avatar'] ?? BASE_URL.'/public/img/avatar_default.png'); ?>" alt="Avatar actual">
+                                <img src="<?php echo htmlspecialchars($usuario['avatar'] ? BASE_URL.'/uploads/avatars/'.$usuario['avatar'] : BASE_URL.'/includes/img/avatar-default.svg'); ?>" alt="Avatar actual">
                             </div>
                         </div>
                         <input type="file" id="avatar" name="avatar" accept="image/*">
@@ -54,10 +43,10 @@ include_once(__DIR__ . '/../includes/header.php');
                         <label>Banner</label>
                         <div class="preview-container">
                             <div id="preview-banner">
-                                <img src="<?php echo htmlspecialchars($usuario['banner'] ?? BASE_URL.'/public/img/banner_default.jpg'); ?>" alt="Banner actual">
+                                <img src="<?php echo htmlspecialchars($usuario['banner_img'] ? BASE_URL.'/uploads/banners/'.$usuario['banner_img'] : BASE_URL.'/includes/img/banner-default.jpg'); ?>" alt="Banner actual">
                             </div>
                         </div>
-                        <input type="file" id="banner" name="banner" accept="image/*">
+                        <input type="file" id="banner_img" name="banner_img" accept="image/*">
                         <small>Recomendado 1200x300px. Máx. 2MB.</small>
                     </div>
                 </div>
@@ -109,7 +98,7 @@ include_once(__DIR__ . '/../includes/header.php');
                 <!-- Redes sociales -->
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="twitter">X</label>
+                        <label for="X">X</label>
                         <input type="url" id="X" name="X" class="form-control"
                                value="<?php echo htmlspecialchars($usuario['X'] ?? ''); ?>"
                                placeholder="https://x.com/usuario">
@@ -162,5 +151,4 @@ include_once(__DIR__ . '/../includes/header.php');
         </div>
     </div>
 </div>
-
 <?php include_once(__DIR__ . '/../includes/footer.php'); ?>

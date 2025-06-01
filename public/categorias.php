@@ -452,7 +452,7 @@ if ($result_populares) {
                 <div class="action-content">
                     <h3>Mis Favoritos</h3>
                     <p>Accede rápidamente a todas las obras que has guardado como favoritas</p>
-                    <a href="<?php echo BASE_URL; ?>/public/favoritos.php" class="btn btn-outline">
+                    <a href="<?php echo BASE_URL; ?>/usuario/favoritos.php" class="btn btn-outline">
                         <i class="fas fa-heart"></i> Ver Favoritos
                     </a>
                 </div>
@@ -464,7 +464,7 @@ if ($result_populares) {
                 <div class="action-content">
                     <h3>Publicar Obra</h3>
                     <p>Comparte tu contenido con la comunidad y llega a miles de lectores</p>
-                    <a href="<?php echo BASE_URL; ?>/public/nueva_obra.php" class="btn btn-outline">
+                    <a href="<?php echo BASE_URL; ?>/usuario/nueva_obra.php" class="btn btn-outline">
                         <i class="fas fa-plus"></i> Subir Obra
                     </a>
                 </div>

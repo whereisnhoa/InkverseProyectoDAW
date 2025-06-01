@@ -16,12 +16,12 @@ $biografia = trim($_POST['biografia'] ?? '');
 $sitio_web = trim($_POST['sitio_web'] ?? '');
 $ubicacion = trim($_POST['ubicacion'] ?? '');
 $privacidad = in_array(($_POST['privacidad'] ?? 'publico'), ['publico','privado']) ? $_POST['privacidad'] : 'publico';
-$X = trim($_POST['X'] ?? ''); // X (antes twitter)
+$X = trim($_POST['X'] ?? '');
 $instagram = trim($_POST['instagram'] ?? '');
 $facebook = trim($_POST['facebook'] ?? '');
 
-// Obtén avatar y banner actuales
-$sql = "SELECT avatar, banner FROM usuarios WHERE id=?";
+// Obtén avatar y banner actuales (CAMBIAR banner -> banner_img)
+$sql = "SELECT avatar, banner_img FROM usuarios WHERE id=?";
 $stmt = $conexion->prepare($sql);
 $stmt->bind_param("i", $usuario_id);
 $stmt->execute();
@@ -38,7 +38,7 @@ if (!empty($_FILES['avatar']['name'])) {
         $avatar_name = uniqid('avatar_') . '.' . $ext;
         $ruta_destino = __DIR__ . '/../uploads/avatars/' . $avatar_name;
         if (move_uploaded_file($_FILES['avatar']['tmp_name'], $ruta_destino)) {
-            $avatar_path = BASE_URL . '/uploads/avatars/' . $avatar_name;
+            $avatar_path = $avatar_name; // solo el nombre, no BASE_URL
         }
     }
 }
@@ -51,14 +51,14 @@ if (!empty($_FILES['banner']['name'])) {
         $banner_name = uniqid('banner_') . '.' . $ext;
         $ruta_destino = __DIR__ . '/../uploads/banners/' . $banner_name;
         if (move_uploaded_file($_FILES['banner']['tmp_name'], $ruta_destino)) {
-            $banner_path = BASE_URL . '/uploads/banners/' . $banner_name;
+            $banner_path = $banner_name; // solo el nombre, no BASE_URL
         }
     }
 }
 
-// Actualiza usuario
+// Actualiza usuario (CAMBIAR banner -> banner_img)
 $sql = "UPDATE usuarios SET
-    usuario=?, email=?, nombre=?, fecha_nacimiento=?, biografia=?, sitio_web=?, ubicacion=?, privacidad=?, avatar=?, banner=?, X=?, instagram=?, facebook=?
+    usuario=?, email=?, nombre=?, fecha_nacimiento=?, biografia=?, sitio_web=?, ubicacion=?, privacidad=?, avatar=?, banner_img=?, X=?, instagram=?, facebook=?
     WHERE id=?";
 $stmt = $conexion->prepare($sql);
 $stmt->bind_param("sssssssssssssi",
