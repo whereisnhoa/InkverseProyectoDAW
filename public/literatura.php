@@ -73,7 +73,7 @@ if ($mostrar_destacados) {
 }
 
 // Consulta principal con paginación
-$sql_principal = "SELECT l.id, l.titulo, l.autor, l.descripcion, l.portada, l.publico_adulto, 
+$sql_principal = "SELECT l.id, l.titulo, l.usuario_id, l.descripcion, l.portada, l.publico_adulto, 
                   c.nombre as categoria, l.fecha_subida, l.visitas,
                   (SELECT COUNT(*) FROM favoritos f WHERE f.contenido_id = l.id AND f.tipo_contenido = 'libro') as total_favoritos
                   FROM libros l
@@ -111,7 +111,7 @@ $total_paginas = ceil($total_obras / $por_pagina);
 // Obtener obras destacadas para el hero (solo si no hay filtros)
 $obras_hero = [];
 if (!$mostrar_destacados && !$mostrar_recientes && !$mostrar_populares && empty($busqueda) && $categoria_id == 0) {
-    $sql_hero = "SELECT l.id, l.titulo, l.autor, l.portada, c.nombre as categoria
+    $sql_hero = "SELECT l.id, l.titulo, l.usuario_id, l.portada, c.nombre as categoria
                  FROM libros l
                  LEFT JOIN categorias c ON l.categoria_id = c.id
                  WHERE l.destacado = 1

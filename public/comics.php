@@ -102,7 +102,7 @@ switch ($orden) {
         $orden_sql = "c.titulo ASC";
         break;
     case 'autor':
-        $orden_sql = "c.autor ASC, c.titulo ASC";
+        $orden_sql = "c.usuario_id ASC, c.titulo ASC";
         break;
     case 'antiguos':
         $orden_sql = "c.fecha_subida ASC";
@@ -112,7 +112,7 @@ switch ($orden) {
 }
 
 // Consulta principal con paginación
-$sql_principal = "SELECT c.id, c.titulo, c.autor, c.descripcion, c.portada, c.publico_adulto, 
+$sql_principal = "SELECT c.id, c.titulo, c.usuario_id, c.descripcion, c.portada, c.publico_adulto, 
                   cat.nombre as categoria, cat.descripcion as categoria_desc, c.fecha_subida, c.visitas, c.valoracion,
                   (SELECT COUNT(*) FROM favoritos f WHERE f.contenido_id = c.id AND f.tipo_contenido = 'comic') as total_favoritos,
                   (SELECT COUNT(*) FROM comentarios co WHERE co.contenido_id = c.id AND co.tipo_contenido = 'comic') as total_comentarios
@@ -151,7 +151,7 @@ $total_paginas = ceil($total_obras / $por_pagina);
 // Obtener obras destacadas para el hero
 $obras_hero = [];
 if (!$mostrar_destacados && !$mostrar_recientes && !$mostrar_populares && empty($busqueda) && $categoria_id == 0) {
-    $sql_hero = "SELECT c.id, c.titulo, c.autor, c.portada, cat.nombre as categoria
+    $sql_hero = "SELECT c.id, c.titulo, c.usuario_id, c.portada, cat.nombre as categoria
                  FROM comics c
                  LEFT JOIN categorias cat ON c.categoria_id = cat.id
                  WHERE c.destacado = 1

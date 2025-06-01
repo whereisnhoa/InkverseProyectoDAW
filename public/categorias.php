@@ -88,10 +88,7 @@ if ($result_populares) {
     <div class="container">
         <div class="hero-content-grid">
             <div class="hero-text-content">
-                <div class="hero-badge">
-                    <i class="fas fa-layer-group"></i>
-                    <span>Organizado por Géneros</span>
-                </div>
+            
                 <h1 class="hero-title">Explorar por Categorías</h1>
                 <p class="hero-description">Descubre contenido perfectamente organizado por géneros, temáticas y estilos que se adaptan a tus gustos</p>
                 <!-- Estadísticas mejoradas -->
