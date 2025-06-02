@@ -11,17 +11,16 @@ $sql_categorias = "SELECT cf.*,
                   (SELECT COUNT(*) FROM temas_foro WHERE categoria_id = cf.id) as total_temas,
                   (SELECT COUNT(*) FROM temas_foro tf JOIN respuestas_foro rf ON tf.id = rf.tema_id WHERE tf.categoria_id = cf.id) as total_respuestas
                   FROM categorias_foro cf
-                  ORDER BY cf.orden";
-$result_categorias = $conexion->query($sql_categorias);
+                  ORDER BY cf.id";
 
 // Obtener temas recientes
 $sql_temas_recientes = "SELECT tf.*, cf.nombre as categoria_nombre, u.usuario as autor_nombre,
                         (SELECT COUNT(*) FROM respuestas_foro WHERE tema_id = tf.id) as total_respuestas,
-                        (SELECT MAX(fecha_creacion) FROM respuestas_foro WHERE tema_id = tf.id) as ultima_respuesta
+                        (SELECT MAX(fecha) FROM respuestas_foro WHERE tema_id = tf.id) as ultima_respuesta
                         FROM temas_foro tf
                         JOIN categorias_foro cf ON tf.categoria_id = cf.id
                         JOIN usuarios u ON tf.usuario_id = u.id
-                        ORDER BY tf.ultima_actividad DESC
+                        ORDER BY tf.fecha DESC
                         LIMIT 5";
 $result_temas_recientes = $conexion->query($sql_temas_recientes);
 ?>

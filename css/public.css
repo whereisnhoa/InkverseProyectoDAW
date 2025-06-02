@@ -2159,3 +2159,101 @@ footer .btn, .footer-section .btn, .main-header .btn {
     .section-header-advanced .section-title h2 { font-size: 1rem;}
     .action-card-advanced { padding: 15px 11px;}
 }
+
+/* === BÚSQUEDA GENERAL Y AVANZADA === */
+.buscar-form {
+    margin-bottom: 12px;
+}
+.btn-avanzada {
+    font-size: 1rem;
+    padding: 0.3rem 0.6rem;
+}
+.buscar-titulo {
+    font-size: 1.18rem;
+    font-weight: 700;
+    margin-bottom: 18px;
+}
+
+.buscar-indicacion i {
+    font-size: 2.5rem;
+    color: #a3b7e7;
+}
+.buscar-indicacion {
+    color: #8e9fc9;
+}
+
+/* ==== ESPACIO ARRIBA Y ABAJO para buscar ==== */
+.buscar-espaciado-externo,
+.container.buscar-espaciado-externo {
+    margin-top: 60px !important;
+    margin-bottom: 60px !important;
+}
+
+@media (max-width: 700px) {
+    .buscar-espaciado-externo,
+    .container.buscar-espaciado-externo {
+        margin-top: 28px !important;
+        margin-bottom: 28px !important;
+    }
+}
+
+.resultados-grid {
+    margin-bottom: 32px;
+}
+.resultado-card {
+    transition: transform 0.13s, box-shadow 0.13s;
+    border-radius: 14px !important;
+    border: none !important;
+}
+.resultado-card:hover {
+    transform: translateY(-7px) scale(1.025);
+    box-shadow: 0 7px 28px rgba(67,97,238,0.16) !important;
+    background: #f6faff !important;
+}
+.resultado-portada img {
+    max-width: 100%;
+    max-height: 150px;
+    object-fit: cover;
+    border-radius: 8px;
+    box-shadow: 0 1px 6px #4361ee16;
+}
+.portada-placeholder {
+    background: linear-gradient(135deg, #4361ee, #4cc9f0);
+    height: 100%;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    color: #fff;
+    width: 100%;
+    min-height: 100px;
+}
+.resultado-info .badge {
+    font-size: 0.87rem;
+    margin-right: 3px;
+    padding: 4px 8px;
+}
+.resultado-info h5 {
+    font-size: 1.07rem;
+    font-weight: 700;
+    color: #4361ee;
+}
+.resultado-info p {
+    font-size: 0.97rem;
+    color: #6373a7;
+}
+.card-footer {
+    border-top: none !important;
+    font-size: 0.98rem;
+    background: #f7faff !important;
+    border-radius: 0 0 14px 14px !important;
+    color: #4361ee !important;
+}
+.card-footer span {
+    margin-right: 8px;
+}
+@media (max-width: 700px) {
+    .buscar-titulo { font-size: 1.05rem;}
+    .resultado-info h5 { font-size: 0.99rem;}
+    .card-footer { font-size: 0.89rem;}
+}

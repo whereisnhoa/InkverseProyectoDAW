@@ -1,314 +1,215 @@
 <?php
+require_once '../includes/config.php';
+require_once '../includes/conexion.php';
+require_once '../includes/funciones.php';
 
-require_once(__DIR__ . '/../includes/header.php');
-include_once(__DIR__ . '/../includes/conexion.php');
+$busqueda = trim($_GET['q'] ?? '');
+$tipo = $_GET['tipo'] ?? '';
+$categoria = $_GET['categoria'] ?? '';
+$publico_adulto = isset($_GET['publico_adulto']) ? intval($_GET['publico_adulto']) : '';
+$orden = $_GET['orden'] ?? 'relevancia';
 
-// obtener término de búsqueda
-$busqueda = isset($_GET['q']) ? trim($_GET['q']) : '';
+$librosWhere = [];
+$comicsWhere = [];
+$tipos = '';
+$paramsLibros = [];
+$paramsComics = [];
 
-// si no hay término de búsqueda, mostrar formulario de búsqueda avanzada
-if (empty($busqueda)) 
-{
-
-?>
-
-<div class="container">
-
-    <h1>Búsqueda Avanzada</h1>
-    
-    <form action="<?php echo BASE_URL; ?>/public/buscar.php" method="GET" class="search-form" role="search" aria-label="Formulario de búsqueda avanzada">
-
-        <div class="form-group">
-            <label for="q">Palabras clave:</label>
-            <input type="text" id="q" name="q" class="form-control" placeholder="Título, autor, descripción..." autocomplete="off">
-        </div>
-        
-        <div class="form-group">
-            <label>Tipo de contenido:</label>
-            <div class="checkbox-group">
-                <label>
-                    <input type="checkbox" name="tipo[]" value="libro" checked> Libros
-                </label>
-                <label>
-                    <input type="checkbox" name="tipo[]" value="comic" checked> Cómics/Manga
-                </label>
-            </div>
-        </div>
-        
-        <div class="form-group">
-            <label for="categoria">Categoría:</label>
-            <select name="categoria" id="categoria" class="form-control">
-                <option value="">Todas las categorías</option>
-                <?php
-                $sql = "SELECT id, nombre FROM categorias ORDER BY nombre";
-                $result = $conexion->query($sql);
-                
-                if ($result && $result->num_rows > 0) {
-                    while($row = $result->fetch_assoc()) {
-                        echo '<option value="' . $row['id'] . '">' . htmlspecialchars($row['nombre']) . '</option>';
-                    }
-                }
-                ?>
-            </select>
-
-        </div>
-        
-        <div class="form-group">
-
-            <label>Contenido para adultos:</label>
-
-            <div class="radio-group">
-
-                <label>
-                    <input type="radio" name="adulto" value="todos" checked> Mostrar todo
-                </label>
-
-                <label>
-                    <input type="radio" name="adulto" value="no"> Solo contenido general
-                </label>
-
-                <label>
-                    <input type="radio" name="adulto" value="si"> Solo contenido para adultos
-                </label>
-
-            </div>
-
-        </div>
-        
-        <button type="submit" class="btn">Buscar</button>
-
-    </form>
-
-</div>
-
-<?php
-
-} else {
-    // preparar la búsqueda
-    $tipos = isset($_GET['tipo']) ? $_GET['tipo'] : ['libro', 'comic'];
-    $categoria = isset($_GET['categoria']) ? $_GET['categoria'] : '';
-    $adulto = isset($_GET['adulto']) ? $_GET['adulto'] : 'todos';
-    
-    // construir consulta para libros
-    $sql_libros = "SELECT 'libro' as tipo, l.id, l.titulo, l.autor, l.descripcion, l.portada, l.publico_adulto, 
-                   c.nombre as categoria, l.fecha_subida
-                   FROM libros l
-                   LEFT JOIN categorias c ON l.categoria_id = c.id
-                   WHERE (l.titulo LIKE ? OR l.autor LIKE ? OR l.descripcion LIKE ?)";
-    
-    // filtrar por categoría si se especificó
-    if (!empty($categoria)) {
-        $sql_libros .= " AND l.categoria_id = ?";
-    }
-    
-    // filtrar por contenido adulto
-    if ($adulto == 'no') {
-        $sql_libros .= " AND l.publico_adulto = 0";
-    } elseif ($adulto == 'si') {
-        $sql_libros .= " AND l.publico_adulto = 1";
-    }
-    
-    // construir consulta para cómics
-    $sql_comics = "SELECT 'comic' as tipo, c.id, c.titulo, c.autor, c.descripcion, c.portada, c.publico_adulto, 
-                   NULL as categoria, c.fecha_subida
-                   FROM comics c
-                   WHERE (c.titulo LIKE ? OR c.autor LIKE ? OR c.descripcion LIKE ?)";
-    
-    // filtrar por contenido adulto
-    if ($adulto == 'no') {
-        $sql_comics .= " AND c.publico_adulto = 0";
-    } elseif ($adulto == 'si') {
-        $sql_comics .= " AND c.publico_adulto = 1";
-    }
-    
-    // combinar resultados si se buscan ambos tipos
-    $sql = "";
-    $params = [];
-    $types = "";
-    
-    if (in_array('libro', $tipos) && in_array('comic', $tipos)) {
-        $sql = "($sql_libros) UNION ($sql_comics) ORDER BY fecha_subida DESC";
-        $busqueda_param = "%$busqueda%";
-        
-        // parámetros para libros
-        $params[] = $busqueda_param;
-        $params[] = $busqueda_param;
-        $params[] = $busqueda_param;
-        $types .= "sss";
-        
-        if (!empty($categoria)) {
-            $params[] = $categoria;
-            $types .= "i";
-        }
-        
-        // parámetros para cómics
-        $params[] = $busqueda_param;
-        $params[] = $busqueda_param;
-        $params[] = $busqueda_param;
-        $types .= "sss";
-
-    } elseif (in_array('libro', $tipos)) {
-        $sql = $sql_libros . " ORDER BY fecha_subida DESC";
-        $busqueda_param = "%$busqueda%";
-        
-        $params[] = $busqueda_param;
-        $params[] = $busqueda_param;
-        $params[] = $busqueda_param;
-        $types .= "sss";
-        
-        if (!empty($categoria)) {
-            $params[] = $categoria;
-            $types .= "i";
-        }
-
-    } elseif (in_array('comic', $tipos)) {
-        $sql = $sql_comics . " ORDER BY fecha_subida DESC";
-        $busqueda_param = "%$busqueda%";
-        
-        $params[] = $busqueda_param;
-        $params[] = $busqueda_param;
-        $params[] = $busqueda_param;
-        $types .= "sss";
-    }
-    
-    // ejecutar la consulta
-    $stmt = $conexion->prepare($sql);
-    
-    if (!empty($params)) 
-    {
-        $stmt->bind_param($types, ...$params);
-    }
-    
-    $stmt->execute();
-    $resultados = $stmt->get_result();
-    $total = $resultados->num_rows;
-?>
-
-<div class="container">
-
-    <h1>Resultados de búsqueda</h1>
-
-    <p class="search-summary">
-        Se encontraron <strong><?php echo $total; ?></strong> resultados para "<strong><?php echo htmlspecialchars($busqueda); ?></strong>"
-    </p>
-    
-    <!-- filtros rápidos -->
-    <div class="search-filters">
-
-        <form action="<?php echo BASE_URL; ?>/public/buscar.php" method="GET" class="flex gap-2 items-center">
-            <input type="hidden" name="q" value="<?php echo htmlspecialchars($busqueda); ?>">
-            
-            <div class="filter-group">
-
-                <label>Tipo:</label>
-
-                <div class="flex gap-1">
-
-                    <label class="checkbox-inline">
-                        <input type="checkbox" name="tipo[]" value="libro" <?php echo in_array('libro', $tipos) ? 'checked' : ''; ?>> Libros
-                    </label>
-                    <label class="checkbox-inline">
-                        <input type="checkbox" name="tipo[]" value="comic" <?php echo in_array('comic', $tipos) ? 'checked' : ''; ?>> Cómics
-                    </label>
-
-                </div>
-
-            </div>
-            
-            <div class="filter-group">
-
-                <label for="categoria-filter">Categoría:</label>
-
-                <select name="categoria" id="categoria-filter">
-                    <option value="">Todas</option>
-                    <?php
-                    $sql = "SELECT id, nombre FROM categorias ORDER BY nombre";
-                    $result = $conexion->query($sql);
-                    
-                    if ($result && $result->num_rows > 0) {
-                        while($row = $result->fetch_assoc()) {
-                            $selected = ($categoria == $row['id']) ? 'selected' : '';
-                            echo '<option value="' . $row['id'] . '" ' . $selected . '>' . htmlspecialchars($row['nombre']) . '</option>';
-                        }
-                    }
-                    ?>
-                </select>
-
-            </div>
-            
-            <button type="submit" class="btn btn-sm">Filtrar</button>
-
-            <a href="<?php echo BASE_URL; ?>/public/buscar.php" class="btn btn-outline btn-sm">Búsqueda avanzada</a>
-
-        </form>
-
-    </div>
-    
-    <?php if ($total > 0): ?>
-
-        <div class="obra-grid mt-4">
-
-            <?php while ($obra = $resultados->fetch_assoc()): ?>
-
-                <div class="obra-card">
-
-                    <div class="obra-card-header">
-
-                        <h3><?php echo htmlspecialchars($obra['titulo']); ?></h3>
-
-                        <div class="flex gap-1 mt-1">
-
-                            <?php if ($obra['tipo'] == 'libro' && !empty($obra['categoria'])): ?>
-                                <span class="badge badge-categoria"><?php echo htmlspecialchars($obra['categoria']); ?></span>
-                            <?php endif; ?>
-
-                            <span class="badge badge-tipo"><?php echo $obra['tipo'] == 'libro' ? 'Libro' : 'Cómic'; ?></span>
-                            <?php if ($obra['publico_adulto']): ?>
-                                <span class="badge badge-adulto">+18</span>
-                            <?php endif; ?>
-
-                        </div>
-
-                    </div>
-
-                    <div class="obra-card-body">
-
-                        <?php if (!empty($obra['portada'])): ?>
-                            <img src="<?php echo htmlspecialchars($obra['portada']); ?>" alt="Portada" class="obra-portada" loading="lazy">
-                        <?php endif; ?>
-
-                        <p class="obra-autor">Por: <?php echo htmlspecialchars($obra['autor']); ?></p>
-                        <p class="obra-descripcion"><?php echo mb_substr(htmlspecialchars($obra['descripcion']), 0, 150, 'UTF-8') . '...'; ?></p>
-
-                    </div>
-
-                    <div class="obra-card-footer">
-                        <span class="obra-fecha"><?php echo date('d/m/Y', strtotime($obra['fecha_subida'])); ?></span>
-                        <a href="<?php echo BASE_URL; ?>/public/obra.php?id=<?php echo $obra['id']; ?>&tipo=<?php echo $obra['tipo']; ?>" class="btn btn-outline">Ver más</a>
-                    </div>
-
-                </div>
-
-            <?php endwhile; ?>
-
-        </div>
-
-    <?php else: ?>
-
-        <div class="no-results">
-
-            <i class="fas fa-search fa-3x"></i>
-            <h2>No se encontraron resultados</h2>
-            <p>Intenta con otros términos de búsqueda o filtros diferentes.</p>
-
-        </div>
-
-    <?php endif; ?>
-
-</div>
-
-<?php
+// Filtros búsqueda
+if ($busqueda !== '') {
+    $librosWhere[] = '(l.titulo LIKE CONCAT("%", ?, "%") OR l.descripcion LIKE CONCAT("%", ?, "%"))';
+    $comicsWhere[] = '(co.titulo LIKE CONCAT("%", ?, "%") OR co.descripcion LIKE CONCAT("%", ?, "%"))';
+    $paramsLibros[] = $busqueda;
+    $paramsLibros[] = $busqueda;
+    $paramsComics[] = $busqueda;
+    $paramsComics[] = $busqueda;
+    $tipos .= 'ss';
+}
+if ($tipo === 'libro') {
+    $librosWhere[] = '1=1';
+    $comicsWhere[] = '0=1'; // no mostrar comics
+} elseif ($tipo === 'comic') {
+    $librosWhere[] = '0=1'; // no mostrar libros
+    $comicsWhere[] = '1=1';
+}
+if ($categoria) {
+    $librosWhere[] = "l.categoria_id = ?";
+    $comicsWhere[] = "co.categoria_id = ?";
+    $paramsLibros[] = $categoria;
+    $paramsComics[] = $categoria;
+    $tipos .= 'i';
+}
+if ($publico_adulto !== '') {
+    $librosWhere[] = "l.publico_adulto = ?";
+    $comicsWhere[] = "co.publico_adulto = ?";
+    $paramsLibros[] = $publico_adulto;
+    $paramsComics[] = $publico_adulto;
+    $tipos .= 'i';
 }
 
-include_once(__DIR__ . '/../includes/footer.php');
+$orderBy = "ORDER BY ";
+switch ($orden) {
+    case 'fecha':
+        $orderBy .= "fecha_subida DESC";
+        break;
+    case 'valoracion':
+        $orderBy .= "valoracion DESC";
+        break;
+    case 'visitas':
+        $orderBy .= "visitas DESC";
+        break;
+    default:
+        $orderBy .= "fecha_subida DESC";
+        break;
+}
+
+// Generamos el WHERE por separado para cada tabla
+$librosWhereSQL = $librosWhere ? 'WHERE ' . implode(' AND ', $librosWhere) : '';
+$comicsWhereSQL = $comicsWhere ? 'WHERE ' . implode(' AND ', $comicsWhere) : '';
+
+// Consulta principal
+$sql = "(SELECT 'libro' as tipo, l.id, l.titulo, l.descripcion, l.portada, l.fecha_subida, l.valoracion, l.visitas, c.nombre as categoria, l.publico_adulto
+         FROM libros l
+         LEFT JOIN categorias c ON l.categoria_id = c.id
+         {$librosWhereSQL}
+         {$orderBy} LIMIT 50)
+       UNION ALL
+       (SELECT 'comic' as tipo, co.id, co.titulo, co.descripcion, co.portada, co.fecha_subida, co.valoracion, co.visitas, c2.nombre as categoria, co.publico_adulto
+         FROM comics co
+         LEFT JOIN categorias c2 ON co.categoria_id = c2.id
+         {$comicsWhereSQL}
+         {$orderBy} LIMIT 50)";
+
+$resultados = [];
+if ($busqueda !== '' || $tipo || $categoria || $publico_adulto !== '') {
+    $stmt = $conexion->prepare($sql);
+    // Unimos parámetros de libros y comics
+    $allParams = array_merge($paramsLibros, $paramsComics);
+    $allTipos = $tipos . $tipos; // porque es UNION ALL
+    if ($allParams) {
+        $stmt->bind_param($allTipos, ...$allParams);
+    }
+    $stmt->execute();
+    $resultados = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    $stmt->close();
+}
+
+// Obtener categorías para el buscador avanzado
+$categorias = [];
+$qc = $conexion->query("SELECT id, nombre FROM categorias ORDER BY nombre");
+while($row = $qc->fetch_assoc()) $categorias[] = $row;
 ?>
+
+<title>Buscar | InkVerse</title>
+    
+<?php include '../includes/header.php'; ?>
+
+<div class="container my-5 buscar-espaciado-externo">
+    <div class="row mb-4">
+        <div class="col-lg-8 mx-auto">
+            <form class="buscar-form row g-2 align-items-center" method="get" action="buscar.php">
+                <div class="col-sm">
+                    <input type="text" class="form-control" name="q" placeholder="Buscar obras o descripciones..." value="<?=htmlspecialchars($busqueda)?>">
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Buscar</button>
+                </div>
+                <div class="col-auto">
+                    <a class="btn btn-link text-secondary btn-avanzada" data-bs-toggle="collapse" href="#busquedaAvanzada" role="button" aria-expanded="false" aria-controls="busquedaAvanzada">
+                        <i class="fas fa-sliders-h"></i> Avanzada
+                    </a>
+                </div>
+            </form>
+            <div class="collapse mt-3" id="busquedaAvanzada">
+                <form class="row g-2 align-items-center" method="get" action="buscar.php">
+                    <input type="hidden" name="q" value="<?=htmlspecialchars($busqueda)?>">
+                    <div class="col-md-3">
+                        <select class="form-select" name="tipo">
+                            <option value="">Tipo: Todos</option>
+                            <option value="libro" <?=$tipo=='libro'?'selected':''?>>Libros</option>
+                            <option value="comic" <?=$tipo=='comic'?'selected':''?>>Cómics</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select" name="categoria">
+                            <option value="">Categoría: Todas</option>
+                            <?php foreach($categorias as $cat): ?>
+                                <option value="<?=$cat['id']?>" <?=$categoria==$cat['id']?'selected':''?>><?=htmlspecialchars($cat['nombre'])?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <select class="form-select" name="publico_adulto">
+                            <option value="">Público</option>
+                            <option value="0" <?=$publico_adulto==='0'?'selected':''?>>Todos</option>
+                            <option value="1" <?=$publico_adulto==='1'?'selected':''?>>+18</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <select class="form-select" name="orden">
+                            <option value="fecha" <?=$orden=='fecha'?'selected':''?>>Más recientes</option>
+                            <option value="valoracion" <?=$orden=='valoracion'?'selected':''?>>Mejor valorados</option>
+                            <option value="visitas" <?=$orden=='visitas'?'selected':''?>>Más vistos</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-outline-primary w-100"><i class="fas fa-filter"></i> Filtrar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <?php if ($busqueda !== '' || $tipo || $categoria || $publico_adulto !== ''): ?>
+        <h2 class="buscar-titulo mb-4 text-primary text-center fs-4">Resultados <?= $busqueda ? 'para "<span class=\'text-dark\'>'.htmlspecialchars($busqueda).'</span>"' : '' ?></h2>
+        <?php if (count($resultados)): ?>
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4 resultados-grid">
+                <?php foreach($resultados as $res): ?>
+                    <div class="col">
+                        <a class="resultado-card card h-100 text-decoration-none shadow-sm" href="<?= $res['tipo']=='libro' ? '../usuario/libro.php?id='.$res['id'] : '../usuario/comic.php?id='.$res['id'] ?>">
+                            <div class="resultado-portada card-img-top d-flex align-items-center justify-content-center bg-light" style="height:170px;">
+                                <?php if ($res['portada']): ?>
+                                    <img src="../uploads/portadas/<?=htmlspecialchars($res['portada'])?>" alt="Portada" class="img-fluid rounded" style="max-height:160px;">
+                                <?php else: ?>
+                                    <div class="portada-placeholder text-center w-100">
+                                        <i class="fas fa-book-open fa-2x text-primary"></i>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                            <div class="resultado-info card-body pb-2 text-center">
+                                <span class="badge bg-primary mb-1"><?=ucfirst($res['tipo'])?></span>
+                                <?php if($res['categoria']): ?>
+                                    <span class="badge bg-secondary mb-1"><?=htmlspecialchars($res['categoria'])?></span>
+                                <?php endif; ?>
+                                <?php if($res['publico_adulto']): ?>
+                                    <span class="badge bg-danger mb-1">+18</span>
+                                <?php endif; ?>
+                                <h5 class="card-title mt-1 mb-2"><?=htmlspecialchars($res['titulo'])?></h5>
+                                <?php if($res['descripcion']): ?>
+                                    <p class="card-text text-muted small"><?=mb_strimwidth(strip_tags($res['descripcion']),0,80,'…')?></p>
+                                <?php endif; ?>
+                            </div>
+                            <div class="card-footer d-flex justify-content-between align-items-center small bg-light">
+                                <span title="Valoración"><i class="fas fa-star text-warning"></i> <?=number_format($res['valoracion'],1)?></span>
+                                <span title="Visitas"><i class="fas fa-eye text-secondary"></i> <?=intval($res['visitas'])?></span>
+                                <span title="Fecha de subida"><i class="far fa-calendar-alt text-info"></i> <?=date('d/m/Y',strtotime($res['fecha_subida']))?></span>
+                            </div>
+                        </a>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        <?php else: ?>
+            <div class="alert alert-info text-center mt-4">
+                <i class="fas fa-search"></i> No se encontraron resultados para esta búsqueda.
+            </div>
+        <?php endif; ?>
+    <?php else: ?>
+        <div class="buscar-indicacion text-center text-muted py-5">
+            <i class="fas fa-search fa-2x mb-2"></i>
+            <p class="mb-0">Introduce un término o usa la búsqueda avanzada.</p>
+        </div>
+    <?php endif; ?>
+</div>
+
+
+<?php include '../includes/footer.php'; ?>

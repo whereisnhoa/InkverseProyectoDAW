@@ -514,3 +514,153 @@ body {
 .perfil-datos-extra a:hover {
     color: #4cc9f0;
 }
+
+/* ========== MIS OBRAS (Bootstrap adaptado y mejorado) ========== */
+.mis-obras-container {
+    max-width: 850px;
+    margin: 60px auto 60px auto;
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 6px 28px rgba(67,97,238,0.10);
+    padding: 34px 30px 44px 30px;
+}
+
+.mis-obras-titulo {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: #4361ee;
+    margin-bottom: 25px;
+    text-align: center;
+    letter-spacing: -1px;
+}
+
+.mis-obras-subtitulo {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #2744c5;
+    margin-bottom: 18px;
+    margin-top: 32px;
+}
+
+.obra-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 22px;
+    background: #f8faff;
+    border-radius: 13px;
+    box-shadow: 0 1px 8px #4361ee10;
+    padding: 18px 17px;
+    margin-bottom: 22px;
+    transition: box-shadow 0.16s, background 0.14s;
+    border: 1.5px solid #e7e9fb;
+}
+.obra-item:hover {
+    background: #e7f0fe;
+    box-shadow: 0 7px 18px rgba(67,97,238,0.13);
+    border-color: #4361ee33;
+}
+.obra-portada-img {
+    width: 90px; height: 120px;
+    object-fit: cover;
+    border-radius: 10px;
+    box-shadow: 0 1px 6px #4361ee16;
+    background: #e7e9fb;
+    display: block;
+}
+.obra-portada-placeholder {
+    width: 90px; height: 120px;
+    background: #eee;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+}
+.obra-portada-placeholder i {
+    font-size: 2.6em;
+    color: #b9bfda;
+}
+.obra-info {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+.obra-info h4 {
+    font-size: 1.18rem;
+    font-weight: 700;
+    color: #4361ee;
+    margin-bottom: 6px;
+    margin-top: 0;
+    word-break: break-word;
+}
+.obra-descripcion {
+    font-size: 1.01rem;
+    color: #505b7a;
+    margin-bottom: 8px;
+    white-space: pre-line;
+    word-break: break-word;
+}
+.obra-info .badge {
+    font-size: 0.91rem;
+    margin-right: 8px;
+    background: #e7f0fe;
+    color: #4361ee;
+    font-weight: 700;
+    border-radius: 7px;
+    padding: 4px 7px;
+}
+.obra-info .badge-adulto {
+    background: #fbe6e6;
+    color: #d10000;
+}
+.obra-fecha {
+    font-size: 0.98rem;
+    color: #8a8f9b;
+    margin-bottom: 7px;
+}
+.obra-link {
+    font-weight: 700;
+    color: #fff !important;
+    background: linear-gradient(90deg, #4361ee 60%, #4cc9f0 100%);
+    border-radius: 7px;
+    padding: 7px 18px;
+    text-decoration: none;
+    font-size: 1.03rem;
+    transition: background 0.14s, color 0.13s;
+    display: inline-block;
+}
+.obra-link:hover {
+    background: linear-gradient(90deg, #2744c5 60%, #4361ee 100%);
+    color: #fff !important;
+}
+
+/* Separador bonito */
+hr {
+    border: none;
+    border-top: 1.5px solid #e7e9fb;
+    margin: 20px 0;
+}
+
+/* Empty state */
+.mis-obras-vacio {
+    color: #b2c3e0;
+    text-align: center;
+    font-size: 1.1rem;
+    margin: 42px 0 30px 0;
+}
+.mis-obras-vacio i {
+    font-size: 2.3rem;
+    margin-bottom: 11px;
+    color: #f72585;
+    display: block;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .mis-obras-container { padding: 18px 4vw 24px 4vw;}
+    .obra-item { flex-direction: column; align-items: stretch; gap: 13px;}
+    .obra-portada-img, .obra-portada-placeholder { margin: 0 auto;}
+}
+@media (max-width: 700px) {
+    .mis-obras-container { padding: 8px 2vw 17px 2vw;}
+    .mis-obras-titulo { font-size: 1.6rem;}
+    .obra-info h4 { font-size: 1.07rem;}
+}
