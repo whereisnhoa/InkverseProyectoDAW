@@ -339,29 +339,7 @@ if ($result_populares) {
             </div>
         </div>
         <?php endif; ?>
-        <!-- Demografías -->
-        <?php if (!empty($comics_por_tipo['demografia'])): ?>
-        <div class="subsection">
-            <h3 class="subsection-title">
-                <i class="fas fa-users"></i> Por Demografía
-            </h3>
-            <div class="demografia-grid">
-                <?php foreach ($comics_por_tipo['demografia'] as $demo): ?>
-                    <div class="demografia-card" data-aos="fade-up">
-                        <div class="demografia-header">
-                            <h4><?php echo htmlspecialchars($demo['nombre']); ?></h4>
-                            <span class="obras-badge"><?php echo intval($demo['total_obras']); ?></span>
-                        </div>
-                        <p><?php echo htmlspecialchars($demo['descripcion']); ?></p>
-                        <a href="<?php echo BASE_URL; ?>/public/categoria.php?categoria_id=<?php echo $demo['id']; ?>&tipo=comic" 
-                           class="demografia-link">
-                            <i class="fas fa-arrow-right"></i> Ver obras
-                        </a>
-                    </div>
-                <?php endforeach; ?>
-            </div>
-        </div>
-        <?php endif; ?>
+    
         <!-- Géneros -->
         <?php if (!empty($comics_por_tipo['genero'])): ?>
         <div class="subsection">

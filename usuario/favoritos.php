@@ -18,7 +18,7 @@ $filtro_categoria = isset($_GET['categoria']) ? intval($_GET['categoria']) : 0;
 $orden = isset($_GET['orden']) ? $_GET['orden'] : 'reciente';
 
 // Obtener libros favoritos
-$sql_libros = "SELECT l.*, c.nombre as categoria_nombre, f.fecha_guardado,
+$sql_libros = "SELECT l.*, c.nombre as categoria_nombre, f.fecha_agregado,
                (SELECT COUNT(*) FROM favoritos f2 WHERE f2.contenido_id = l.id AND f2.tipo_contenido = 'libro') as total_favoritos
                FROM libros l 
                JOIN favoritos f ON f.contenido_id = l.id 
@@ -48,12 +48,12 @@ if ($filtro_tipo === 'libro' || $filtro_tipo === 'todos') {
             $sql_libros .= " ORDER BY total_favoritos DESC";
             break;
         default:
-            $sql_libros .= " ORDER BY f.fecha_guardado DESC";
+            $sql_libros .= " ORDER BY f.fecha_agregado DESC";
     }
 }
 
 // Obtener cómics favoritos
-$sql_comics = "SELECT c.*, f.fecha_guardado,
+$sql_comics = "SELECT c.*, f.fecha_agregado,
                (SELECT COUNT(*) FROM favoritos f2 WHERE f2.contenido_id = c.id AND f2.tipo_contenido = 'comic') as total_favoritos
                FROM comics c 
                JOIN favoritos f ON f.contenido_id = c.id 
@@ -74,7 +74,7 @@ switch ($orden) {
         $sql_comics .= " ORDER BY total_favoritos DESC";
         break;
     default:
-        $sql_comics .= " ORDER BY f.fecha_guardado DESC";
+        $sql_comics .= " ORDER BY f.fecha_agregado DESC";
 }
 
 // Ejecutar consultas según el filtro de tipo

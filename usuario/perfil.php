@@ -235,6 +235,7 @@ $stmt_seguidos->close();
                         <a class="enlace-rapido" href="favoritos.php"><i class="fas fa-heart"></i>Ver favoritos</a>
                         <a class="enlace-rapido" href="mis_obras.php?id=<?= $usuario['id'] ?>"><i class="fas fa-book"></i>Mis obras</a>
                         <a class="enlace-rapido" href="test.php"><i class="fas fa-question-circle"></i>Test</a>
+                        <a class="enlace-rapido" href="biblioteca.php"><i class="fas fa-bookmark"></i> Mi biblioteca</a>
                     <?php endif; ?>
                 </div>
             </div>

@@ -43,60 +43,67 @@ if (!$categoria) {
     </div>
 
     <?php
-    // Reciente: hasta 6 obras más recientes
+    // --- CONSULTAS MODIFICADAS PARA USAR TABLA INTERMEDIA DE CATEGORÍAS ---
+
     if ($tipo == 'libro') {
         $sql_obras_recientes = "SELECT o.*, u.usuario 
-                      FROM libros o 
-                      JOIN usuarios u ON o.usuario_id = u.id 
-                      WHERE o.categoria_id = ? 
-                      ORDER BY o.fecha_subida DESC
-                      LIMIT 6";
+            FROM libros o
+            JOIN usuarios u ON o.usuario_id = u.id 
+            JOIN libro_categorias lc ON lc.libro_id = o.id
+            WHERE lc.categoria_id = ?
+            ORDER BY o.fecha_subida DESC
+            LIMIT 6";
+
+        $sql_obras_recomendadas = "SELECT o.*, u.usuario 
+            FROM libros o
+            JOIN usuarios u ON o.usuario_id = u.id 
+            JOIN libro_categorias lc ON lc.libro_id = o.id
+            WHERE lc.categoria_id = ? AND o.valoracion IS NOT NULL
+            ORDER BY o.valoracion DESC, o.fecha_subida DESC
+            LIMIT 6";
+
+        $sql_obras_todas = "SELECT o.*, u.usuario 
+            FROM libros o
+            JOIN usuarios u ON o.usuario_id = u.id 
+            JOIN libro_categorias lc ON lc.libro_id = o.id
+            WHERE lc.categoria_id = ?
+            ORDER BY o.fecha_subida DESC";
     } else {
         $sql_obras_recientes = "SELECT o.*, u.usuario 
-                      FROM comics o 
-                      JOIN usuarios u ON o.usuario_id = u.id 
-                      WHERE o.categoria_id = ? 
-                      ORDER BY o.fecha_subida DESC
-                      LIMIT 6";
+            FROM comics o
+            JOIN usuarios u ON o.usuario_id = u.id 
+            JOIN comic_categorias cc ON cc.comic_id = o.id
+            WHERE cc.categoria_id = ?
+            ORDER BY o.fecha_subida DESC
+            LIMIT 6";
+
+        $sql_obras_recomendadas = "SELECT o.*, u.usuario 
+            FROM comics o
+            JOIN usuarios u ON o.usuario_id = u.id 
+            JOIN comic_categorias cc ON cc.comic_id = o.id
+            WHERE cc.categoria_id = ? AND o.valoracion IS NOT NULL
+            ORDER BY o.valoracion DESC, o.fecha_subida DESC
+            LIMIT 6";
+
+        $sql_obras_todas = "SELECT o.*, u.usuario 
+            FROM comics o
+            JOIN usuarios u ON o.usuario_id = u.id 
+            JOIN comic_categorias cc ON cc.comic_id = o.id
+            WHERE cc.categoria_id = ?
+            ORDER BY o.fecha_subida DESC";
     }
+
+    // Ejecutar consultas
     $stmt_obras_recientes = $conexion->prepare($sql_obras_recientes);
     $stmt_obras_recientes->bind_param("i", $categoria_id);
     $stmt_obras_recientes->execute();
     $result_obras_recientes = $stmt_obras_recientes->get_result();
 
-    // Recomendado: hasta 6 mejores valoradas
-    if ($tipo == 'libro') {
-        $sql_obras_recomendadas = "SELECT o.*, u.usuario 
-                      FROM libros o 
-                      JOIN usuarios u ON o.usuario_id = u.id 
-                      WHERE o.categoria_id = ? AND o.valoracion IS NOT NULL
-                      ORDER BY o.valoracion DESC, o.fecha_subida DESC LIMIT 6";
-    } else {
-        $sql_obras_recomendadas = "SELECT o.*, u.usuario 
-                      FROM comics o 
-                      JOIN usuarios u ON o.usuario_id = u.id 
-                      WHERE o.categoria_id = ? AND o.valoracion IS NOT NULL
-                      ORDER BY o.valoracion DESC, o.fecha_subida DESC LIMIT 6";
-    }
     $stmt_obras_recomendadas = $conexion->prepare($sql_obras_recomendadas);
     $stmt_obras_recomendadas->bind_param("i", $categoria_id);
     $stmt_obras_recomendadas->execute();
     $result_obras_recomendadas = $stmt_obras_recomendadas->get_result();
 
-    // Todas las obras de la categoría (sin límite)
-    if ($tipo == 'libro') {
-        $sql_obras_todas = "SELECT o.*, u.usuario 
-                      FROM libros o 
-                      JOIN usuarios u ON o.usuario_id = u.id 
-                      WHERE o.categoria_id = ? 
-                      ORDER BY o.fecha_subida DESC";
-    } else {
-        $sql_obras_todas = "SELECT o.*, u.usuario 
-                      FROM comics o 
-                      JOIN usuarios u ON o.usuario_id = u.id 
-                      WHERE o.categoria_id = ? 
-                      ORDER BY o.fecha_subida DESC";
-    }
     $stmt_obras_todas = $conexion->prepare($sql_obras_todas);
     $stmt_obras_todas->bind_param("i", $categoria_id);
     $stmt_obras_todas->execute();
