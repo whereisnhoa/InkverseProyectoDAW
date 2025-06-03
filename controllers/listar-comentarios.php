@@ -3,7 +3,8 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-require_once('../includes/conexion.php');
+// Cambia la ruta según tu estructura real
+require_once(__DIR__ . '/../includes/conexion.php');
 header('Content-Type: application/json');
 
 $contenido_id = isset($_GET['contenido_id']) ? intval($_GET['contenido_id']) : 0;
@@ -19,6 +20,10 @@ $sql = "SELECT c.contenido, c.fecha, u.usuario FROM comentarios c
         WHERE c.contenido_id = ? AND c.tipo_contenido = ?
         ORDER BY c.fecha ASC";
 $stmt = $conexion->prepare($sql);
+if (!$stmt) {
+    echo json_encode(['error' => $conexion->error]);
+    exit;
+}
 $stmt->bind_param("is", $contenido_id, $tipo_contenido);
 $stmt->execute();
 $res = $stmt->get_result();
@@ -31,3 +36,4 @@ while($row = $res->fetch_assoc()) {
     );
 }
 echo json_encode($comentarios);
+exit;
