@@ -2,7 +2,6 @@
 /**
  * Header del sitio 
  */
-
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -113,10 +112,9 @@ if ($current_script === 'login.php' || $current_script === 'register.php') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>InkVerse - Plataforma de Literatura y Cómics</title>
     <meta name="description" content="Descubre, lee y comparte literatura y cómics en InkVerse. La plataforma definitiva para amantes de la lectura.">
-    <!-- bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
-    <!-- estilo -->
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>/css/public.css">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>/css/header.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
@@ -127,11 +125,16 @@ if ($current_script === 'login.php' || $current_script === 'register.php') {
 
         <!-- LOGO -->
         <div class="logo">
-            <a href="<?php echo BASE_URL; ?>/public/index.php">
+            <a href="<?php echo BASE_URL; ?>/public/index.php" style="display:flex;align-items:center;gap:13px;text-decoration:none;">
                 <img src="<?php echo BASE_URL; ?>/includes/img/inkverse3.jpg" alt="Logo InkVerse">
                 <span>InkVerse</span>
             </a>
         </div>
+
+        <!-- BOTÓN HAMBURGUESA -->
+        <button class="menu-toggle icon-btn" aria-label="Abrir menú" onclick="toggleMenu()">
+            <i class="fas fa-bars"></i>
+        </button>
 
         <!-- NAV MENU -->
         <nav class="nav-links">
@@ -146,9 +149,10 @@ if ($current_script === 'login.php' || $current_script === 'register.php') {
                         <i class="fas fa-compass"></i> <?= htmlspecialchars($TEXTOS['explorar']) ?>
                     </a>
                 </li>
+                <!-- CATEGORÍAS -->
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle nav-link" onclick="return false;">
-                        <i class="fas fa-tags"></i> <?= htmlspecialchars($TEXTOS['categorias']) ?> <i class="fas fa-chevron-down"></i>
+                        <i class="fas fa-tags"></i> <?= htmlspecialchars($TEXTOS['categorias']) ?>
                     </a>
                     <div class="dropdown-content mega-dropdown">
                         <div class="dropdown-grid">
@@ -156,8 +160,8 @@ if ($current_script === 'login.php' || $current_script === 'register.php') {
                                 <h4><i class="fas fa-book"></i> <?= htmlspecialchars($TEXTOS['literatura']) ?></h4>
                                 <div class="dropdown-links">
                                     <?php foreach ($categorias_libros as $categoria): ?>
-                                        <a href="<?php echo BASE_URL; ?>/public/categoria.php?id=<?php echo $categoria['id']; ?>&tipo=libro">
-                                            <?php echo htmlspecialchars($categoria['nombre']); ?>
+                                        <a href="<?php echo BASE_URL; ?>/public/categoria.php?categoria_id=<?php echo $categoria['id']; ?>&tipo=libro">
+                                            <i class="fas fa-angle-right"></i> <?php echo htmlspecialchars($categoria['nombre']); ?>
                                         </a>
                                     <?php endforeach; ?>
                                     <div class="dropdown-divider"></div>
@@ -173,8 +177,8 @@ if ($current_script === 'login.php' || $current_script === 'register.php') {
                                 <h4><i class="fas fa-book-open"></i> <?= htmlspecialchars($TEXTOS['comic_manga']) ?></h4>
                                 <div class="dropdown-links">
                                     <?php foreach ($categorias_comics as $categoria): ?>
-                                        <a href="<?php echo BASE_URL; ?>/public/categoria.php?id=<?php echo $categoria['id']; ?>&tipo=comic">
-                                            <?php echo htmlspecialchars($categoria['nombre']); ?>
+                                        <a href="<?php echo BASE_URL; ?>/public/categoria.php?categoria_id=<?php echo $categoria['id']; ?>&tipo=comic">
+                                            <i class="fas fa-angle-right"></i> <?php echo htmlspecialchars($categoria['nombre']); ?>
                                         </a>
                                     <?php endforeach; ?>
                                     <div class="dropdown-divider"></div>
@@ -189,14 +193,15 @@ if ($current_script === 'login.php' || $current_script === 'register.php') {
                         </div>
                     </div>
                 </li>
+                <!-- COMUNIDAD -->
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle nav-link" onclick="return false;">
-                        <i class="fas fa-users"></i> <?= htmlspecialchars($TEXTOS['comunidad']) ?> <i class="fas fa-chevron-down"></i>
+                        <i class="fas fa-users"></i> <?= htmlspecialchars($TEXTOS['comunidad']) ?>
                     </a>
                     <div class="dropdown-content mega-dropdown">
                         <div class="dropdown-grid">
                             <div class="dropdown-section">
-                                <h4><?= htmlspecialchars($TEXTOS['participar']) ?></h4>
+                                <h4><i class="fas fa-handshake"></i> <?= htmlspecialchars($TEXTOS['participar']) ?></h4>
                                 <div class="dropdown-links">
                                     <a href="<?php echo BASE_URL; ?>/comunidad/foros.php">
                                         <i class="fas fa-comments"></i> <?= htmlspecialchars($TEXTOS['foros_discusion']) ?>
@@ -210,10 +215,10 @@ if ($current_script === 'login.php' || $current_script === 'register.php') {
                                 </div>
                             </div>
                             <div class="dropdown-section">
-                                <h4><?= htmlspecialchars($TEXTOS['contenido']) ?></h4>
+                                <h4><i class="fas fa-palette"></i> <?= htmlspecialchars($TEXTOS['contenido']) ?></h4>
                                 <div class="dropdown-links">
                                     <a href="<?php echo BASE_URL; ?>/comunidad/arte.php">
-                                        <i class="fas fa-palette"></i> <?= htmlspecialchars($TEXTOS['galeria_arte']) ?>
+                                        <i class="fas fa-image"></i> <?= htmlspecialchars($TEXTOS['galeria_arte']) ?>
                                     </a>
                                     <a href="<?php echo BASE_URL; ?>/comunidad/recomendaciones.php">
                                         <i class="fas fa-thumbs-up"></i> <?= htmlspecialchars($TEXTOS['recomendaciones']) ?>
@@ -224,16 +229,16 @@ if ($current_script === 'login.php' || $current_script === 'register.php') {
                                 </div>
                             </div>
                             <div class="dropdown-section">
-                                <h4>Información</h4>
+                                <h4><i class="fas fa-info-circle"></i> <?= isset($TEXTOS['acerca_de']) ? htmlspecialchars($TEXTOS['acerca_de']) : 'Información' ?></h4>
                                 <div class="dropdown-links">
                                     <a href="<?php echo BASE_URL; ?>/public/acerca.php">
-                                        <i class="fas fa-info-circle"></i> <?= htmlspecialchars($TEXTOS['acerca_de']) ?>
+                                        <i class="fas fa-info-circle"></i> <?= isset($TEXTOS['acerca_de']) ? htmlspecialchars($TEXTOS['acerca_de']) : 'Acerca de' ?>
                                     </a>
                                     <a href="<?php echo BASE_URL; ?>/public/contacto.php">
-                                        <i class="fas fa-envelope"></i> <?= htmlspecialchars($TEXTOS['contacto']) ?>
+                                        <i class="fas fa-envelope"></i> <?= isset($TEXTOS['contacto']) ? htmlspecialchars($TEXTOS['contacto']) : 'Contacto' ?>
                                     </a>
                                     <a href="<?php echo BASE_URL; ?>/public/aleatorio.php">
-                                        <i class="fas fa-random"></i> <?= htmlspecialchars($TEXTOS['aleatorio']) ?>
+                                        <i class="fas fa-random"></i> <?= isset($TEXTOS['aleatorio']) ? htmlspecialchars($TEXTOS['aleatorio']) : 'Aleatorio' ?>
                                     </a>
                                 </div>
                             </div>
@@ -261,23 +266,30 @@ if ($current_script === 'login.php' || $current_script === 'register.php') {
                 <button class="lang-btn dropdown-toggle icon-btn" aria-label="Seleccionar idioma" onclick="return false;">
                     <img src="<?php echo BASE_URL; ?>/includes/img/<?php echo htmlspecialchars($idioma); ?>.png"
                          alt="<?php echo htmlspecialchars($idioma); ?>" class="flag-icon">
-                    <i class="fas fa-chevron-down chevron"></i>
                 </button>
+
                 <div class="dropdown-content language-dropdown-content">
+
                     <a href="?lang=es" class="flag-item <?php echo ($idioma == 'es') ? 'active' : ''; ?>">
                         <img src="<?php echo BASE_URL; ?>/includes/img/es.png" alt="Español"><span>Español</span>
                     </a>
+
                     <a href="?lang=en" class="flag-item <?php echo ($idioma == 'en') ? 'active' : ''; ?>">
                         <img src="<?php echo BASE_URL; ?>/includes/img/en.png" alt="English"><span>English</span>
                     </a>
+
                     <a href="?lang=fr" class="flag-item <?php echo ($idioma == 'fr') ? 'active' : ''; ?>">
                         <img src="<?php echo BASE_URL; ?>/includes/img/fr.png" alt="Français"><span>Français</span>
                     </a>
+
                     <a href="?lang=ca" class="flag-item <?php echo ($idioma == 'ca') ? 'active' : ''; ?>">
                         <img src="<?php echo BASE_URL; ?>/includes/img/ca.png" alt="Catalá"><span>Catalá</span>
                     </a>
+
                 </div>
+
             </div>
+
             <?php if (isset($_SESSION['usuario_id'])): ?>
                 <a href="<?php echo BASE_URL; ?>/usuario/favoritos.php"
                    title="<?= htmlspecialchars($TEXTOS['mis_favoritos']) ?>"
@@ -293,7 +305,9 @@ if ($current_script === 'login.php' || $current_script === 'register.php') {
                             <span class="notification-badge"><?php echo $notificaciones_no_leidas; ?></span>
                         <?php endif; ?>
                     </button>
+
                     <div class="dropdown-content notification-dropdown-content">
+
                         <div class="notification-header">
                             <h4><?= htmlspecialchars($TEXTOS['notificaciones']) ?></h4>
                             <?php if ($notificaciones_no_leidas > 0): ?>
@@ -303,6 +317,7 @@ if ($current_script === 'login.php' || $current_script === 'register.php') {
                                 </a>
                             <?php endif; ?>
                         </div>
+
                         <div class="notification-list">
                             <?php
                             if (isset($_SESSION['usuario_id'])) {
@@ -314,7 +329,6 @@ if ($current_script === 'login.php' || $current_script === 'register.php') {
                                     $notificaciones = $stmt_notif_list->get_result();
                                     if ($notificaciones && $notificaciones->num_rows > 0):
                                         while ($notificacion = $notificaciones->fetch_assoc()):
-                                            // Selección de icono por tipo
                                             switch ($notificacion['tipo']) {
                                                 case 'comentario': $icon = 'comment'; break;
                                                 case 'like': $icon = 'heart'; break;
@@ -322,7 +336,6 @@ if ($current_script === 'login.php' || $current_script === 'register.php') {
                                                 case 'nueva_obra': $icon = 'book'; break;
                                                 case 'sistema': default: $icon = 'bell'; break;
                                             }
-                                            // URL personalizada si existe
                                             $url = !empty($notificacion['url']) ? htmlspecialchars($notificacion['url']) : '#';
                             ?>
                                 <a href="<?php echo $url; ?>" class="notification-item <?php echo $notificacion['leido'] ? '' : 'unread'; ?>">
@@ -365,7 +378,7 @@ if ($current_script === 'login.php' || $current_script === 'register.php') {
             </button>
             <div class="dropdown user-dropdown">
                 <button class="dropdown-toggle icon-btn user-menu-btn" onclick="return false;">
-                    <i class="fas fa-user-circle"></i> <i class="fas fa-chevron-down"></i>
+                    <i class="fas fa-user-circle"></i>
                 </button>
                 <div class="dropdown-content user-dropdown-content">
                     <?php if (isset($_SESSION['usuario_id'])): ?>
@@ -430,7 +443,19 @@ if (isset($_SESSION['mensaje'])) {
 <script>
     let currentTheme = localStorage.getItem('theme') || 'light';
 
+    // Hamburger menu
+    function toggleMenu() {
+        const navLinks = document.querySelector('.nav-links');
+        const icon = document.querySelector('.menu-toggle i');
+        navLinks.classList.toggle('open');
+        if (icon) {
+            icon.classList.toggle('fa-bars');
+            icon.classList.toggle('fa-times');
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
+        // Tema oscuro
         if (currentTheme === 'dark') {
             document.body.setAttribute('data-theme', 'dark');
             const themeToggle = document.querySelector('.dark-mode-toggle i');
@@ -438,24 +463,8 @@ if (isset($_SESSION['mensaje'])) {
                 themeToggle.className = 'fas fa-sun';
             }
         }
-    });
 
-    function toggleTheme() {
-        const body = document.body;
-        const themeToggle = document.querySelector('.dark-mode-toggle i');
-        if (currentTheme === 'light') {
-            currentTheme = 'dark';
-            body.setAttribute('data-theme', 'dark');
-            if (themeToggle) themeToggle.className = 'fas fa-sun';
-        } else {
-            currentTheme = 'light';
-            body.removeAttribute('data-theme');
-            if (themeToggle) themeToggle.className = 'fas fa-moon';
-        }
-        localStorage.setItem('theme', currentTheme);
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
+        // Dropdowns
         const dropdowns = document.querySelectorAll('.dropdown');
         dropdowns.forEach(dropdown => {
             const toggle = dropdown.querySelector('.dropdown-toggle');
@@ -472,21 +481,51 @@ if (isset($_SESSION['mensaje'])) {
                 });
             }
         });
+
+        // Cerrar dropdowns al hacer click fuera
         document.addEventListener('click', function(e) {
             if (!e.target.closest('.dropdown')) {
                 dropdowns.forEach(dropdown => {
                     dropdown.classList.remove('active');
                 });
             }
+            // Cierra menú hamburguesa si haces click fuera en móvil
+            if (!e.target.closest('.header-bar')) {
+                const navLinks = document.querySelector('.nav-links');
+                const icon = document.querySelector('.menu-toggle i');
+                if (navLinks) navLinks.classList.remove('open');
+                if (icon) { icon.classList.remove('fa-times'); icon.classList.add('fa-bars'); }
+            }
         });
+        // Cerrar con ESC
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 dropdowns.forEach(dropdown => {
                     dropdown.classList.remove('active');
                 });
+                // Cierra menú hamburguesa
+                const navLinks = document.querySelector('.nav-links');
+                const icon = document.querySelector('.menu-toggle i');
+                if (navLinks) navLinks.classList.remove('open');
+                if (icon) { icon.classList.remove('fa-times'); icon.classList.add('fa-bars'); }
             }
         });
     });
+
+    function toggleTheme() {
+        const body = document.body;
+        const themeToggle = document.querySelector('.dark-mode-toggle i');
+        if (currentTheme === 'light') {
+            currentTheme = 'dark';
+            body.setAttribute('data-theme', 'dark');
+            if (themeToggle) themeToggle.className = 'fas fa-sun';
+        } else {
+            currentTheme = 'light';
+            body.removeAttribute('data-theme');
+            if (themeToggle) themeToggle.className = 'fas fa-moon';
+        }
+        localStorage.setItem('theme', currentTheme);
+    }
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>

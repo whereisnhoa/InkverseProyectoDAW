@@ -10,10 +10,8 @@
                     </div>
                     <p>Plataforma para compartir y descubrir obras literarias, cómics y manga. Un espacio para lectores y creadores.</p>
                     <div class="social-links">
-                        <a href="#" aria-label="Facebook" title="Facebook"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" aria-label="Twitter" title="Twitter"><i class="fab fa-twitter"></i></a>
-                        <a href="#" aria-label="Instagram" title="Instagram"><i class="fab fa-instagram"></i></a>
-                        <a href="#" aria-label="Discord" title="Discord"><i class="fab fa-discord"></i></a>
+                        <a href="https://discord.com/" aria-label="Discord" title="Discord" target="_blank" rel="noopener"><i class="fab fa-discord"></i></a>
+                        <a href="https://github.com/whereisnhoa/proyecto" aria-label="Guthub" title="Github" target="_blank" rel="noopener"><i class="fab fa-github"></i></a>
                     </div>
                 </div>
                 
@@ -69,7 +67,6 @@
             </div>
         </div>
     </footer>
-
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script src="<?php echo BASE_URL; ?>/js/script.js"></script>
@@ -78,5 +75,4 @@
     <?php include_once(__DIR__ . '/cookies-banner.php'); ?>
 
 </body>
-
 </html>

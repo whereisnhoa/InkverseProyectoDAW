@@ -1,14 +1,12 @@
 <?php
 /**
- * Página de inicio adaptada a Bootstrap
+ * Página de inicio adaptada y mejorada
  */
-
 require_once(__DIR__ . '/../includes/header.php');
 include_once(__DIR__ . '/../includes/conexion.php');
 
-// Obtener obras destacadas recientes (una mezcla de libros y cómics)
-$sql_destacados = "
-    (SELECT 'libro' as tipo, l.id, l.titulo, u.usuario AS autor, l.descripcion, l.portada, l.publico_adulto, 
+// Obras destacadas
+$sql_destacados = "(SELECT 'libro' as tipo, l.id, l.titulo, u.usuario AS autor, l.descripcion, l.portada, l.publico_adulto, 
      c.nombre as categoria, l.fecha_subida, l.visitas,
      (SELECT COUNT(*) FROM favoritos f WHERE f.contenido_id = l.id AND f.tipo_contenido = 'libro') as total_favoritos
      FROM libros l
@@ -31,9 +29,8 @@ $sql_destacados = "
     LIMIT 8";
 $result_destacados = $conexion->query($sql_destacados);
 
-// Obtener obras recientes
-$sql_recientes = "
-    (SELECT 'libro' as tipo, l.id, l.titulo, u.usuario AS autor, l.portada, l.fecha_subida
+// Recientes
+$sql_recientes = "(SELECT 'libro' as tipo, l.id, l.titulo, u.usuario AS autor, l.portada, l.fecha_subida
      FROM libros l
      LEFT JOIN usuarios u ON l.usuario_id = u.id
      ORDER BY l.fecha_subida DESC
@@ -48,9 +45,8 @@ $sql_recientes = "
     LIMIT 6";
 $result_recientes = $conexion->query($sql_recientes);
 
-// Obtener obras populares
-$sql_populares = "
-    (SELECT 'libro' as tipo, l.id, l.titulo, u.usuario AS autor, l.portada, l.visitas
+// Populares
+$sql_populares = "(SELECT 'libro' as tipo, l.id, l.titulo, u.usuario AS autor, l.portada, l.visitas
      FROM libros l
      LEFT JOIN usuarios u ON l.usuario_id = u.id
      ORDER BY l.visitas DESC
@@ -65,20 +61,22 @@ $sql_populares = "
     LIMIT 6";
 $result_populares = $conexion->query($sql_populares);
 
-// Obtener categorías populares
+// Categorías (soluciona multi-categoría)
 $sql_categorias = "
-    SELECT c.id, c.nombre, c.tipo, c.descripcion,
-           CASE 
-               WHEN c.tipo = 'libro' THEN (SELECT COUNT(*) FROM libros l WHERE l.categoria_id = c.id)
-               WHEN c.tipo = 'comic' THEN (SELECT COUNT(*) FROM comics co WHERE co.categoria_id = c.id)
-           END as total_obras
-    FROM categorias c
-    HAVING total_obras > 0
-    ORDER BY total_obras DESC, c.nombre
-    LIMIT 12";
+SELECT c.id, c.nombre, c.tipo, c.descripcion,
+    (
+        CASE 
+            WHEN c.tipo = 'libro' THEN (SELECT COUNT(*) FROM libro_categorias lc WHERE lc.categoria_id = c.id)
+            WHEN c.tipo = 'comic' THEN (SELECT COUNT(*) FROM comic_categorias cc WHERE cc.categoria_id = c.id)
+        END
+    ) as total_obras
+FROM categorias c
+HAVING total_obras > 0
+ORDER BY total_obras DESC, c.nombre
+LIMIT 12";
 $result_categorias = $conexion->query($sql_categorias);
 
-// Obtener estadísticas generales
+// Stats
 $sql_stats = "SELECT 
              (SELECT COUNT(*) FROM libros) as total_libros,
              (SELECT COUNT(*) FROM comics) as total_comics,
@@ -88,68 +86,51 @@ $result_stats = $conexion->query($sql_stats);
 $stats = $result_stats->fetch_assoc();
 ?>
 
-<!-- Hero Section -->
-<section class="hero-section position-relative d-flex align-items-center min-vh-100 overflow-hidden">
-    <div class="hero-background position-absolute top-0 start-0 w-100 h-100">
-        <div class="hero-particles"></div>
-        <div class="hero-gradient"></div>
-    </div>
+<!-- Hero Section Mejorado -->
+<section class="hero-section-mini position-relative d-flex align-items-center min-vh-60 py-5">
     <div class="container position-relative z-2">
-        <div class="row align-items-center g-5">
-            <div class="col-lg-6 hero-text" data-aos="fade-up">
-                <h1 class="hero-title mb-4">
-                    <span class="title-main d-block">Descubre infinitas historias de</span>
-                    <span class="title-accent d-block">infinitos mundos</span>
+        <div class="row justify-content-between align-items-center flex-wrap">
+            <!-- IZQUIERDA -->
+            <div class="col-lg-7 col-md-12">
+                <h1 class="hero-title mb-4 text-center text-lg-start">
+                    <span class="d-block fw-bold" style="font-size:clamp(2.5rem,7vw,4.5rem);line-height:1.0;">Descubre<br>historias y mundos</span>
+                    <span class="fs-3 fw-normal d-block mt-2">Tu universo de literatura, cómics y manga</span>
                 </h1>
-                <p class="hero-subtitle mb-4">
-                    Tu plataforma definitiva para explorar, compartir y disfrutar tu lectura literaria, cómics y manga.
-                    Únete a la comunidad.
+                <p class="hero-subtitle mb-4 text-center text-lg-start">
+                    Explora, comparte y disfruta de la lectura sin límites. Únete a una comunidad vibrante de lectores y creadores.
                 </p>
-                <!-- Estadísticas -->
-                <div class="row hero-stats mb-4">
-                    <div class="col-auto stat-item">
-                        <span class="stat-number fs-2 fw-bold text-success"><?php echo number_format($stats['total_libros'] + $stats['total_comics']); ?></span>
-                        <span class="stat-label d-block">Obras disponibles</span>
-                    </div>
-                    <div class="col-auto stat-item">
-                        <span class="stat-number fs-2 fw-bold text-success"><?php echo number_format($stats['total_usuarios']); ?></span>
-                        <span class="stat-label d-block">Lectores activos</span>
-                    </div>
-                    <div class="col-auto stat-item">
-                        <span class="stat-number fs-2 fw-bold text-success"><?php echo $stats['total_categorias']; ?></span>
-                        <span class="stat-label d-block">Géneros</span>
-                    </div>
-                </div>
-                <?php if (!isset($_SESSION['usuario_id'])): ?>
-                <div class="hero-buttons d-flex gap-3 flex-wrap">
-                    <a href="<?php echo BASE_URL; ?>/public/register.php" class="btn btn-primary btn-lg">
+                <div class="d-flex flex-column flex-md-row gap-3 justify-content-center justify-content-lg-start mb-3">
+                    <a href="<?php echo BASE_URL; ?>/public/register.php" class="btn btn-primary btn-lg px-4">
                         <i class="fas fa-rocket"></i> Únete Gratis
                     </a>
-                    <a href="<?php echo BASE_URL; ?>/public/explorar.php" class="btn btn-outline-light btn-lg">
-                        <i class="fas fa-compass"></i> Explorar Ahora
+                    <a href="<?php echo BASE_URL; ?>/public/explorar.php" class="btn btn-outline-light btn-lg px-4">
+                        <i class="fas fa-compass"></i> Explorar
                     </a>
                 </div>
-                <?php else: ?>
-                <div class="hero-buttons d-flex gap-3 flex-wrap">
-                    <a href="<?php echo BASE_URL; ?>/usuario/nueva_obra.php" class="btn btn-primary btn-lg">
-                        <i class="fas fa-plus"></i> Publicar Obra
-                    </a>
-                    <a href="<?php echo BASE_URL; ?>/usuario/favoritos.php" class="btn btn-outline-light btn-lg">
-                        <i class="fas fa-heart"></i> Mis Favoritos
-                    </a>
-                </div>
-                <?php endif; ?>
             </div>
-            <div class="col-lg-6 hero-visual d-flex justify-content-center align-items-center" data-aos="fade-left" data-aos-delay="200">
-                <div class="floating-books position-relative" style="height:400px;">
-                    <div class="book book-1 position-absolute">
-                        <i class="fas fa-book"></i>
+            <!-- DERECHA -->
+            <div class="col-lg-5 col-md-12 d-flex flex-column align-items-center align-items-lg-end mt-5 mt-lg-0">
+                <div class="stats-box">
+                    <div>
+                        <span class="stat-icon"><i class="fas fa-book"></i></span>
+                        <span>
+                            <span class="stat-number"><?php echo number_format($stats['total_libros'] + $stats['total_comics']); ?></span>
+                            <span class="stat-label">Obras</span>
+                        </span>
                     </div>
-                    <div class="book book-2 position-absolute">
-                        <i class="fas fa-book-open"></i>
+                    <div>
+                        <span class="stat-icon"><i class="fas fa-user-friends"></i></span>
+                        <span>
+                            <span class="stat-number"><?php echo number_format($stats['total_usuarios']); ?></span>
+                            <span class="stat-label">Lectores</span>
+                        </span>
                     </div>
-                    <div class="book book-3 position-absolute">
-                        <i class="fas fa-scroll"></i>
+                    <div>
+                        <span class="stat-icon"><i class="fas fa-tags"></i></span>
+                        <span>
+                            <span class="stat-number"><?php echo $stats['total_categorias']; ?></span>
+                            <span class="stat-label">Géneros</span>
+                        </span>
                     </div>
                 </div>
             </div>
@@ -157,262 +138,580 @@ $stats = $result_stats->fetch_assoc();
     </div>
 </section>
 
-<!-- Sección de Explorar Contenido -->
-<section class="explore-section py-5 bg-light">
-    <div class="container">
-        <div class="section-header text-center mb-5" data-aos="fade-up">
-            <h2 class="section-title">Explora las distintas categorías</h2>
-        </div>
-        <div class="row g-4 justify-content-center">
-            <!-- literatura -->
-            <div class="col-md-6">
-                <div class="content-type-card literatura-card h-100 shadow-sm" data-aos="fade-up" data-aos-delay="100">
-                    <div class="card-background"></div>
-                    <div class="card-content position-relative z-2">
-                        <div class="card-icon mx-auto mb-3">
-                            <i class="fas fa-feather-alt"></i>
-                        </div>
-                        <h3>Literatura</h3>
-                        <p>Explora novelas, poesía, ensayos y todo tipo de obras literarias.</p>
-                        <div class="card-stats mb-3">
-                            <span><i class="fas fa-book"></i> <?php echo number_format($stats['total_libros']); ?> obras</span>
-                        </div>
-                        <a href="<?php echo BASE_URL; ?>/public/literatura.php" class="btn btn-primary">
-                            <i class="fas fa-arrow-right"></i> Descubrir Literatura
-                        </a>
-                    </div>
-                </div>
-            </div>
-            <!-- comics -->
-            <div class="col-md-6">
-                <div class="content-type-card comics-card h-100 shadow-sm" data-aos="fade-up" data-aos-delay="200">
-                    <div class="card-background"></div>
-                    <div class="card-content position-relative z-2">
-                        <div class="card-icon mx-auto mb-3">
-                            <i class="fas fa-palette"></i>
-                        </div>
-                        <h3>Cómics y Manga</h3>
-                        <p>Sumérgete en el mundo visual de cómics, manga e historias gráficas.</p>
-                        <div class="card-stats mb-3">
-                            <span><i class="fas fa-images"></i> <?php echo number_format($stats['total_comics']); ?> obras</span>
-                        </div>
-                        <a href="<?php echo BASE_URL; ?>/public/comics.php" class="btn btn-primary">
-                            <i class="fas fa-arrow-right"></i> Explorar Cómics
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Sección de Obras Destacadas -->
-<section class="featured-section py-5">
-    <div class="container">
-        <div class="section-header d-flex flex-wrap justify-content-between align-items-end mb-5 gap-3" data-aos="fade-up">
-            <div class="header-content">
-                <h2 class="section-title d-flex align-items-center gap-2">
-                    <i class="fas fa-star text-warning"></i> Obras Destacadas
-                </h2>
-                <p class="section-subtitle">Lo mejor de nuestra colección seleccionado para ti</p>
-            </div>
-            <a href="<?php echo BASE_URL; ?>/public/explorar.php" class="btn btn-outline-secondary">
-                <i class="fas fa-eye"></i> Ver todas
+<!-- Explora categorías -->
+<section class="explore-section">
+  <div class="container">
+    <h2 class="section-title">Explora por género</h2>
+    <div class="row justify-content-center align-items-stretch g-4">
+      <!-- Literatura -->
+      <div class="col-12 col-md-6 col-lg-5 d-flex">
+        <div class="content-type-card literatura-card flex-fill">
+          <div class="card-icon">
+            <i class="fas fa-feather-alt"></i>
+          </div>
+          <h3>Literatura</h3>
+          <p>Novelas, poesía y relatos para todos los gustos.</p>
+          <div class="d-flex flex-column align-items-center gap-2 mt-4">
+            <span class="badge">
+              <i class="fas fa-book"></i>
+              <?php echo number_format($stats['total_libros']); ?> OBRAS
+            </span>
+            <a href="literatura.php" class="explore-btn">
+              <i class="fas fa-arrow-right"></i> Ver Literatura
             </a>
+          </div>
         </div>
-        <?php if ($result_destacados && $result_destacados->num_rows > 0): ?>
-            <div class="row obras-grid featured-grid g-4">
-                <?php while ($obra = $result_destacados->fetch_assoc()): ?>
-                <div class="col-md-6 col-lg-4 col-xl-3">
-                    <div class="obra-card featured-card h-100 d-flex flex-column" data-aos="fade-up">
-                        <div class="obra-image position-relative">
-                            <?php if (!empty($obra['portada'])): ?>
-                                <img src="<?php echo BASE_URL . '/uploads/portadas/' . htmlspecialchars($obra['portada']); ?>" 
-                                     alt="<?php echo htmlspecialchars($obra['titulo']); ?>"
-                                     loading="lazy" class="img-fluid w-100 h-100 object-fit-cover">
-                            <?php else: ?>
-                                <div class="obra-placeholder d-flex align-items-center justify-content-center w-100 h-100">
-                                    <i class="fas <?php echo $obra['tipo'] == 'libro' ? 'fa-book' : 'fa-book-open'; ?>"></i>
-                                </div>
-                            <?php endif; ?>
-                            <div class="obra-overlay position-absolute top-0 start-0 w-100 h-100 d-flex flex-column justify-content-between p-3">
-                                <div class="obra-badges d-flex gap-2 flex-wrap">
-                                    <span class="badge bg-primary badge-<?php echo $obra['tipo']; ?>">
-                                        <?php echo $obra['tipo'] == 'libro' ? 'Libro' : 'Cómic'; ?>
-                                    </span>
-                                    <?php if ($obra['publico_adulto']): ?>
-                                        <span class="badge bg-warning badge-adulto">+18</span>
-                                    <?php endif; ?>
-                                </div>
-                                <div class="obra-actions d-flex gap-2">
-                                    <a href="<?php echo BASE_URL; ?>/public/obra.php?id=<?php echo $obra['id']; ?>&tipo=<?php echo $obra['tipo']; ?>" 
-                                       class="btn btn-primary btn-sm">
-                                        <i class="fas fa-eye"></i> Ver
-                                    </a>
-                                    <?php if (isset($_SESSION['usuario_id'])): ?>
-                                        <button class="btn btn-outline-light btn-sm btn-favorito" 
-                                                data-obra-id="<?php echo $obra['id']; ?>" 
-                                                data-tipo="<?php echo $obra['tipo']; ?>">
-                                            <i class="fas fa-heart"></i>
-                                        </button>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="obra-content p-4 flex-grow-1 d-flex flex-column">
-                            <h3 class="obra-title mb-2"><?php echo htmlspecialchars($obra['titulo']); ?></h3>
-                            <p class="obra-author mb-2 text-muted small d-flex align-items-center gap-2">
-                                <i class="fas fa-user"></i>
-                                <?php echo htmlspecialchars($obra['autor']); ?>
-                            </p>
-                            <?php if (!empty($obra['categoria'])): ?>
-                                <span class="obra-category d-inline-block mb-2 px-2 py-1 bg-light text-primary rounded-pill small">
-                                    <?php echo htmlspecialchars($obra['categoria']); ?>
-                                </span>
-                            <?php endif; ?>
-                            <p class="obra-description mb-3 text-truncate" style="max-height: 70px;">
-                                <?php echo substr(htmlspecialchars($obra['descripcion']), 0, 100) . '...'; ?>
-                            </p>
-                            <div class="obra-stats d-flex gap-3 mt-auto">
-                                <span class="stat d-flex align-items-center gap-1">
-                                    <i class="fas fa-eye"></i>
-                                    <?php echo number_format($obra['visitas']); ?>
-                                </span>
-                                <span class="stat d-flex align-items-center gap-1">
-                                    <i class="fas fa-heart"></i>
-                                    <?php echo $obra['total_favoritos']; ?>
-                                </span>
-                                <span class="stat d-flex align-items-center gap-1">
-                                    <i class="fas fa-calendar"></i>
-                                    <?php echo date('d/m/Y', strtotime($obra['fecha_subida'])); ?>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <?php endwhile; ?>
-            </div>
-        <?php else: ?>
-            <div class="no-content text-center py-5" data-aos="fade-up">
-                <div class="no-content-icon mb-3">
-                    <i class="fas fa-star"></i>
-                </div>
-                <h3>¡Próximamente obras destacadas!</h3>
-                <p>Estamos preparando contenido increíble para ti</p>
-                <?php if (isset($_SESSION['usuario_id'])): ?>
-                    <a href="<?php echo BASE_URL; ?>/usuario/nueva_obra.php" class="btn btn-primary mt-3">
-                        <i class="fas fa-plus"></i> Sé el primero en publicar
-                    </a>
-                <?php endif; ?>
-            </div>
-        <?php endif; ?>
+      </div>
+      <!-- Cómics y Manga -->
+      <div class="col-12 col-md-6 col-lg-5 d-flex">
+        <div class="content-type-card comics-card flex-fill">
+          <div class="card-icon">
+            <i class="fas fa-palette"></i>
+          </div>
+          <h3>Cómics y Manga</h3>
+          <p>Historietas, manga y aventuras gráficas.</p>
+          <div class="d-flex flex-column align-items-center gap-2 mt-4">
+            <span class="badge">
+              <i class="fas fa-image"></i>
+              <?php echo number_format($stats['total_comics']); ?> OBRAS
+            </span>
+            <a href="comics.php" class="explore-btn">
+              <i class="fas fa-arrow-right"></i> Ver Cómics
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 </section>
 
-<!-- Sección de Contenido Dinámico -->
+<!-- Obras Destacadas -->
+<section class="featured-section">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <h2 class="section-title">
+          <span class="icon-star"><i class="fas fa-star"></i></span>
+          Obras Destacadas
+        </h2>
+        <div class="section-subtitle">
+          Selección especial para ti
+        </div>
+      </div>
+      <a href="explorar.php" class="view-all-link">
+        <span class="icon-view"><i class="fas fa-eye"></i></span>
+        Ver todas
+      </a>
+    </div>
+    <div class="row g-4">
+      <?php if($result_destacados && $result_destacados->num_rows > 0): ?>
+        <?php while($obra = $result_destacados->fetch_assoc()): ?>
+          <div class="col-12 col-md-6 col-lg-4 d-flex">
+            <a href="<?= BASE_URL ?>/public/obra.php?id=<?= $obra['id'] ?>&tipo=<?= $obra['tipo'] ?>" class="featured-card obra-card flex-fill text-decoration-none">
+              <div class="obra-image">
+                <img src="<?= htmlspecialchars($obra['portada'] ?? 'default.jpg') ?>" alt="<?= htmlspecialchars($obra['titulo']) ?>" class="img-fluid rounded-4 shadow" style="object-fit:cover; width:100%;height:230px;max-height:230px;">
+              </div>
+              <div class="obra-content py-3">
+                <div class="obra-badges mb-2">
+                  <span class="badge badge-libro"><i class="fas fa-book"></i> <?= ucfirst($obra['tipo']) ?></span>
+                  <?php
+                  // Muestra las categorías (multi)
+                  if ($obra['tipo'] === 'libro') {
+                    $cats_q = $conexion->query("SELECT c.nombre FROM libro_categorias lc JOIN categorias c ON lc.categoria_id = c.id WHERE lc.libro_id = {$obra['id']}");
+                  } else {
+                    $cats_q = $conexion->query("SELECT c.nombre FROM comic_categorias cc JOIN categorias c ON cc.categoria_id = c.id WHERE cc.comic_id = {$obra['id']}");
+                  }
+                  while($cat = $cats_q->fetch_assoc()) {
+                    echo '<span class="badge badge-categoria">'.htmlspecialchars($cat['nombre']).'</span> ';
+                  }
+                  ?>
+                  <?php if(!empty($obra['publico_adulto'])): ?>
+                    <span class="badge badge-adulto"><i class="fas fa-exclamation-triangle"></i> +18</span>
+                  <?php endif; ?>
+                </div>
+                <div class="obra-title"><?= htmlspecialchars($obra['titulo']) ?></div>
+                <div class="obra-author">por <?= htmlspecialchars($obra['autor']) ?></div>
+                <div class="obra-description"><?= htmlspecialchars($obra['descripcion']) ?></div>
+                <div class="obra-stats mt-2">
+                  <span class="stat"><i class="fas fa-eye"></i> <?= (int)$obra['visitas'] ?></span>
+                  <span class="stat"><i class="fas fa-heart"></i> <?= (int)($obra['valoracion'] ?? 0) ?></span>
+                </div>
+              </div>
+            </a>
+          </div>
+        <?php endwhile; ?>
+      <?php else: ?>
+        <div class="col-12">
+          <div class="empty-featured">
+            <div class="big-icon">
+              <i class="fas fa-star"></i>
+            </div>
+            <div class="empty-title">
+              ¡Próximamente obras destacadas!
+            </div>
+            <div class="empty-desc">
+              Estamos preparando contenido increíble para ti
+            </div>
+          </div>
+        </div>
+      <?php endif; ?>
+    </div>
+  </div>
+</section>
+
+<!-- Tabs de Recientes, Populares, Categorías -->
 <section class="dynamic-content py-5 bg-light">
-    <div class="container">
-        <div class="content-tabs bg-white rounded-4 p-4 shadow-sm" data-aos="fade-up">
-            <div class="tab-buttons d-flex gap-3 mb-4 border-bottom">
-                <button class="tab-btn btn btn-link active" data-tab="recientes">
-                    <i class="fas fa-clock"></i> Recientes
-                </button>
-                <button class="tab-btn btn btn-link" data-tab="populares">
-                    <i class="fas fa-fire"></i> Populares
-                </button>
-                <button class="tab-btn btn btn-link" data-tab="categorias">
-                    <i class="fas fa-tags"></i> Categorías
-                </button>
-            </div>
-            <!-- Tab Recientes -->
-            <div class="tab-content active" id="tab-recientes">
-                <div class="row obras-carousel g-3">
-                    <?php if ($result_recientes && $result_recientes->num_rows > 0): ?>
-                        <?php while ($obra = $result_recientes->fetch_assoc()): ?>
-                        <div class="col-6 col-md-4">
-                            <div class="mini-card bg-light rounded-3 p-3 text-center h-100 shadow-sm">
-                                <div class="mini-image mx-auto mb-2">
-                                    <?php if (!empty($obra['portada'])): ?>
-                                    <img src="<?php echo BASE_URL . '/uploads/portadas/' . htmlspecialchars($obra['portada']); ?>" 
-                                         alt="<?php echo htmlspecialchars($obra['titulo']); ?>" class="img-fluid rounded-2">
-                                    <?php else: ?>
-                                    <div class="mini-placeholder d-flex align-items-center justify-content-center w-100 h-100">
-                                        <i class="fas <?php echo $obra['tipo'] == 'libro' ? 'fa-book' : 'fa-book-open'; ?>"></i>
-                                    </div>
-                                    <?php endif; ?>
-                                </div>
-                                <div class="mini-content">
-                                    <h4 class="mb-1"><?php echo htmlspecialchars($obra['titulo']); ?></h4>
-                                    <p class="mb-1 text-muted small"><?php echo htmlspecialchars($obra['autor']); ?></p>
-                                    <span class="mini-type badge bg-primary"><?php echo $obra['tipo'] == 'libro' ? 'Libro' : 'Cómic'; ?></span>
-                                </div>
-                            </div>
+  <div class="container">
+    <div class="content-tabs bg-white rounded-4 p-4 shadow-sm" data-aos="fade-up">
+      <div class="tab-buttons d-flex gap-3 mb-4 border-bottom justify-content-center">
+        <button class="tab-btn btn btn-link active" data-tab="recientes">
+          <i class="fas fa-clock"></i> <span class="fw-semibold">Recientes</span>
+        </button>
+        <button class="tab-btn btn btn-link" data-tab="populares">
+          <i class="fas fa-fire"></i> <span class="fw-semibold">Populares</span>
+        </button>
+        <button class="tab-btn btn btn-link" data-tab="categorias">
+          <i class="fas fa-tags"></i> <span class="fw-semibold">Categorías</span>
+        </button>
+      </div>
+      <!-- Tab Recientes -->
+      <div class="tab-content active" id="tab-recientes">
+        <div class="row obras-carousel g-4 justify-content-start">
+          <?php if ($result_recientes && $result_recientes->num_rows > 0): ?>
+            <?php while ($obra = $result_recientes->fetch_assoc()): ?>
+              <div class="col-12 col-sm-6 col-md-4 col-lg-3 d-flex">
+                <a href="<?= BASE_URL ?>/public/obra.php?id=<?= $obra['id'] ?>&tipo=<?= $obra['tipo'] ?>" class="recent-card-link w-100 text-decoration-none">
+                  <div class="recent-card position-relative w-100">
+                    <div class="recent-image mb-2">
+                      <?php if (!empty($obra['portada'])): ?>
+                        <img src="<?= BASE_URL ?>/uploads/portadas/<?= htmlspecialchars($obra['portada']) ?>"
+                          alt="<?= htmlspecialchars($obra['titulo']) ?>" class="portada-obra">
+                      <?php else: ?>
+                        <div class="recent-placeholder d-flex align-items-center justify-content-center portada-obra">
+                          <i class="fas fa-book fa-2x text-muted"></i>
                         </div>
-                        <?php endwhile; ?>
-                    <?php endif; ?>
-                </div>
-            </div>
-            <!-- Tab Populares -->
-            <div class="tab-content" id="tab-populares">
-                <div class="row obras-carousel g-3">
-                    <?php if ($result_populares && $result_populares->num_rows > 0): ?>
-                        <?php while ($obra = $result_populares->fetch_assoc()): ?>
-                        <div class="col-6 col-md-4">
-                            <div class="mini-card bg-light rounded-3 p-3 text-center h-100 shadow-sm">
-                                <div class="mini-image mx-auto mb-2">
-                                    <?php if (!empty($obra['portada'])): ?>
-                                    <img src="<?php echo BASE_URL . '/uploads/portadas/' . htmlspecialchars($obra['portada']); ?>" 
-                                         alt="<?php echo htmlspecialchars($obra['titulo']); ?>" class="img-fluid rounded-2">
-                                    <?php else: ?>
-                                    <div class="mini-placeholder d-flex align-items-center justify-content-center w-100 h-100">
-                                        <i class="fas <?php echo $obra['tipo'] == 'libro' ? 'fa-book' : 'fa-book-open'; ?>"></i>
-                                    </div>
-                                    <?php endif; ?>
-                                </div>
-                                <div class="mini-content">
-                                    <h4 class="mb-1"><?php echo htmlspecialchars($obra['titulo']); ?></h4>
-                                    <p class="mb-1 text-muted small"><?php echo htmlspecialchars($obra['autor']); ?></p>
-                                    <div class="mini-stats d-flex justify-content-center gap-2">
-                                        <span><i class="fas fa-eye"></i> <?php echo number_format($obra['visitas']); ?></span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <?php endwhile; ?>
-                    <?php endif; ?>
-                </div>
-            </div>
-            <!-- Tab Categorías -->
-            <div class="tab-content" id="tab-categorias">
-                <div class="row categorias-grid g-3">
-                    <?php if ($result_categorias && $result_categorias->num_rows > 0): ?>
-                        <?php while ($categoria = $result_categorias->fetch_assoc()): ?>
-                        <div class="col-12 col-md-6 col-lg-4">
-                            <a href="<?php echo BASE_URL; ?>/public/categoria.php?id=<?php echo $categoria['id']; ?>&tipo=<?php echo $categoria['tipo']; ?>" 
-                               class="categoria-item d-flex align-items-center gap-3 p-3 bg-light rounded-3 text-decoration-none text-dark shadow-sm h-100">
-                                <div class="categoria-icon d-flex align-items-center justify-content-center">
-                                    <i class="fas <?php echo $categoria['tipo'] == 'libro' ? 'fa-book' : 'fa-book-open'; ?>"></i>
-                                </div>
-                                <div class="categoria-info">
-                                    <h4 class="mb-1"><?php echo htmlspecialchars($categoria['nombre']); ?></h4>
-                                    <span class="categoria-count small"><?php echo $categoria['total_obras']; ?> obras</span>
-                                </div>
-                            </a>
-                        </div>
-                        <?php endwhile; ?>
-                    <?php endif; ?>
-                </div>
-            </div>
+                      <?php endif; ?>
+                    </div>
+                    <div class="recent-title"><?= htmlspecialchars($obra['titulo']) ?></div>
+                    <div class="recent-author">
+                      <i class="fas fa-user"></i> <?= htmlspecialchars($obra['autor']) ?>
+                    </div>
+                    <div class="recent-categorias mb-2">
+                      <?php
+                      if ($obra['tipo'] === 'libro') {
+                        $cats_q = $conexion->query("SELECT c.nombre FROM libro_categorias lc JOIN categorias c ON lc.categoria_id=c.id WHERE lc.libro_id={$obra['id']}");
+                      } else {
+                        $cats_q = $conexion->query("SELECT c.nombre FROM comic_categorias cc JOIN categorias c ON cc.categoria_id=c.id WHERE cc.comic_id={$obra['id']}");
+                      }
+                      while($cat = $cats_q->fetch_assoc()) {
+                        echo '<span class="badge badge-categoria me-1">'.htmlspecialchars($cat['nombre']).'</span>';
+                      }
+                      ?>
+                    </div>
+                    <span class="badge recent-type-badge"><?= strtoupper($obra['tipo']) ?></span>
+                  </div>
+                </a>
+              </div>
+            <?php endwhile; ?>
+          <?php else: ?>
+            <div class="col-12 text-center text-muted py-5">No hay obras recientes aún.</div>
+          <?php endif; ?>
         </div>
+      </div>
+
+      <!-- Tab Populares -->
+      <div class="tab-content" id="tab-populares">
+        <div class="row obras-carousel g-4 justify-content-start">
+          <?php if ($result_populares && $result_populares->num_rows > 0): ?>
+            <?php while ($obra = $result_populares->fetch_assoc()): ?>
+              <div class="col-12 col-sm-6 col-md-4 col-lg-3 d-flex">
+                <a href="<?= BASE_URL ?>/public/obra.php?id=<?= $obra['id'] ?>&tipo=<?= $obra['tipo'] ?>" class="recent-card-link w-100 text-decoration-none">
+                  <div class="recent-card position-relative w-100">
+                    <div class="recent-image mb-2">
+                      <?php if (!empty($obra['portada'])): ?>
+                        <img src="<?= BASE_URL ?>/uploads/portadas/<?= htmlspecialchars($obra['portada']) ?>"
+                          alt="<?= htmlspecialchars($obra['titulo']) ?>" class="portada-obra">
+                      <?php else: ?>
+                        <div class="recent-placeholder d-flex align-items-center justify-content-center portada-obra">
+                          <i class="fas fa-book fa-2x text-muted"></i>
+                        </div>
+                      <?php endif; ?>
+                    </div>
+                    <div class="recent-title"><?= htmlspecialchars($obra['titulo']) ?></div>
+                    <div class="recent-author">
+                      <i class="fas fa-user"></i> <?= htmlspecialchars($obra['autor']) ?>
+                    </div>
+                    <div class="mini-stats d-flex justify-content-center gap-2 mb-1">
+                      <span><i class="fas fa-eye"></i> <?= number_format($obra['visitas'] ?? 0) ?></span>
+                    </div>
+                    <div class="recent-categorias mb-2">
+                      <?php
+                      if ($obra['tipo'] === 'libro') {
+                        $cats_q = $conexion->query("SELECT c.nombre FROM libro_categorias lc JOIN categorias c ON lc.categoria_id=c.id WHERE lc.libro_id={$obra['id']}");
+                      } else {
+                        $cats_q = $conexion->query("SELECT c.nombre FROM comic_categorias cc JOIN categorias c ON cc.categoria_id=c.id WHERE cc.comic_id={$obra['id']}");
+                      }
+                      while($cat = $cats_q->fetch_assoc()) {
+                        echo '<span class="badge badge-categoria me-1">'.htmlspecialchars($cat['nombre']).'</span>';
+                      }
+                      ?>
+                    </div>
+                    <span class="badge recent-type-badge"><?= strtoupper($obra['tipo']) ?></span>
+                  </div>
+                </a>
+              </div>
+            <?php endwhile; ?>
+          <?php else: ?>
+            <div class="col-12 text-center text-muted py-5">No hay obras populares aún.</div>
+          <?php endif; ?>
+        </div>
+      </div>
+
+      <!-- Tab Categorías -->
+      <div class="tab-content" id="tab-categorias">
+        <div class="row categorias-grid g-3">
+          <?php if ($result_categorias && $result_categorias->num_rows > 0): ?>
+            <?php while ($categoria = $result_categorias->fetch_assoc()): ?>
+              <div class="col-12 col-md-6 col-lg-4">
+                <a href="<?= BASE_URL ?>/public/categoria.php?id=<?= $categoria['id']; ?>&tipo=<?= $categoria['tipo']; ?>" 
+                  class="categoria-item d-flex align-items-center gap-3 p-3 bg-light rounded-3 text-decoration-none text-dark shadow-sm h-100">
+                  <div class="categoria-icon d-flex align-items-center justify-content-center">
+                    <i class="fas <?= $categoria['tipo'] == 'libro' ? 'fa-book' : 'fa-book-open'; ?>"></i>
+                  </div>
+                  <div class="categoria-info">
+                    <h4 class="mb-1"><?= htmlspecialchars($categoria['nombre']); ?></h4>
+                    <span class="categoria-count small"><?= $categoria['total_obras']; ?> obras</span>
+                  </div>
+                </a>
+              </div>
+            <?php endwhile; ?>
+          <?php else: ?>
+            <div class="col-12 text-center text-muted py-5">No hay categorías con obras aún.</div>
+          <?php endif; ?>
+        </div>
+      </div>
     </div>
+  </div>
 </section>
 
-<!-- Sección de Características -->
+<style>
+.recent-card-link { 
+  color: inherit; 
+  text-decoration: none;
+}
+.recent-card-link:hover .recent-card, 
+.recent-card-link:focus .recent-card {
+  border-color: #906dfc;
+  box-shadow: 0 16px 44px #7b2ff244;
+  transform: translateY(-9px) scale(1.035);
+}
+.recent-card {
+  background: #fff;
+  border-radius: 1.7rem;
+  box-shadow: 0 2px 18px #c7cefa23;
+  border: 2px solid #ebe8fa;
+  padding: 2.1rem 1.4rem 1.7rem 1.4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  max-width: 340px;
+  min-width: 220px;
+  min-height: 0;
+  position: relative;
+  overflow: visible;
+}
+
+.recent-image {
+  width: 120px;
+  height: 120px;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 1.2rem;
+  background: #f8f9ff;
+  box-shadow: 0 4px 18px #7b2ff222;
+}
+
+.portada-obra {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 1.2rem !important;
+  display: block;
+  margin: 0 auto;
+  transition: transform .18s;
+  box-shadow: 0 2px 8px #7b2ff222;
+}
+.recent-card-link:hover .portada-obra { 
+  transform: scale(1.07) rotate(-2deg);
+}
+
+.recent-title {
+  font-size: 1.16rem;
+  font-weight: 800;
+  margin-top: 1.2rem;
+  margin-bottom: .45rem;
+  color: #24184b;
+  line-height: 1.18;
+  text-align: left;
+  width: 100%;
+  word-break: break-word;
+  writing-mode: initial !important;
+  text-orientation: initial !important;
+  direction: ltr !important;
+  white-space: normal !important;
+}
+
+.recent-author {
+  color: #a08be4;
+  font-size: 1.01rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+  width: 100%;
+  writing-mode: initial !important;
+  text-orientation: initial !important;
+  direction: ltr !important;
+  white-space: normal !important;
+}
+
+.recent-categorias {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.18em;
+  margin-bottom: 0.6em;
+  writing-mode: initial !important;
+  text-orientation: initial !important;
+  direction: ltr !important;
+  white-space: normal !important;
+}
+
+.recent-categorias .badge-categoria {
+  background: #f3edff;
+  color: #7b2ff2;
+  font-size: 0.95em;
+  border-radius: 0.7em;
+  margin-right: 0.3em;
+  margin-bottom: 0.12em;
+  padding: 0.2em 0.8em;
+  font-weight: 700;
+  display: inline-block;
+}
+
+.recent-type-badge {
+  background: linear-gradient(90deg, #7b2ff2 0%, #4cc9f0 100%);
+  color: #fff !important;
+  font-weight: 700;
+  font-size: 1.07rem;
+  padding: 0.43em 1.4em;
+  border-radius: 1.6em;
+  letter-spacing: 1px;
+  border: none;
+  box-shadow: 0 2px 10px #7b2ff233;
+  position: absolute;
+  left: 1.5rem;
+  bottom: 1.2rem;
+  transition: background .16s;
+}
+
+.cat-badge, .badge-categoria {
+  background: #f3edff;
+  color: #7b2ff2;
+  font-size: 0.95em;
+  border-radius: 0.7em;
+  margin-right: 0.3em;
+  margin-bottom: 0.12em;
+  padding: 0.2em 0.8em;
+  font-weight: 700;
+  display: inline-block;
+}
+
+/* Resetea writing-mode y orientación para evitar texto vertical */
+.recent-card, .recent-card *, .recent-title, .recent-author, .recent-categorias {
+  writing-mode: initial !important;
+  text-orientation: initial !important;
+  direction: ltr !important;
+  white-space: normal !important;
+  word-break: break-word !important;
+}
+
+/* Responsive */
+@media (max-width: 1300px) {
+  .recent-card { max-width: 270px; }
+}
+@media (max-width: 1100px) {
+  .recent-card { max-width: 44vw; min-width: 220px; }
+}
+@media (max-width: 800px) {
+  .recent-card { max-width: 90vw; min-width: 180px;}
+}
+@media (max-width: 600px) {
+  .recent-card { max-width: 97vw; min-width: 140px; padding: 1rem 0.5rem 1.1rem 0.5rem;}
+  .recent-type-badge { font-size:0.98rem; left: 1rem; }
+  .recent-title { font-size:1.03rem; }
+}
+
+/* CORRIGE writing-mode heredado y layout básico */
+.feature-card, .feature-card *, .features-section * {
+  writing-mode: initial !important;
+  text-orientation: initial !important;
+  direction: ltr !important;
+  white-space: normal !important;
+  word-break: break-word !important;
+  box-sizing: border-box;
+}
+
+/* Estilo moderno y limpio para la sección de características */
+.features-section {
+  background: transparent;
+  padding-top: 2.5rem;
+  padding-bottom: 2.5rem;
+}
+
+.features-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2.4rem 0;
+  justify-content: center;
+}
+
+.feature-card {
+  border-radius: 1.7rem;
+  background: #fff;
+  box-shadow: 0 2px 18px #c7cefa23;
+  border: 2px solid #ebe8fa;
+  padding: 2.6rem 1.7rem 2.2rem 1.7rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  transition: box-shadow 0.14s, border-color 0.14s, transform 0.16s;
+  min-height: 330px;
+  height: 100%;
+  width: 100%;
+  max-width: 410px;
+  margin: 0 auto;
+}
+
+.feature-card:hover, .feature-card:focus-within {
+  border-color: #a99bfc;
+  box-shadow: 0 14px 38px #7b2ff244, 0 3px 14px #b2b5fa18;
+  transform: translateY(-8px) scale(1.032);
+  z-index: 2;
+}
+
+.feature-icon {
+  width: 68px;
+  height: 68px;
+  border-radius: 1.1em;
+  background: linear-gradient(135deg, #7b2ff2 0%, #4cc9f0 100%);
+  color: #fff;
+  font-size: 2.3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 18px #7b2ff222;
+  margin-bottom: 1.1rem;
+}
+
+.feature-card h3 {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #24184b;
+  margin-bottom: 0.8rem;
+  margin-top: 0.5rem;
+  text-align: center;
+}
+
+.feature-card p {
+  color: #524b7d;
+  font-size: 1.04rem;
+  margin: 0;
+  text-align: center;
+}
+
+.section-title {
+  font-size: 2.2rem;
+  font-weight: 900;
+  background: linear-gradient(90deg, #7b2ff2 0%, #4cc9f0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+  margin-bottom: 0.5rem;
+}
+
+.section-subtitle {
+  color: #7c88ad;
+  font-size: 1.22rem;
+  margin-bottom: 0;
+}
+
+@media (max-width: 1200px) {
+  .feature-card { max-width: 330px; }
+}
+@media (max-width: 900px) {
+  .feature-card { max-width: 100%; }
+}
+@media (max-width: 600px) {
+  .features-grid { gap: 1.1rem 0; }
+  .feature-card { padding: 1.6rem 0.7rem 1.2rem 0.7rem; min-height: 220px; }
+  .feature-icon { width: 54px; height: 54px; font-size: 1.6rem; }
+  .section-title { font-size: 1.3rem; }
+}
+
+.cta-section-premium {
+  background: linear-gradient(90deg,#7b2ff2 0%,#4cc9f0 100%);
+  color: #fff;
+  padding: 4rem 0 4rem 0;
+  position: relative;
+}
+.cta-section-premium .cta-icon-premium {
+  width: 78px;
+  height: 78px;
+  background: rgba(255,255,255,0.14);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.6rem;
+  margin-bottom: 1.3rem;
+}
+.premium-features-list {
+  max-width: 480px;
+  margin: 0 auto 1.8rem auto;
+  padding: 0;
+  list-style: none;
+}
+.premium-features-list li {
+  font-size: 1.13rem;
+  margin-bottom: .6rem;
+  display: flex;
+  align-items: center;
+  gap: .7em;
+}
+.cta-section-premium .btn-warning {
+  background: linear-gradient(90deg, #f7971e 0%, #ffd200 100%);
+  border: none;
+  color: #fff;
+  font-weight: bold;
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+</style>
+
+<!-- Características -->
 <section class="features-section py-5">
     <div class="container">
         <div class="section-header text-center mb-5" data-aos="fade-up">
             <h2 class="section-title">¿Por qué elegir InkVerse?</h2>
-            <p class="section-subtitle">Descubre todas las ventajas de formar parte de la comunidad</p>
+            <p class="section-subtitle">Ventajas únicas para lectores y creadores</p>
         </div>
         <div class="row features-grid g-4">
             <div class="col-md-6 col-lg-4">
@@ -430,10 +729,7 @@ $stats = $result_stats->fetch_assoc();
                         <i class="fas fa-users"></i>
                     </div>
                     <h3>Comunidad Activa</h3>
-                    <p>Conecta con autores y lectores. Recibe feedback de tu contenido y participa en discusiones.</p>
-                    <div class="feature-highlight bg-light text-primary px-3 py-1 rounded-pill d-inline-block">
-                        <span><?php echo number_format($stats['total_usuarios']); ?> miembros</span>
-                    </div>
+                    <p>Conecta con autores y lectores. Recibe feedback y participa en foros.</p>
                 </div>
             </div>
             <div class="col-md-6 col-lg-4">
@@ -442,7 +738,7 @@ $stats = $result_stats->fetch_assoc();
                         <i class="fas fa-palette"></i>
                     </div>
                     <h3>Sección de Arte</h3>
-                    <p>Al igual que puedes compartir tus teorías y opiniones, tienes la oportunidad de compartir tu arte a los demás usuarios.</p>
+                    <p>Comparte y descubre arte inspirado en tus obras favoritas.</p>
                 </div>
             </div>
             <div class="col-md-6 col-lg-4">
@@ -451,7 +747,7 @@ $stats = $result_stats->fetch_assoc();
                         <i class="fas fa-mobile-alt"></i>
                     </div>
                     <h3>Acceso Multiplataforma</h3>
-                    <p>Lee y publica desde cualquier dispositivo, se adapta perfectamente a móviles, tablets y escritorio.</p>
+                    <p>Lee y publica desde cualquier dispositivo, móvil o escritorio.</p>
                 </div>
             </div>
             <div class="col-md-6 col-lg-4">
@@ -460,7 +756,7 @@ $stats = $result_stats->fetch_assoc();
                         <i class="fas fa-heart"></i>
                     </div>
                     <h3>Sistema de Favoritos</h3>
-                    <p>Guarda tus obras favoritas y crea listas personalizadas.</p>
+                    <p>Guarda tus obras favoritas y accede a ellas rápidamente.</p>
                 </div>
             </div>
             <div class="col-md-6 col-lg-4">
@@ -469,14 +765,14 @@ $stats = $result_stats->fetch_assoc();
                         <i class="fas fa-comments"></i>
                     </div>
                     <h3>Interacción Social</h3>
-                    <p>Comenta, valora y comparte opiniones sobre las obras de los demás usuarios.</p>
+                    <p>Comenta, valora y comparte opiniones con otros usuarios.</p>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Sección de CTA Final -->
+<!-- CTA Final -->
 <?php if (!isset($_SESSION['usuario_id'])): ?>
 <section class="cta-section py-5 position-relative text-center text-white overflow-hidden">
     <div class="cta-background position-absolute top-0 start-0 w-100 h-100"></div>
@@ -486,21 +782,7 @@ $stats = $result_stats->fetch_assoc();
                 <i class="fas fa-rocket"></i>
             </div>
             <h2 class="mb-3">¿Listo para comenzar tu aventura?</h2>
-            <p class="mb-4 fs-4">Únete a miles de lectores y escritores que ya forman parte de nuestra comunidad. Es gratis y solo toma unos segundos.</p>
-            <div class="cta-benefits d-flex justify-content-center flex-wrap gap-4 mb-4">
-                <div class="benefit d-flex align-items-center gap-2">
-                    <i class="fas fa-check"></i>
-                    <span>Acceso ilimitado a todas las obras</span>
-                </div>
-                <div class="benefit d-flex align-items-center gap-2">
-                    <i class="fas fa-check"></i>
-                    <span>Publica tus propias historias</span>
-                </div>
-                <div class="benefit d-flex align-items-center gap-2">
-                    <i class="fas fa-check"></i>
-                    <span>Conecta con otros lectores</span>
-                </div>
-            </div>
+            <p class="mb-4 fs-4">Regístrate gratis y accede al universo InkVerse.</p>
             <div class="cta-buttons d-flex justify-content-center flex-wrap gap-3">
                 <a href="<?php echo BASE_URL; ?>/public/register.php" class="btn btn-primary btn-lg">
                     <i class="fas fa-user-plus"></i> Crear Cuenta Gratis
@@ -512,8 +794,46 @@ $stats = $result_stats->fetch_assoc();
         </div>
     </div>
 </section>
+<?php else: ?>
+<section class="cta-section-premium py-5 position-relative text-center text-white overflow-hidden" style="background: linear-gradient(90deg,#7b2ff2 0%,#4cc9f0 100%);">
+    <div class="container position-relative z-2">
+        <div class="cta-content" data-aos="fade-up">
+            <div class="cta-icon-premium mx-auto mb-4">
+                <i class="fas fa-gem"></i>
+            </div>
+            <h2 class="mb-3 fw-bold">¡Próximamente plan premium InkVerse Plus!</h2>
+            <p class="mb-4 fs-4">Prepárate para desbloquear ventajas exclusivas</p>
+            <ul class="premium-features-list text-start mx-auto mb-4">
+                <li><i class="fas fa-star"></i> Lectura sin anuncios</li>
+                <li><i class="fas fa-cloud-download-alt"></i> Descarga de libros y cómics</li>
+                <li><i class="fas fa-eye"></i> Estadísticas avanzadas</li>
+                <li><i class="fas fa-rocket"></i> Obras y capítulos exclusivos</li>
+                <li><i class="fas fa-user-shield"></i> Insignia de usuario premium</li>
+            </ul>
+            <div class="cta-buttons d-flex justify-content-center flex-wrap gap-3">
+                <button class="btn btn-warning btn-lg text-white fw-bold" disabled>
+                    <i class="fas fa-gem"></i> ¡Muy pronto!
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
 <?php endif; ?>
 
-<!-- (Deja tus estilos y scripts existentes, solo asegúrate de tener Bootstrap cargado en tu header/footer) -->
+<script>
+    // Tabs dinámicas
+    document.addEventListener("DOMContentLoaded", function () {
+        const tabBtns = document.querySelectorAll(".tab-btn");
+        const tabContents = document.querySelectorAll(".tab-content");
+        tabBtns.forEach(btn => {
+            btn.addEventListener("click", function () {
+                tabBtns.forEach(b => b.classList.remove("active"));
+                tabContents.forEach(tc => tc.classList.remove("active"));
+                btn.classList.add("active");
+                document.getElementById("tab-" + btn.dataset.tab).classList.add("active");
+            });
+        });
+    });
+</script>
 
 <?php include_once(__DIR__ . '/../includes/footer.php'); ?>
