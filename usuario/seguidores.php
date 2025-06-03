@@ -1,4 +1,3 @@
-
 <?php
 // Iniciar sesión
 session_start();
@@ -26,6 +25,7 @@ if (!defined('BASE_URL')) {
 }
 
 // Incluir archivos necesarios
+require_once($project_path . '/includes/idioma.php');
 require_once($project_path . '/includes/funciones.php');
 require_once($project_path . '/includes/conexion.php');
 require_once($project_path . '/includes/header.php');
@@ -37,14 +37,13 @@ verificarLogin();
 $usuario_id = $_SESSION['usuario_id'];
 
 // Obtener seguidores
-$sql = "SELECT u.id, u.usuario, u.avatar, u.biografia, s.fecha_seguimiento,
-        (SELECT COUNT(*) FROM seguidores WHERE seguidor_id = u.id) AS seguidos,
+$sql = "SELECT u.id, u.usuario, u.avatar, u.biografia,
+        (SELECT COUNT(*) FROM seguidores WHERE usuario_id = u.id) AS seguidos,
         (SELECT COUNT(*) FROM seguidores WHERE seguido_id = u.id) AS seguidores,
-        (SELECT COUNT(*) FROM seguidores WHERE seguidor_id = ? AND seguido_id = u.id) AS lo_sigues
+        (SELECT COUNT(*) FROM seguidores WHERE usuario_id = ? AND seguido_id = u.id) AS lo_sigues
         FROM seguidores s
-        JOIN usuarios u ON s.seguidor_id = u.id
-        WHERE s.seguido_id = ?
-        ORDER BY s.fecha_seguimiento DESC";
+        JOIN usuarios u ON s.usuario_id = u.id
+        WHERE s.seguido_id = ?";
 
 $stmt = $conexion->prepare($sql);
 $stmt->bind_param("ii", $usuario_id, $usuario_id);
@@ -56,8 +55,8 @@ $total_seguidores = $seguidores->num_rows;
 <div class="container">
     <div class="card">
         <div class="card-header">
-            <h1><i class="fas fa-users"></i> Mis Seguidores</h1>
-            <p>Tienes <?php echo $total_seguidores; ?> seguidores</p>
+            <h1><i class="fas fa-users"></i> <?= htmlspecialchars($TEXTOS["mis_seguidores_titulo"] ?? '') ?></h1>
+            <p><?= htmlspecialchars(str_replace("{n}", $total_seguidores, $TEXTOS["mis_seguidores_descripcion"] ?? '')) ?></p>
         </div>
         <div class="card-body">
             <?php if ($total_seguidores > 0): ?>
@@ -65,27 +64,35 @@ $total_seguidores = $seguidores->num_rows;
                     <?php while ($seguidor = $seguidores->fetch_assoc()): ?>
                         <div class="user-card">
                             <div class="user-avatar">
-                                <img src="<?php echo !empty($seguidor['avatar']) ? BASE_URL . '/uploads/avatars/' . $seguidor['avatar'] : BASE_URL . '/img/default-avatar.png'; ?>" alt="Avatar de <?php echo htmlspecialchars($seguidor['usuario']); ?>">
+                                <img src="<?php echo !empty($seguidor['avatar']) ? BASE_URL . '/uploads/avatars/' . $seguidor['avatar'] : BASE_URL . '/img/default-avatar.png'; ?>"
+                                     alt="<?= htmlspecialchars(str_replace("{usuario}", htmlspecialchars($seguidor['usuario']), $TEXTOS["avatar_de"] ?? '')) ?>">
                             </div>
                             <div class="user-info">
-                                <h3><a href="<?php echo BASE_URL; ?>/public/perfil.php?id=<?php echo $seguidor['id']; ?>"><?php echo htmlspecialchars($seguidor['usuario']); ?></a></h3>
+                                <h3>
+                                    <a href="<?php echo BASE_URL; ?>/public/perfil.php?id=<?php echo $seguidor['id']; ?>">
+                                        <?php echo htmlspecialchars($seguidor['usuario']); ?>
+                                    </a>
+                                </h3>
                                 <div class="user-stats">
-                                    <span><strong><?php echo $seguidor['seguidores']; ?></strong> seguidores</span>
-                                    <span><strong><?php echo $seguidor['seguidos']; ?></strong> seguidos</span>
+                                    <span><strong><?php echo $seguidor['seguidores']; ?></strong> <?= htmlspecialchars($TEXTOS["seguidores"] ?? '') ?></span>
+                                    <span><strong><?php echo $seguidor['seguidos']; ?></strong> <?= htmlspecialchars($TEXTOS["seguidos"] ?? '') ?></span>
                                 </div>
-                                <p class="user-bio"><?php echo !empty($seguidor['biografia']) ? htmlspecialchars(substr($seguidor['biografia'], 0, 100)) . (strlen($seguidor['biografia']) > 100 ? '...' : '') : 'Sin biografía'; ?></p>
-                                <p class="follow-date">Te sigue desde <?php echo date('d/m/Y', strtotime($seguidor['fecha_seguimiento'])); ?></p>
+                                <p class="user-bio">
+                                    <?php echo !empty($seguidor['biografia'])
+                                        ? htmlspecialchars(substr($seguidor['biografia'], 0, 100)) . (strlen($seguidor['biografia']) > 100 ? '...' : '')
+                                        : htmlspecialchars($TEXTOS["sin_biografia"] ?? ''); ?>
+                                </p>
                             </div>
                             <div class="user-actions">
                                 <?php if ($seguidor['lo_sigues']): ?>
                                     <form action="<?php echo BASE_URL; ?>/controllers/dejar-seguir.php" method="POST">
                                         <input type="hidden" name="usuario_id" value="<?php echo $seguidor['id']; ?>">
-                                        <button type="submit" class="btn btn-outline btn-sm">Dejar de seguir</button>
+                                        <button type="submit" class="btn btn-outline btn-sm"><?= htmlspecialchars($TEXTOS["dejar_de_seguir"] ?? '') ?></button>
                                     </form>
                                 <?php else: ?>
                                     <form action="<?php echo BASE_URL; ?>/controllers/seguir-usuario.php" method="POST">
                                         <input type="hidden" name="usuario_id" value="<?php echo $seguidor['id']; ?>">
-                                        <button type="submit" class="btn btn-sm">Seguir</button>
+                                        <button type="submit" class="btn btn-sm"><?= htmlspecialchars($TEXTOS["seguir"] ?? '') ?></button>
                                     </form>
                                 <?php endif; ?>
                             </div>
@@ -95,9 +102,9 @@ $total_seguidores = $seguidores->num_rows;
             <?php else: ?>
                 <div class="empty-state">
                     <i class="fas fa-users fa-4x"></i>
-                    <h2>Aún no tienes seguidores</h2>
-                    <p>Cuando alguien te siga, aparecerá aquí.</p>
-                    <a href="<?php echo BASE_URL; ?>/public/explorar.php" class="btn">Explorar usuarios</a>
+                    <h2><?= htmlspecialchars($TEXTOS["aun_no_tienes_seguidores"] ?? '') ?></h2>
+                    <p><?= htmlspecialchars($TEXTOS["mensaje_no_seguidores"] ?? '') ?></p>
+                    <a href="<?php echo BASE_URL; ?>/public/explorar.php" class="btn"><?= htmlspecialchars($TEXTOS["explorar_usuarios"] ?? '') ?></a>
                 </div>
             <?php endif; ?>
         </div>

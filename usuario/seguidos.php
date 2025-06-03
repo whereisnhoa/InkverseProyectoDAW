@@ -1,4 +1,3 @@
-
 <?php
 // Iniciar sesión
 session_start();
@@ -25,7 +24,14 @@ if (!defined('BASE_URL')) {
     define('BASE_URL', $relative_path);
 }
 
-// Incluir archivos necesarios
+// Selección de idioma
+$idioma = $_SESSION['idioma'] ?? 'es';
+$archivo_idioma = $project_path . "/includes/languages/{$idioma}.php";
+if (!file_exists($archivo_idioma)) {
+    $archivo_idioma = $project_path . "/includes/languages/es.php"; // fallback
+}
+require_once($archivo_idioma);
+
 require_once($project_path . '/includes/funciones.php');
 require_once($project_path . '/includes/conexion.php');
 require_once($project_path . '/includes/header.php');
@@ -37,14 +43,13 @@ verificarLogin();
 $usuario_id = $_SESSION['usuario_id'];
 
 // Obtener seguidos
-$sql = "SELECT u.id, u.usuario, u.avatar, u.biografia, s.fecha_seguimiento,
-        (SELECT COUNT(*) FROM seguidores WHERE seguidor_id = u.id) AS seguidos,
+$sql = "SELECT u.id, u.usuario, u.avatar, u.biografia,
+        (SELECT COUNT(*) FROM seguidores WHERE usuario_id = u.id) AS seguidos,
         (SELECT COUNT(*) FROM seguidores WHERE seguido_id = u.id) AS seguidores,
-        (SELECT COUNT(*) FROM seguidores WHERE seguido_id = ? AND seguidor_id = u.id) AS te_sigue
+        (SELECT COUNT(*) FROM seguidores WHERE seguido_id = ? AND usuario_id = u.id) AS te_sigue
         FROM seguidores s
         JOIN usuarios u ON s.seguido_id = u.id
-        WHERE s.seguidor_id = ?
-        ORDER BY s.fecha_seguimiento DESC";
+        WHERE s.usuario_id = ?";
 
 $stmt = $conexion->prepare($sql);
 $stmt->bind_param("ii", $usuario_id, $usuario_id);
@@ -56,8 +61,8 @@ $total_seguidos = $seguidos->num_rows;
 <div class="container">
     <div class="card">
         <div class="card-header">
-            <h1><i class="fas fa-user-friends"></i> Usuarios que Sigo</h1>
-            <p>Sigues a <?php echo $total_seguidos; ?> usuarios</p>
+            <h1><i class="fas fa-user-friends"></i> <?= htmlspecialchars($TEXTOS['usuarios_que_sigo'] ?? 'Usuarios que Sigo') ?></h1>
+            <p><?= htmlspecialchars(str_replace("{n}", $total_seguidos, $TEXTOS['sigues_a_n_usuarios'] ?? "Sigues a {$total_seguidos} usuarios")) ?></p>
         </div>
         <div class="card-body">
             <?php if ($total_seguidos > 0): ?>
@@ -65,24 +70,24 @@ $total_seguidos = $seguidos->num_rows;
                     <?php while ($seguido = $seguidos->fetch_assoc()): ?>
                         <div class="user-card">
                             <div class="user-avatar">
-                                <img src="<?php echo !empty($seguido['avatar']) ? BASE_URL . '/uploads/avatars/' . $seguido['avatar'] : BASE_URL . '/img/default-avatar.png'; ?>" alt="Avatar de <?php echo htmlspecialchars($seguido['usuario']); ?>">
+                                <img src="<?php echo !empty($seguido['avatar']) ? BASE_URL . '/uploads/avatars/' . $seguido['avatar'] : BASE_URL . '/img/default-avatar.png'; ?>"
+                                     alt="<?= htmlspecialchars(str_replace("{usuario}", htmlspecialchars($seguido['usuario']), $TEXTOS["avatar_de"] ?? 'Avatar de usuario')) ?>">
                             </div>
                             <div class="user-info">
                                 <h3><a href="<?php echo BASE_URL; ?>/public/perfil.php?id=<?php echo $seguido['id']; ?>"><?php echo htmlspecialchars($seguido['usuario']); ?></a></h3>
                                 <div class="user-stats">
-                                    <span><strong><?php echo $seguido['seguidores']; ?></strong> seguidores</span>
-                                    <span><strong><?php echo $seguido['seguidos']; ?></strong> seguidos</span>
+                                    <span><strong><?php echo $seguido['seguidores']; ?></strong> <?= htmlspecialchars($TEXTOS["seguidores"] ?? 'seguidores') ?></span>
+                                    <span><strong><?php echo $seguido['seguidos']; ?></strong> <?= htmlspecialchars($TEXTOS["seguidos"] ?? 'seguidos') ?></span>
                                 </div>
-                                <p class="user-bio"><?php echo !empty($seguido['biografia']) ? htmlspecialchars(substr($seguido['biografia'], 0, 100)) . (strlen($seguido['biografia']) > 100 ? '...' : '') : 'Sin biografía'; ?></p>
-                                <p class="follow-date">Sigues desde <?php echo date('d/m/Y', strtotime($seguido['fecha_seguimiento'])); ?></p>
+                                <p class="user-bio"><?php echo !empty($seguido['biografia']) ? htmlspecialchars(substr($seguido['biografia'], 0, 100)) . (strlen($seguido['biografia']) > 100 ? '...' : '') : htmlspecialchars($TEXTOS["sin_biografia"] ?? 'Sin biografía'); ?></p>
                                 <?php if ($seguido['te_sigue']): ?>
-                                    <span class="follows-you">Te sigue</span>
+                                    <span class="follows-you"><?= htmlspecialchars($TEXTOS["te_sigue"] ?? "Te sigue") ?></span>
                                 <?php endif; ?>
                             </div>
                             <div class="user-actions">
                                 <form action="<?php echo BASE_URL; ?>/controllers/dejar-seguir.php" method="POST">
                                     <input type="hidden" name="usuario_id" value="<?php echo $seguido['id']; ?>">
-                                    <button type="submit" class="btn btn-outline btn-sm">Dejar de seguir</button>
+                                    <button type="submit" class="btn btn-outline btn-sm"><?= htmlspecialchars($TEXTOS["dejar_de_seguir"] ?? 'Dejar de seguir') ?></button>
                                 </form>
                             </div>
                         </div>
@@ -91,9 +96,9 @@ $total_seguidos = $seguidos->num_rows;
             <?php else: ?>
                 <div class="empty-state">
                     <i class="fas fa-user-friends fa-4x"></i>
-                    <h2>Aún no sigues a ningún usuario</h2>
-                    <p>Cuando sigas a alguien, aparecerá aquí.</p>
-                    <a href="<?php echo BASE_URL; ?>/public/explorar.php" class="btn">Explorar usuarios</a>
+                    <h2><?= htmlspecialchars($TEXTOS["aun_no_sigues_usuarios"] ?? 'Aún no sigues a ningún usuario') ?></h2>
+                    <p><?= htmlspecialchars($TEXTOS["mensaje_no_sigues_usuarios"] ?? 'Cuando sigas a alguien, aparecerá aquí.') ?></p>
+                    <a href="<?php echo BASE_URL; ?>/public/explorar.php" class="btn"><?= htmlspecialchars($TEXTOS["explorar_usuarios"] ?? 'Explorar usuarios') ?></a>
                 </div>
             <?php endif; ?>
         </div>

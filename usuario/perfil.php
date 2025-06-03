@@ -101,7 +101,7 @@ $stmt_seguidos->close();
 <html lang="<?= htmlspecialchars($TEXTOS['lang'] ?? 'es') ?>">
 <head>
     <meta charset="UTF-8">
-    <title><?= htmlspecialchars($usuario['usuario']) ?> - <?= htmlspecialchars($TEXTOS['perfil'] ?? 'Perfil') ?> | InkVerse</title>
+    <title><?= htmlspecialchars($usuario['usuario'] ?? '') ?> - <?= htmlspecialchars($TEXTOS['perfil'] ?? 'Perfil') ?> | InkVerse</title>
     <link rel="stylesheet" href="../css/usuario.css">
     <link rel="stylesheet" href="../public/fontawesome/css/all.min.css">
     <style>
@@ -284,64 +284,96 @@ $stmt_seguidos->close();
         transition: color 0.13s;
     }
     .ver-todo:hover { color: #4361ee; text-decoration: underline; }
+
+    /* --- MEJOR DISEÑO DE OBRAS MÁS ANCHO --- */
     .obras-grid {
-        display: flex;
-        gap: 17px;
-        flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 36px 36px;
+      justify-items: center;
+      padding: 10px 0 5px 0;
     }
     .obra-card {
-        background: #fff;
-        border-radius: 12px;
-        box-shadow: 0 1px 7px #4361ee10;
-        width: 135px;
-        padding: 10px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        transition: box-shadow 0.15s, transform 0.12s;
+      background: #fff;
+      border-radius: 22px;
+      box-shadow: 0 6px 32px #4361ee18, 0 2px 5px #4cc9f015;
+      width: 230px;
+      padding: 20px 20px 18px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: transform 0.18s, box-shadow 0.18s;
+      position: relative;
+      cursor: pointer;
+      border: 2px solid #f3f6ff;
     }
     .obra-card:hover {
-        box-shadow: 0 4px 18px #4cc9f014;
-        transform: translateY(-3px) scale(1.035);
+      transform: translateY(-7px) scale(1.045);
+      box-shadow: 0 14px 42px #4361ee33, 0 4px 12px #4cc9f021;
+      border-color: #4cc9f0;
     }
     .obra-portada img, .obra-card .obra-portada img {
-        width: 86px;
-        height: 120px;
-        object-fit: cover;
-        border-radius: 7px;
-        background: #e7e9fb;
-        box-shadow: 0 1px 5px #22316c12;
-        margin-bottom: 7px;
+      width: 100%;
+      height: 260px;
+      object-fit: cover;
+      border-radius: 13px;
+      background: #e7e9fb;
+      box-shadow: 0 3px 14px #22316c12;
+      margin-bottom: 18px;
+      transition: box-shadow 0.16s;
+    }
+    .obra-card:hover .obra-portada img {
+      box-shadow: 0 8px 28px #4361ee19;
     }
     .obra-info {
-        text-align: center;
-        width: 100%;
+      width: 100%;
+      text-align: left;
     }
     .obra-info h3 {
-        font-size: 1.06rem;
-        font-weight: 700;
-        margin-bottom: 3px;
-        color: #22316c;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        max-width: 100%;
+      font-size: 1.12rem;
+      font-weight: 900;
+      color: #22316c;
+      margin-bottom: 5px;
+      margin-top: 0;
+      line-height: 1.18;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
     .obra-categoria {
-        font-size: 0.98rem;
-        color: #6a7bb5;
-        margin-bottom: 2px;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #4cc9f0;
+      margin-bottom: 9px;
+      letter-spacing: 0.02em;
     }
     .badge {
-        background: #4361ee;
-        color: #fff;
-        border-radius: 5px;
-        padding: 2px 7px;
-        font-size: 0.9rem;
-        font-weight: 600;
-        margin-top: 4px;
-        display: inline-block;
+      background: #4361ee;
+      color: #fff;
+      border-radius: 7px;
+      padding: 3px 12px;
+      font-size: 1.01rem;
+      font-weight: 700;
+      display: inline-block;
+      margin-top: 0px;
+      margin-bottom: 2px;
+      letter-spacing: 0.04em;
     }
+    .portada-placeholder {
+      width: 100%;
+      height: 260px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      color: #a0a8ff;
+      background: linear-gradient(120deg,#e7e9fb 70%, #c8e0fc 100%);
+      border-radius: 13px;
+      margin-bottom: 18px;
+    }
+    /* --- FIN MEJOR DISEÑO DE OBRAS --- */
+
     .no-resultados {
         text-align: center;
         color: #6a7bb5;
@@ -418,6 +450,8 @@ $stmt_seguidos->close();
         .perfil-nombre-completo { font-size: 1.01rem;}
         .perfil-container { min-height: 220px; }
         .perfil-cover { height: 100px; }
+        .obra-card { width: 97vw; max-width: 320px;}
+        .obras-grid { gap: 20px 10px;}
     }
     </style>
 </head>
@@ -431,15 +465,15 @@ $stmt_seguidos->close();
         <div class="perfil-cover" style="<?= $banner_style ?>"></div>
         <div class="perfil-avatar-outer">
             <div class="perfil-avatar">
-                <img src="<?= $user_avatar ?>" alt="<?= htmlspecialchars($usuario['usuario']) ?>">
+                <img src="<?= $user_avatar ?>" alt="<?= htmlspecialchars($usuario['usuario'] ?? '') ?>">
             </div>
         </div>
     </div>
     <div class="perfil-header-info">
         <div class="perfil-nombre">
-            <h1><?= htmlspecialchars($usuario['usuario']) ?></h1>
+            <h1><?= htmlspecialchars($usuario['usuario'] ?? '') ?></h1>
             <div class="perfil-nombre-completo">
-                <?= htmlspecialchars($usuario['nombre']) ?>
+                <?= htmlspecialchars($usuario['nombre'] ?? '') ?>
                 <?php if ($edad !== '-'): ?>
                     &middot; <?= $edad ?> <?= $TEXTOS['anios'] ?>
                 <?php endif; ?>
@@ -447,44 +481,44 @@ $stmt_seguidos->close();
         </div>
         <div class="perfil-estadisticas-row">
             <div class="estadistica">
-                <span class="numero"><?= $stats['obras'] ?></span>
+                <span class="numero"><?= $stats['obras'] ?? 0 ?></span>
                 <span class="etiqueta"><?= $TEXTOS['obras'] ?></span>
             </div>
             <div class="estadistica">
-                <span class="numero"><?= $stats['seguidores'] ?></span>
+                <span class="numero"><?= $stats['seguidores'] ?? 0 ?></span>
                 <span class="etiqueta"><?= $TEXTOS['seguidores'] ?></span>
             </div>
             <div class="estadistica">
-                <span class="numero"><?= $stats['siguiendo'] ?></span>
+                <span class="numero"><?= $stats['siguiendo'] ?? 0 ?></span>
                 <span class="etiqueta"><?= $TEXTOS['siguiendo'] ?></span>
             </div>
             <div class="estadistica">
-                <span class="numero"><?= $stats['favoritos'] ?></span>
+                <span class="numero"><?= $stats['favoritos'] ?? 0 ?></span>
                 <span class="etiqueta"><?= $TEXTOS['favoritos'] ?></span>
             </div>
         </div>
         <?php if (!empty($usuario['biografia'])): ?>
             <div class="perfil-bio">
                 <i class="fas fa-quote-left" style="color:#4cc9f0"></i>
-                <?= nl2br(htmlspecialchars($usuario['biografia'])) ?>
+                <?= nl2br(htmlspecialchars($usuario['biografia'] ?? '')) ?>
             </div>
         <?php endif; ?>
 
         <div class="perfil-links-extra">
             <?php if (!empty($usuario['sitio_web'])): ?>
-                <a href="<?= htmlspecialchars($usuario['sitio_web']) ?>" target="_blank"><i class="fas fa-link"></i><?= $TEXTOS['web'] ?></a>
+                <a href="<?= htmlspecialchars($usuario['sitio_web'] ?? '') ?>" target="_blank"><i class="fas fa-link"></i><?= $TEXTOS['web'] ?></a>
             <?php endif; ?>
             <?php if (!empty($usuario['ubicacion'])): ?>
-                <span><i class="fas fa-map-marker-alt"></i><?= htmlspecialchars($usuario['ubicacion']) ?></span>
+                <span><i class="fas fa-map-marker-alt"></i><?= htmlspecialchars($usuario['ubicacion'] ?? '') ?></span>
             <?php endif; ?>
             <?php if (!empty($usuario['X'])): ?>
-                <a href="<?= htmlspecialchars($usuario['X']) ?>" target="_blank"><i class="fab fa-x-twitter"></i>X</a>
+                <a href="<?= htmlspecialchars($usuario['X'] ?? '') ?>" target="_blank"><i class="fab fa-x-twitter"></i>X</a>
             <?php endif; ?>
             <?php if (!empty($usuario['instagram'])): ?>
-                <a href="<?= htmlspecialchars($usuario['instagram']) ?>" target="_blank"><i class="fab fa-instagram"></i>Instagram</a>
+                <a href="<?= htmlspecialchars($usuario['instagram'] ?? '') ?>" target="_blank"><i class="fab fa-instagram"></i>Instagram</a>
             <?php endif; ?>
             <?php if (!empty($usuario['facebook'])): ?>
-                <a href="<?= htmlspecialchars($usuario['facebook']) ?>" target="_blank"><i class="fab fa-facebook"></i>Facebook</a>
+                <a href="<?= htmlspecialchars($usuario['facebook'] ?? '') ?>" target="_blank"><i class="fab fa-facebook"></i>Facebook</a>
             <?php endif; ?>
         </div>
     </div>
@@ -494,23 +528,27 @@ $stmt_seguidos->close();
             <div class="perfil-seccion">
                 <div class="seccion-header" style="display:flex;justify-content:space-between;align-items:center;">
                     <h2><?= $TEXTOS['mis_obras_recientes'] ?></h2>
-                    <a class="ver-todo" href="mis_obras.php?id=<?= $usuario['id'] ?>"><?= $TEXTOS['ver_todas'] ?></a>
+                    <a class="ver-todo" href="mis_obras.php?id=<?= $usuario['id'] ?? 0 ?>"><?= $TEXTOS['ver_todas'] ?></a>
                 </div>
                 <div class="obras-grid">
                     <?php if ($ultimas_obras->num_rows): ?>
                         <?php while ($obra = $ultimas_obras->fetch_assoc()): ?>
                             <div class="obra-card">
                                 <div class="obra-portada">
-                                    <?php if ($obra['portada']): ?>
-                                        <img src="../uploads/portadas/<?= htmlspecialchars($obra['portada']) ?>" alt="Portada">
+                                    <?php 
+                                    $ruta_portada = (!empty($obra['portada'])) ? __DIR__ . '/../uploads/portadas/' . $obra['portada'] : '';
+                                    if (!empty($obra['portada']) && file_exists($ruta_portada)): ?>
+                                        <img src="../uploads/portadas/<?= htmlspecialchars($obra['portada'] ?? '') ?>" alt="Portada">
                                     <?php else: ?>
                                         <div class="portada-placeholder"><i class="fas fa-book"></i></div>
                                     <?php endif; ?>
                                 </div>
                                 <div class="obra-info">
-                                    <h3><?= htmlspecialchars($obra['titulo']) ?></h3>
-                                    <div class="obra-categoria"><?= htmlspecialchars($obra['categoria']) ?></div>
-                                    <span class="badge"><?= $obra['tipo'] == 'libro' ? $TEXTOS['libro'] : $TEXTOS['comic'] ?></span>
+                                    <div class="obra-categoria"><?= htmlspecialchars($obra['categoria'] ?? '') ?></div>
+                                    <h3 title="<?= htmlspecialchars($obra['titulo'] ?? '') ?>">
+                                      <?= htmlspecialchars($obra['titulo'] ?? '') ?>
+                                    </h3>
+                                    <span class="badge"><?= ($obra['tipo'] ?? '') == 'libro' ? $TEXTOS['libro'] : $TEXTOS['comic'] ?></span>
                                 </div>
                             </div>
                         <?php endwhile; ?>
@@ -527,14 +565,14 @@ $stmt_seguidos->close();
             <div class="perfil-seccion">
                 <div class="seccion-header">
                     <h2><?= $TEXTOS['seguidores_recientes'] ?></h2>
-                    <a class="ver-todo" href="seguidores.php?id=<?= $usuario['id'] ?>"><?= $TEXTOS['ver_todos'] ?></a>
+                    <a class="ver-todo" href="seguidores.php?id=<?= $usuario['id'] ?? 0 ?>"><?= $TEXTOS['ver_todos'] ?></a>
                 </div>
                 <div class="usuarios-grid">
                     <?php if ($seguidores->num_rows): ?>
                         <?php while ($seg = $seguidores->fetch_assoc()): ?>
-                            <a class="usuario-item" href="perfil.php?id=<?= $seg['id'] ?>">
-                                <img src="<?= $seg['avatar'] ? "../uploads/avatars/" . htmlspecialchars($seg['avatar']) : "../public/img/avatar_default.png" ?>" alt="Avatar">
-                                <span><?= htmlspecialchars($seg['usuario']) ?></span>
+                            <a class="usuario-item" href="perfil.php?id=<?= $seg['id'] ?? 0 ?>">
+                                <img src="<?= !empty($seg['avatar']) ? "../uploads/avatars/" . htmlspecialchars($seg['avatar']) : "../public/img/avatar_default.png" ?>" alt="Avatar">
+                                <span><?= htmlspecialchars($seg['usuario'] ?? '') ?></span>
                             </a>
                         <?php endwhile; ?>
                     <?php else: ?>
@@ -548,14 +586,14 @@ $stmt_seguidos->close();
             <div class="perfil-seccion">
                 <div class="seccion-header">
                     <h2><?= $TEXTOS['seguidos_recientes'] ?></h2>
-                    <a class="ver-todo" href="seguidos.php?id=<?= $usuario['id'] ?>"><?= $TEXTOS['ver_todos'] ?></a>
+                    <a class="ver-todo" href="seguidos.php?id=<?= $usuario['id'] ?? 0 ?>"><?= $TEXTOS['ver_todos'] ?></a>
                 </div>
                 <div class="usuarios-grid">
                     <?php if ($seguidos->num_rows): ?>
                         <?php while ($seg = $seguidos->fetch_assoc()): ?>
-                            <a class="usuario-item" href="perfil.php?id=<?= $seg['id'] ?>">
-                                <img src="<?= $seg['avatar'] ? "../uploads/avatars/" . htmlspecialchars($seg['avatar']) : "../public/img/avatar_default.png" ?>" alt="Avatar">
-                                <span><?= htmlspecialchars($seg['usuario']) ?></span>
+                            <a class="usuario-item" href="perfil.php?id=<?= $seg['id'] ?? 0 ?>">
+                                <img src="<?= !empty($seg['avatar']) ? "../uploads/avatars/" . htmlspecialchars($seg['avatar']) : "../public/img/avatar_default.png" ?>" alt="Avatar">
+                                <span><?= htmlspecialchars($seg['usuario'] ?? '') ?></span>
                             </a>
                         <?php endwhile; ?>
                     <?php else: ?>
@@ -575,7 +613,7 @@ $stmt_seguidos->close();
                         <a class="enlace-rapido" href="editar_perfil.php"><i class="fas fa-user-edit"></i><?= $TEXTOS['editar_perfil'] ?></a>
                         <a class="enlace-rapido" href="nueva_obra.php"><i class="fas fa-plus"></i><?= $TEXTOS['nueva_obra'] ?></a>
                         <a class="enlace-rapido" href="favoritos.php"><i class="fas fa-heart"></i><?= $TEXTOS['ver_favoritos'] ?></a>
-                        <a class="enlace-rapido" href="mis_obras.php?id=<?= $usuario['id'] ?>"><i class="fas fa-book"></i><?= $TEXTOS['mis_obras'] ?></a>
+                        <a class="enlace-rapido" href="mis_obras.php?id=<?= $usuario['id'] ?? 0 ?>"><i class="fas fa-book"></i><?= $TEXTOS['mis_obras'] ?></a>
                         <a class="enlace-rapido" href="test.php"><i class="fas fa-question-circle"></i>Test</a>
                         <a class="enlace-rapido" href="biblioteca.php"><i class="fas fa-bookmark"></i><?= $TEXTOS['mi_biblioteca'] ?></a>
                     <?php endif; ?>

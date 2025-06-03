@@ -40,7 +40,6 @@ if ($accion === "agregar") {
     ]);
     exit();
 } elseif ($accion === "toggle") {
-    // Saber si ya es favorito
     $sql_check = "SELECT 1 FROM favoritos WHERE usuario_id = ? AND tipo_contenido = ? AND contenido_id = ?";
     $stmt = $conexion->prepare($sql_check);
     $stmt->bind_param("isi", $usuario_id, $tipo_contenido, $contenido_id);

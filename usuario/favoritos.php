@@ -1,23 +1,25 @@
 <?php
-// Iniciar sesión
 session_start();
-
-// Incluir configuración y archivos necesarios
 require_once(__DIR__ . '/../includes/config.php');
 require_once(__DIR__ . '/../includes/funciones.php');
 require_once(__DIR__ . '/../includes/conexion.php');
+
+// Cargar idioma
+$idioma = $_SESSION['idioma'] ?? 'es';
+$archivo_idioma = __DIR__ . "/../includes/languages/{$idioma}.php";
+if (!file_exists($archivo_idioma)) $archivo_idioma = __DIR__ . "/../includes/languages/es.php";
+require_once($archivo_idioma);
 
 // Verificar que el usuario esté logueado
 verificarLogin();
 
 $usuario_id = $_SESSION['usuario_id'];
 
-// Configurar filtros
-$filtro_tipo = isset($_GET['tipo']) ? $_GET['tipo'] : 'todos';
+$filtro_tipo = $_GET['tipo'] ?? 'todos';
 $filtro_categoria = isset($_GET['categoria']) ? intval($_GET['categoria']) : 0;
-$orden = isset($_GET['orden']) ? $_GET['orden'] : 'reciente';
+$orden = $_GET['orden'] ?? 'reciente';
 
-// Obtener libros favoritos
+// Libros favoritos
 $sql_libros = "SELECT l.*, c.nombre as categoria_nombre, f.fecha_agregado,
                (SELECT COUNT(*) FROM favoritos f2 WHERE f2.contenido_id = l.id AND f2.tipo_contenido = 'libro') as total_favoritos
                FROM libros l 
@@ -28,15 +30,12 @@ $sql_libros = "SELECT l.*, c.nombre as categoria_nombre, f.fecha_agregado,
 $params_libros = [$usuario_id];
 $param_types_libros = "i";
 
-// Aplicar filtros para libros
 if ($filtro_tipo === 'libro' || $filtro_tipo === 'todos') {
     if ($filtro_categoria > 0) {
         $sql_libros .= " AND l.categoria_id = ?";
         $params_libros[] = $filtro_categoria;
         $param_types_libros .= "i";
     }
-    
-    // Aplicar orden
     switch ($orden) {
         case 'titulo':
             $sql_libros .= " ORDER BY l.titulo ASC";
@@ -52,7 +51,7 @@ if ($filtro_tipo === 'libro' || $filtro_tipo === 'todos') {
     }
 }
 
-// Obtener cómics favoritos
+// Cómics favoritos
 $sql_comics = "SELECT c.*, f.fecha_agregado,
                (SELECT COUNT(*) FROM favoritos f2 WHERE f2.contenido_id = c.id AND f2.tipo_contenido = 'comic') as total_favoritos
                FROM comics c 
@@ -62,7 +61,6 @@ $sql_comics = "SELECT c.*, f.fecha_agregado,
 $params_comics = [$usuario_id];
 $param_types_comics = "i";
 
-// Aplicar orden para cómics
 switch ($orden) {
     case 'titulo':
         $sql_comics .= " ORDER BY c.titulo ASC";
@@ -77,7 +75,6 @@ switch ($orden) {
         $sql_comics .= " ORDER BY f.fecha_agregado DESC";
 }
 
-// Ejecutar consultas según el filtro de tipo
 $libros_favoritos = null;
 $comics_favoritos = null;
 
@@ -95,7 +92,7 @@ if ($filtro_tipo === 'todos' || $filtro_tipo === 'comic') {
     $comics_favoritos = $stmt_comics->get_result();
 }
 
-// Obtener categorías para el filtro (solo de libros)
+// Categorías para filtro (solo de libros)
 $sql_categorias = "SELECT DISTINCT c.id, c.nombre 
                    FROM categorias c 
                    JOIN libros l ON c.id = l.categoria_id 
@@ -107,647 +104,323 @@ $stmt_cat->bind_param("i", $usuario_id);
 $stmt_cat->execute();
 $categorias = $stmt_cat->get_result();
 
-// Contar total de favoritos
+// Total favoritos
 $total_favoritos = 0;
 if ($libros_favoritos) $total_favoritos += $libros_favoritos->num_rows;
 if ($comics_favoritos) $total_favoritos += $comics_favoritos->num_rows;
 
-// Incluir header
 include_once(__DIR__ . '/../includes/header.php');
 ?>
 
-<div class="container">
-    <div class="favoritos-container">
-        <!-- Header de la página -->
-        <div class="page-header">
-            <div class="page-title">
-                <h1><i class="fas fa-heart"></i> Mis Favoritos</h1>
-                <p>Todas las obras que has guardado como favoritas</p>
-            </div>
-            <div class="page-stats">
-                <span class="stat-item">
-                    <i class="fas fa-bookmark"></i>
-                    <?php echo $total_favoritos; ?> obras guardadas
-                </span>
-            </div>
+<div class="container-favoritos">
+    <div class="favoritos-header">
+        <h1><i class="fas fa-heart"></i> <?= htmlspecialchars($TEXTOS['mis_favoritos'] ?? 'Mis Favoritos') ?></h1>
+        <p><?= htmlspecialchars($TEXTOS['descripcion_favoritos'] ?? 'Todas las obras que has guardado como favoritas') ?></p>
+        <div class="favoritos-stats">
+            <span class="stat-item">
+                <i class="fas fa-bookmark"></i>
+                <?= $total_favoritos . ' ' . htmlspecialchars($TEXTOS['obras_guardadas'] ?? 'obras guardadas') ?>
+            </span>
         </div>
-
-        <!-- Filtros y ordenación -->
-        <div class="filtros-container">
-            <form method="GET" class="filtros-form">
-                <div class="filtro-grupo">
-                    <label for="tipo">Tipo:</label>
-                    <select name="tipo" id="tipo">
-                        <option value="todos" <?php echo $filtro_tipo === 'todos' ? 'selected' : ''; ?>>Todos</option>
-                        <option value="libro" <?php echo $filtro_tipo === 'libro' ? 'selected' : ''; ?>>Libros</option>
-                        <option value="comic" <?php echo $filtro_tipo === 'comic' ? 'selected' : ''; ?>>Cómics</option>
-                    </select>
-                </div>
-
-                <div class="filtro-grupo">
-                    <label for="categoria">Categoría:</label>
-                    <select name="categoria" id="categoria">
-                        <option value="0">Todas las categorías</option>
-                        <?php 
-                        $categorias->data_seek(0);
-                        while ($cat = $categorias->fetch_assoc()): 
-                        ?>
-                            <option value="<?php echo $cat['id']; ?>" <?php echo $filtro_categoria == $cat['id'] ? 'selected' : ''; ?>>
-                                <?php echo htmlspecialchars($cat['nombre']); ?>
-                            </option>
-                        <?php endwhile; ?>
-                    </select>
-                </div>
-
-                <div class="filtro-grupo">
-                    <label for="orden">Ordenar por:</label>
-                    <select name="orden" id="orden">
-                        <option value="reciente" <?php echo $orden === 'reciente' ? 'selected' : ''; ?>>Más recientes</option>
-                        <option value="titulo" <?php echo $orden === 'titulo' ? 'selected' : ''; ?>>Título A-Z</option>
-                        <option value="autor" <?php echo $orden === 'autor' ? 'selected' : ''; ?>>Autor A-Z</option>
-                        <option value="popular" <?php echo $orden === 'popular' ? 'selected' : ''; ?>>Más populares</option>
-                    </select>
-                </div>
-
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-filter"></i> Aplicar filtros
-                </button>
-            </form>
-        </div>
-
-        <!-- Lista de obras favoritas -->
-        <?php if ($total_favoritos > 0): ?>
-            <div class="obras-grid">
-                
-                <!-- Mostrar libros favoritos -->
-                <?php if ($libros_favoritos && $libros_favoritos->num_rows > 0): ?>
-                    <?php while ($libro = $libros_favoritos->fetch_assoc()): ?>
-                        <div class="obra-card favorita" data-obra-id="<?php echo $libro['id']; ?>" data-tipo="libro">
-                            <div class="obra-portada">
-                                <?php if (!empty($libro['portada'])): ?>
-                                    <img src="<?php echo BASE_URL . '/uploads/portadas/' . htmlspecialchars($libro['portada']); ?>" 
-                                         alt="Portada de <?php echo htmlspecialchars($libro['titulo']); ?>">
-                                <?php else: ?>
-                                    <div class="portada-placeholder">
-                                        <i class="fas fa-book"></i>
-                                    </div>
-                                <?php endif; ?>
-                                
-                                <!-- Botón para quitar de favoritos -->
-                                <button class="btn-quitar-favorito" data-obra-id="<?php echo $libro['id']; ?>" data-tipo="libro" title="Quitar de favoritos">
-                                    <i class="fas fa-heart"></i>
-                                </button>
-                            </div>
-
-                            <div class="obra-info">
-                                <div class="obra-header">
-                                    <h3><?php echo htmlspecialchars($libro['titulo']); ?></h3>
-                                    <div class="obra-badges">
-                                        <span class="badge badge-tipo">Libro</span>
-                                        <?php if (!empty($libro['categoria_nombre'])): ?>
-                                            <span class="badge badge-categoria"><?php echo htmlspecialchars($libro['categoria_nombre']); ?></span>
-                                        <?php endif; ?>
-                                        <?php if ($libro['publico_adulto']): ?>
-                                            <span class="badge badge-adulto">+18</span>
-                                        <?php endif; ?>
-                                    </div>
-                                </div>
-
-                                <p class="obra-autor">
-                                    <i class="fas fa-user"></i>
-                                    Por: <?php echo htmlspecialchars($libro['autor']); ?>
-                                </p>
-
-                                <?php if (!empty($libro['descripcion'])): ?>
-                                    <p class="obra-descripcion">
-                                        <?php echo substr(htmlspecialchars($libro['descripcion']), 0, 120) . '...'; ?>
-                                    </p>
-                                <?php endif; ?>
-
-                                <div class="obra-stats">
-                                    <span><i class="fas fa-heart"></i> <?php echo $libro['total_favoritos']; ?></span>
-                                    <span><i class="fas fa-calendar-plus"></i> Guardado: <?php echo date('d/m/Y', strtotime($libro['fecha_guardado'])); ?></span>
-                                </div>
-
-                                <div class="obra-acciones">
-                                    <a href="<?php echo BASE_URL; ?>/public/obra.php?id=<?php echo $libro['id']; ?>&tipo=libro" class="btn btn-primary">
-                                        <i class="fas fa-eye"></i> Ver obra
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    <?php endwhile; ?>
-                <?php endif; ?>
-
-                <!-- Mostrar cómics favoritos -->
-                <?php if ($comics_favoritos && $comics_favoritos->num_rows > 0): ?>
-                    <?php while ($comic = $comics_favoritos->fetch_assoc()): ?>
-                        <div class="obra-card favorita" data-obra-id="<?php echo $comic['id']; ?>" data-tipo="comic">
-                            <div class="obra-portada">
-                                <?php if (!empty($comic['portada'])): ?>
-                                    <img src="<?php echo BASE_URL . '/uploads/portadas/' . htmlspecialchars($comic['portada']); ?>" 
-                                         alt="Portada de <?php echo htmlspecialchars($comic['titulo']); ?>">
-                                <?php else: ?>
-                                    <div class="portada-placeholder">
-                                        <i class="fas fa-book-open"></i>
-                                    </div>
-                                <?php endif; ?>
-                                
-                                <!-- Botón para quitar de favoritos -->
-                                <button class="btn-quitar-favorito" data-obra-id="<?php echo $comic['id']; ?>" data-tipo="comic" title="Quitar de favoritos">
-                                    <i class="fas fa-heart"></i>
-                                </button>
-                            </div>
-
-                            <div class="obra-info">
-                                <div class="obra-header">
-                                    <h3><?php echo htmlspecialchars($comic['titulo']); ?></h3>
-                                    <div class="obra-badges">
-                                        <span class="badge badge-tipo">Cómic</span>
-                                        <?php if ($comic['publico_adulto']): ?>
-                                            <span class="badge badge-adulto">+18</span>
-                                        <?php endif; ?>
-                                    </div>
-                                </div>
-
-                                <p class="obra-autor">
-                                    <i class="fas fa-user"></i>
-                                    Por: <?php echo htmlspecialchars($comic['autor']); ?>
-                                </p>
-
-                                <?php if (!empty($comic['descripcion'])): ?>
-                                    <p class="obra-descripcion">
-                                        <?php echo substr(htmlspecialchars($comic['descripcion']), 0, 120) . '...'; ?>
-                                    </p>
-                                <?php endif; ?>
-
-                                <div class="obra-stats">
-                                    <span><i class="fas fa-heart"></i> <?php echo $comic['total_favoritos']; ?></span>
-                                    <span><i class="fas fa-calendar-plus"></i> Guardado: <?php echo date('d/m/Y', strtotime($comic['fecha_guardado'])); ?></span>
-                                </div>
-
-                                <div class="obra-acciones">
-                                    <a href="<?php echo BASE_URL; ?>/public/obra.php?id=<?php echo $comic['id']; ?>&tipo=comic" class="btn btn-primary">
-                                        <i class="fas fa-eye"></i> Ver obra
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    <?php endwhile; ?>
-                <?php endif; ?>
-                
-            </div>
-        <?php else: ?>
-            <div class="no-favoritos">
-                <div class="no-favoritos-icon">
-                    <i class="fas fa-heart-broken"></i>
-                </div>
-                <h3>No tienes obras favoritas</h3>
-                <p>Cuando encuentres obras que te gusten, puedes guardarlas como favoritas haciendo clic en el corazón.</p>
-                <div class="no-favoritos-acciones">
-                    <a href="<?php echo BASE_URL; ?>/public/explorar.php" class="btn btn-primary">
-                        <i class="fas fa-compass"></i> Explorar obras
-                    </a>
-                    <a href="<?php echo BASE_URL; ?>/public/buscar.php" class="btn btn-outline">
-                        <i class="fas fa-search"></i> Buscar obras
-                    </a>
-                </div>
-            </div>
-        <?php endif; ?>
     </div>
+
+    <div class="favoritos-filtros">
+        <form method="GET" class="filtros-form">
+            <div class="filtro-grupo">
+                <label for="tipo"><?= htmlspecialchars($TEXTOS['tipo'] ?? 'Tipo:') ?></label>
+                <select name="tipo" id="tipo">
+                    <option value="todos" <?= $filtro_tipo === 'todos' ? 'selected' : ''; ?>><?= htmlspecialchars($TEXTOS['todos'] ?? 'Todos') ?></option>
+                    <option value="libro" <?= $filtro_tipo === 'libro' ? 'selected' : ''; ?>><?= htmlspecialchars($TEXTOS['libros'] ?? 'Libros') ?></option>
+                    <option value="comic" <?= $filtro_tipo === 'comic' ? 'selected' : ''; ?>><?= htmlspecialchars($TEXTOS['comics'] ?? 'Cómics') ?></option>
+                </select>
+            </div>
+            <div class="filtro-grupo">
+                <label for="categoria"><?= htmlspecialchars($TEXTOS['categoria'] ?? 'Categoría:') ?></label>
+                <select name="categoria" id="categoria">
+                    <option value="0"><?= htmlspecialchars($TEXTOS['todas_categorias'] ?? 'Todas las categorías') ?></option>
+                    <?php 
+                    $categorias->data_seek(0);
+                    while ($cat = $categorias->fetch_assoc()): 
+                    ?>
+                        <option value="<?= $cat['id']; ?>" <?= $filtro_categoria == $cat['id'] ? 'selected' : ''; ?>>
+                            <?= htmlspecialchars($cat['nombre']); ?>
+                        </option>
+                    <?php endwhile; ?>
+                </select>
+            </div>
+            <div class="filtro-grupo">
+                <label for="orden"><?= htmlspecialchars($TEXTOS['ordenar_por'] ?? 'Ordenar por:') ?></label>
+                <select name="orden" id="orden">
+                    <option value="reciente" <?= $orden === 'reciente' ? 'selected' : ''; ?>><?= htmlspecialchars($TEXTOS['mas_recientes'] ?? 'Más recientes') ?></option>
+                    <option value="titulo" <?= $orden === 'titulo' ? 'selected' : ''; ?>><?= htmlspecialchars($TEXTOS['titulo_az'] ?? 'Título A-Z') ?></option>
+                    <option value="autor" <?= $orden === 'autor' ? 'selected' : ''; ?>><?= htmlspecialchars($TEXTOS['autor_az'] ?? 'Autor A-Z') ?></option>
+                    <option value="popular" <?= $orden === 'popular' ? 'selected' : ''; ?>><?= htmlspecialchars($TEXTOS['mas_populares'] ?? 'Más populares') ?></option>
+                </select>
+            </div>
+            <button type="submit" class="btn-gradient">
+                <i class="fas fa-filter"></i> <?= htmlspecialchars($TEXTOS['aplicar_filtros'] ?? 'Aplicar filtros') ?>
+            </button>
+        </form>
+    </div>
+
+    <?php if ($total_favoritos > 0): ?>
+        <div class="obras-grid">
+            <?php if ($libros_favoritos && $libros_favoritos->num_rows > 0): ?>
+                <?php while ($libro = $libros_favoritos->fetch_assoc()): ?>
+                    <?php $autor = $libro['autor'] ?? $TEXTOS['autor_desconocido'] ?? 'Autor desconocido'; ?>
+                    <div class="obra-card favorita" data-obra-id="<?= $libro['id']; ?>" data-tipo="libro">
+                        <div class="obra-portada">
+                            <?php if (!empty($libro['portada'])): ?>
+                                <img src="<?= BASE_URL . '/uploads/portadas/' . htmlspecialchars($libro['portada']); ?>" alt="<?= htmlspecialchars($libro['titulo']) ?>">
+                            <?php else: ?>
+                                <div class="portada-placeholder">
+                                    <i class="fas fa-book"></i>
+                                </div>
+                            <?php endif; ?>
+                            <button class="btn-quitar-favorito" data-obra-id="<?= $libro['id']; ?>" data-tipo="libro" title="<?= htmlspecialchars($TEXTOS['quitar_favorito'] ?? 'Quitar de favoritos') ?>">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                            <button class="btn btn-outline btn-compartir" data-url="<?= BASE_URL; ?>/public/obra.php?id=<?= $libro['id']; ?>&tipo=libro" data-titulo="<?= htmlspecialchars($libro['titulo']); ?>" title="<?= htmlspecialchars($TEXTOS['compartir'] ?? 'Compartir') ?>">
+                                <i class="fas fa-share"></i>
+                            </button>
+                        </div>
+                        <div class="obra-info">
+                            <div class="obra-header">
+                                <h3><?= htmlspecialchars($libro['titulo']); ?></h3>
+                                <div class="obra-badges">
+                                    <span class="badge badge-tipo"><?= htmlspecialchars($TEXTOS['libro'] ?? 'Libro') ?></span>
+                                    <?php if (!empty($libro['categoria_nombre'])): ?>
+                                        <span class="badge badge-categoria"><?= htmlspecialchars($libro['categoria_nombre']); ?></span>
+                                    <?php endif; ?>
+                                    <?php if (!empty($libro['publico_adulto'])): ?>
+                                        <span class="badge badge-adulto"><?= htmlspecialchars($TEXTOS['adulto'] ?? '+18') ?></span>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                            <p class="obra-autor">
+                                <i class="fas fa-user"></i>
+                                <?= htmlspecialchars($TEXTOS['por'] ?? 'Por:') ?> <?= htmlspecialchars($autor); ?>
+                            </p>
+                            <?php if (!empty($libro['descripcion'])): ?>
+                                <p class="obra-descripcion">
+                                    <?= substr(htmlspecialchars($libro['descripcion']), 0, 120) . '...'; ?>
+                                </p>
+                            <?php endif; ?>
+                            <div class="obra-stats">
+                                <span><i class="fas fa-heart"></i> <?= $libro['total_favoritos']; ?></span>
+                                <span><i class="fas fa-calendar-plus"></i> <?= htmlspecialchars($TEXTOS['guardado'] ?? 'Guardado:') ?> <?= date('d/m/Y', strtotime($libro['fecha_agregado'])); ?></span>
+                            </div>
+                            <div class="obra-acciones">
+                                <a href="<?= BASE_URL; ?>/public/obra.php?id=<?= $libro['id']; ?>&tipo=libro" class="btn btn-gradient">
+                                    <i class="fas fa-eye"></i> <?= htmlspecialchars($TEXTOS['ver_obra'] ?? 'Ver obra') ?>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                <?php endwhile; ?>
+            <?php endif; ?>
+
+            <?php if ($comics_favoritos && $comics_favoritos->num_rows > 0): ?>
+                <?php while ($comic = $comics_favoritos->fetch_assoc()): ?>
+                    <?php $autor = $comic['autor'] ?? $TEXTOS['autor_desconocido'] ?? 'Autor desconocido'; ?>
+                    <div class="obra-card favorita" data-obra-id="<?= $comic['id']; ?>" data-tipo="comic">
+                        <div class="obra-portada">
+                            <?php if (!empty($comic['portada'])): ?>
+                                <img src="<?= BASE_URL . '/uploads/portadas/' . htmlspecialchars($comic['portada']); ?>" alt="<?= htmlspecialchars($comic['titulo']); ?>">
+                            <?php else: ?>
+                                <div class="portada-placeholder">
+                                    <i class="fas fa-book-open"></i>
+                                </div>
+                            <?php endif; ?>
+                            <button class="btn-quitar-favorito" data-obra-id="<?= $comic['id']; ?>" data-tipo="comic" title="<?= htmlspecialchars($TEXTOS['quitar_favorito'] ?? 'Quitar de favoritos') ?>">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                            <button class="btn btn-outline btn-compartir" data-url="<?= BASE_URL; ?>/public/obra.php?id=<?= $comic['id']; ?>&tipo=comic" data-titulo="<?= htmlspecialchars($comic['titulo']); ?>" title="<?= htmlspecialchars($TEXTOS['compartir'] ?? 'Compartir') ?>">
+                                <i class="fas fa-share"></i>
+                            </button>
+                        </div>
+                        <div class="obra-info">
+                            <div class="obra-header">
+                                <h3><?= htmlspecialchars($comic['titulo']); ?></h3>
+                                <div class="obra-badges">
+                                    <span class="badge badge-tipo"><?= htmlspecialchars($TEXTOS['comic'] ?? 'Cómic') ?></span>
+                                    <?php if (!empty($comic['publico_adulto'])): ?>
+                                        <span class="badge badge-adulto"><?= htmlspecialchars($TEXTOS['adulto'] ?? '+18') ?></span>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                            <p class="obra-autor">
+                                <i class="fas fa-user"></i>
+                                <?= htmlspecialchars($TEXTOS['por'] ?? 'Por:') ?> <?= htmlspecialchars($autor); ?>
+                            </p>
+                            <?php if (!empty($comic['descripcion'])): ?>
+                                <p class="obra-descripcion">
+                                    <?= substr(htmlspecialchars($comic['descripcion']), 0, 120) . '...'; ?>
+                                </p>
+                            <?php endif; ?>
+                            <div class="obra-stats">
+                                <span><i class="fas fa-heart"></i> <?= $comic['total_favoritos']; ?></span>
+                                <span><i class="fas fa-calendar-plus"></i> <?= htmlspecialchars($TEXTOS['guardado'] ?? 'Guardado:') ?> <?= date('d/m/Y', strtotime($comic['fecha_agregado'])); ?></span>
+                            </div>
+                            <div class="obra-acciones">
+                                <a href="<?= BASE_URL; ?>/public/obra.php?id=<?= $comic['id']; ?>&tipo=comic" class="btn btn-gradient">
+                                    <i class="fas fa-eye"></i> <?= htmlspecialchars($TEXTOS['ver_obra'] ?? 'Ver obra') ?>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                <?php endwhile; ?>
+            <?php endif; ?>
+        </div>
+    <?php else: ?>
+        <div class="no-favoritos">
+            <div class="no-favoritos-icon">
+                <i class="fas fa-heart-broken"></i>
+            </div>
+            <h3><?= htmlspecialchars($TEXTOS['no_tienes_favoritos'] ?? 'No tienes obras favoritas') ?></h3>
+            <p><?= htmlspecialchars($TEXTOS['explicacion_favoritos'] ?? 'Cuando encuentres obras que te gusten, puedes guardarlas como favoritas haciendo clic en el corazón.') ?></p>
+            <div class="no-favoritos-acciones">
+                <a href="<?= BASE_URL; ?>/public/explorar.php" class="btn btn-gradient">
+                    <i class="fas fa-compass"></i> <?= htmlspecialchars($TEXTOS['explorar_obras'] ?? 'Explorar obras') ?>
+                </a>
+                <a href="<?= BASE_URL; ?>/public/buscar.php" class="btn btn-outline">
+                    <i class="fas fa-search"></i> <?= htmlspecialchars($TEXTOS['buscar_obras'] ?? 'Buscar obras') ?>
+                </a>
+            </div>
+        </div>
+    <?php endif; ?>
 </div>
 
-<!-- Estilos CSS -->
 <style>
-.favoritos-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-}
-
-.page-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 30px;
-    padding-bottom: 20px;
-    border-bottom: 2px solid #f0f0f0;
-}
-
-.page-title h1 {
-    margin: 0;
-    color: #333;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.page-title h1 i {
-    color: #e74c3c;
-}
-
-.page-title p {
-    margin: 5px 0 0 0;
-    color: #666;
-}
-
-.page-stats {
-    display: flex;
-    gap: 20px;
-}
-
-.stat-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: #666;
-    font-weight: 500;
-}
-
-.stat-item i {
-    color: #4361ee;
-}
-
-.filtros-container {
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    padding: 20px;
-    margin-bottom: 30px;
-}
-
-.filtros-form {
-    display: flex;
-    gap: 20px;
-    align-items: end;
-    flex-wrap: wrap;
-}
-
-.filtro-grupo {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-}
-
-.filtro-grupo label {
-    font-weight: 500;
-    color: #333;
-    font-size: 14px;
-}
-
-.filtro-grupo select {
-    padding: 8px 12px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    font-size: 14px;
-    min-width: 150px;
-}
-
-.obras-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 25px;
-}
-
-.obra-card {
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    overflow: hidden;
-    transition: all 0.3s ease;
-    position: relative;
-}
-
-.obra-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-}
-
-.obra-portada {
-    height: 200px;
-    overflow: hidden;
-    position: relative;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-
-.obra-portada img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.portada-placeholder {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: rgba(255,255,255,0.8);
-    font-size: 48px;
-}
-
-.btn-quitar-favorito {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: rgba(231, 76, 60, 0.9);
-    color: white;
+body { background: #fafbfc; }
+.container-favoritos { max-width: 1220px; margin: 40px auto 0 auto; padding: 0 24px; }
+.favoritos-header { margin-bottom: 30px; }
+.favoritos-header h1 { font-size: 2.2rem; color: #c0392b; margin-bottom: 0; }
+.favoritos-header p { color: #666; margin: 8px 0 20px 1px; font-size: 1.08rem; }
+.favoritos-stats { margin-bottom: 12px; }
+.stat-item { display: flex; align-items: center; gap: 8px; color: #666; font-weight: 500; }
+.favoritos-filtros { background: #fff; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); padding: 20px 18px 10px 18px; margin-bottom: 32px; }
+.filtros-form { display: flex; gap: 18px; align-items: flex-end; flex-wrap: wrap; }
+.filtro-grupo { display: flex; flex-direction: column; gap: 5px; }
+.filtro-grupo label { font-weight: 600; color: #333; font-size: 14px; }
+.filtro-grupo select { padding: 8px 12px; border: 1px solid #ddd; border-radius: 7px; font-size: 15px; min-width: 145px; }
+.btn-gradient {
+    background: linear-gradient(90deg, #7b2ff2 0%, #f357a8 100%);
+    color: #fff;
     border: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.2s;
-    opacity: 0.8;
+    border-radius: 11px;
+    padding: 12px 28px;
+    font-size: 1.01rem;
+    font-weight: 700;
+    box-shadow: 0 6px 24px rgba(123,47,242,0.10);
+    transition: box-shadow 0.2s, transform 0.2s;
 }
-
-.btn-quitar-favorito:hover {
-    opacity: 1;
-    transform: scale(1.1);
-    background: #e74c3c;
-}
-
-.obra-info {
-    padding: 20px;
-}
-
-.obra-header {
-    margin-bottom: 15px;
-}
-
-.obra-header h3 {
-    margin: 0 0 8px 0;
-    font-size: 18px;
-    color: #333;
-    line-height: 1.3;
-}
-
-.obra-badges {
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-}
-
-.badge {
-    padding: 3px 8px;
-    border-radius: 12px;
-    font-size: 11px;
-    font-weight: 500;
-    text-transform: uppercase;
-}
-
-.badge-tipo {
-    background: #e3f2fd;
-    color: #1976d2;
-}
-
-.badge-categoria {
-    background: #f3e5f5;
-    color: #7b1fa2;
-}
-
-.badge-adulto {
-    background: #ffebee;
-    color: #d32f2f;
-}
-
-.obra-autor {
-    color: #666;
-    margin: 10px 0;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 14px;
-}
-
-.obra-descripcion {
-    color: #555;
-    line-height: 1.5;
-    margin: 12px 0;
-    font-size: 14px;
-}
-
-.obra-stats {
-    display: flex;
-    gap: 15px;
-    margin: 15px 0;
-    font-size: 13px;
-    color: #777;
-}
-
-.obra-stats span {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-}
-
-.obra-acciones {
-    display: flex;
-    gap: 10px;
-    margin-top: 15px;
-}
-
-.btn {
-    padding: 8px 16px;
-    border-radius: 6px;
-    text-decoration: none;
-    font-weight: 500;
-    font-size: 14px;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    transition: all 0.2s;
-    border: none;
-    cursor: pointer;
-}
-
-.btn-primary {
-    background: #4361ee;
-    color: white;
-}
-
-.btn-primary:hover {
-    background: #3a56d4;
-}
-
+.btn-gradient:hover { transform: translateY(-2px) scale(1.04); box-shadow: 0 12px 40px rgba(123,47,242,0.12);}
 .btn-outline {
-    background: transparent;
-    border: 1px solid #ddd;
-    color: #666;
-}
-
-.btn-outline:hover {
-    border-color: #4361ee;
-    color: #4361ee;
-}
-
-.no-favoritos {
-    text-align: center;
-    padding: 60px 20px;
     background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    color: #7b2ff2;
+    border: 2px solid #e2d8f7;
+    border-radius: 11px;
+    padding: 12px 28px;
+    font-size: 1.01rem;
+    font-weight: 700;
+    transition: background 0.2s, color 0.2s;
 }
-
-.no-favoritos-icon {
-    font-size: 64px;
-    color: #ddd;
-    margin-bottom: 20px;
+.btn-outline:hover {
+    background: linear-gradient(90deg, #7b2ff2 0%, #f357a8 100%);
+    color: #fff;
 }
-
-.no-favoritos h3 {
-    color: #333;
-    margin-bottom: 10px;
+.obras-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); gap: 28px; }
+.obra-card { background: #fff; border-radius: 13px; box-shadow: 0 4px 24px rgba(123,47,242,0.07); overflow: hidden; transition: box-shadow .2s, transform .2s; position: relative; }
+.obra-card:hover { transform: translateY(-6px) scale(1.02); box-shadow: 0 8px 32px rgba(123,47,242,0.13); }
+.obra-portada { height: 180px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); position: relative; display: flex; justify-content: center; align-items: center; }
+.obra-portada img { width: 100%; height: 100%; object-fit: cover; }
+.portada-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #fff9; font-size: 48px; }
+.btn-quitar-favorito, .btn-compartir {
+    position: absolute; top: 10px; width: 38px; height: 38px; border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center; font-size: 17px; cursor: pointer; transition: background 0.2s, color 0.2s;
 }
-
-.no-favoritos p {
-    color: #666;
-    margin-bottom: 30px;
-    max-width: 400px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.no-favoritos-acciones {
-    display: flex;
-    gap: 15px;
-    justify-content: center;
-    flex-wrap: wrap;
-}
-
-@media (max-width: 768px) {
-    .page-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 15px;
-    }
-    
-    .filtros-form {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    
-    .filtro-grupo {
-        width: 100%;
-    }
-    
-    .obras-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .obra-acciones {
-        flex-direction: column;
-    }
-    
-    .no-favoritos-acciones {
-        flex-direction: column;
-        align-items: center;
-    }
+.btn-quitar-favorito { right: 10px; background: #e74c3c; color: #fff; z-index: 2; }
+.btn-quitar-favorito:hover { background: #c0392b; }
+.btn-compartir { right: 54px; background: #fff; color: #7b2ff2; border: 2px solid #e2d8f7; }
+.btn-compartir:hover { background: #7b2ff2; color: #fff; }
+.obra-info { padding: 22px 20px 19px 20px; }
+.obra-header h3 { margin: 0 0 9px 0; font-size: 1.18rem; color: #222; }
+.obra-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+.badge { padding: 3px 9px; border-radius: 11px; font-size: 12px; font-weight: 600; text-transform: uppercase; }
+.badge-tipo { background: #e3f2fd; color: #7b2ff2; }
+.badge-categoria { background: #f3e5f5; color: #f357a8; }
+.badge-adulto { background: #ffebee; color: #d32f2f; }
+.obra-autor { color: #666; margin: 10px 0 0 0; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 7px; }
+.obra-descripcion { color: #555; line-height: 1.5; margin: 12px 0 0 0; font-size: 14px; }
+.obra-stats { display: flex; gap: 15px; margin: 13px 0 0 0; font-size: 13px; color: #777; }
+.obra-stats span { display: flex; align-items: center; gap: 4px; }
+.obra-acciones { display: flex; gap: 9px; margin-top: 13px; }
+.no-favoritos { text-align: center; padding: 60px 20px; background: #fff; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.06);}
+.no-favoritos-icon { font-size: 64px; color: #ddd; margin-bottom: 20px;}
+.no-favoritos h3 { color: #c0392b; margin-bottom: 10px;}
+.no-favoritos p { color: #666; margin-bottom: 30px; max-width: 400px; margin-left: auto; margin-right: auto;}
+.no-favoritos-acciones { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; }
+@media (max-width: 900px) {
+    .obras-grid { grid-template-columns: 1fr; }
+    .container-favoritos { padding: 0 7px; }
+    .favoritos-header h1 { font-size: 1.4rem;}
 }
 </style>
 
-<!-- JavaScript para funcionalidad -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Manejar botones de quitar favorito
     document.querySelectorAll('.btn-quitar-favorito').forEach(button => {
         button.addEventListener('click', function(e) {
             e.preventDefault();
             const obraId = this.dataset.obraId;
             const tipo = this.dataset.tipo;
-            
-            if (confirm('¿Estás seguro de que quieres quitar esta obra de tus favoritos?')) {
+            if (confirm('<?= addslashes($TEXTOS['confirmar_quitar_favorito'] ?? "¿Estás seguro de que quieres quitar esta obra de tus favoritos?") ?>')) {
                 quitarDeFavoritos(obraId, tipo);
             }
         });
     });
-    
-    // Función para quitar de favoritos
     function quitarDeFavoritos(obraId, tipo) {
-        fetch('<?php echo BASE_URL; ?>/controllers/procesar-favoritos.php', {
+        fetch('<?php echo BASE_URL; ?>/controllers/procesar-favorito.php', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: `accion=quitar&obra_id=${obraId}&tipo=${tipo}`
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded', },
+            body: `accion=quitar&contenido_id=${obraId}&tipo_contenido=${tipo}`
         })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                // Remover la tarjeta de la vista
                 const card = document.querySelector(`[data-obra-id="${obraId}"][data-tipo="${tipo}"]`);
                 if (card) {
                     card.style.animation = 'fadeOut 0.3s ease-out';
                     setTimeout(() => {
                         card.remove();
-                        
-                        // Si no quedan obras, mostrar mensaje
                         if (document.querySelectorAll('.obra-card').length === 0) {
                             location.reload();
                         }
                     }, 300);
                 }
-                
-                // Mostrar mensaje de éxito
-                mostrarMensaje('Obra quitada de favoritos', 'success');
             } else {
-                mostrarMensaje('Error al quitar de favoritos', 'error');
+                alert('<?= addslashes($TEXTOS['error_quitar_favorito'] ?? "Error al quitar de favoritos") ?>');
             }
         })
         .catch(error => {
-            console.error('Error:', error);
-            mostrarMensaje('Error de conexión', 'error');
+            alert('<?= addslashes($TEXTOS['error_conexion'] ?? "Error de conexión") ?>');
         });
     }
-    
-    // Función para mostrar mensajes
-    function mostrarMensaje(mensaje, tipo) {
-        const alerta = document.createElement('div');
-        alerta.className = `alerta alerta-${tipo}`;
-        alerta.textContent = mensaje;
-        alerta.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1000;
-            padding: 12px 20px;
-            border-radius: 6px;
-            color: white;
-            font-weight: 500;
-            animation: slideIn 0.3s ease-out;
-        `;
-        
-        if (tipo === 'success') {
-            alerta.style.background = '#27ae60';
-        } else {
-            alerta.style.background = '#e74c3c';
-        }
-        
-        document.body.appendChild(alerta);
-        
-        setTimeout(() => {
-            alerta.remove();
-        }, 3000);
-    }
-});
 
-// Animaciones CSS
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes fadeOut {
-        from { opacity: 1; transform: scale(1); }
-        to { opacity: 0; transform: scale(0.8); }
-    }
-    
-    @keyframes slideIn {
-        from { transform: translateX(100%); opacity: 0; }
-        to { transform: translateX(0); opacity: 1; }
-    }
-`;
-document.head.appendChild(style);
+    document.querySelectorAll('.btn-compartir').forEach(button => {
+        button.addEventListener('click', function() {
+            const url = this.dataset.url;
+            const titulo = this.dataset.titulo;
+            if (navigator.share) {
+                navigator.share({ title: titulo, text: titulo, url: url });
+            } else {
+                navigator.clipboard.writeText(url).then(() => {
+                    alert('<?= addslashes($TEXTOS['copiado_portapapeles'] ?? "Enlace copiado al portapapeles") ?>');
+                });
+            }
+        });
+    });
+});
 </script>
 
 <?php include_once(__DIR__ . '/../includes/footer.php'); ?>
