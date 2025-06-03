@@ -1,3 +1,4 @@
+
 <?php
 /**
  * Página de inicio adaptada y mejorada
@@ -93,18 +94,18 @@ $stats = $result_stats->fetch_assoc();
             <!-- IZQUIERDA -->
             <div class="col-lg-7 col-md-12">
                 <h1 class="hero-title mb-4 text-center text-lg-start">
-                    <span class="d-block fw-bold" style="font-size:clamp(2.5rem,7vw,4.5rem);line-height:1.0;">Descubre<br>historias y mundos</span>
-                    <span class="fs-3 fw-normal d-block mt-2">Tu universo de literatura, cómics y manga</span>
+                    <span class="d-block fw-bold" style="font-size:clamp(2.5rem,7vw,4.5rem);line-height:1.0;"><?= $TEXTOS['descubre_historias'] ?></span>
+                    <span class="fs-3 fw-normal d-block mt-2"><?= $TEXTOS['universo_literatura'] ?></span>
                 </h1>
                 <p class="hero-subtitle mb-4 text-center text-lg-start">
-                    Explora, comparte y disfruta de la lectura sin límites. Únete a una comunidad vibrante de lectores y creadores.
+                    <?= $TEXTOS['explora_comparte'] ?>
                 </p>
                 <div class="d-flex flex-column flex-md-row gap-3 justify-content-center justify-content-lg-start mb-3">
                     <a href="<?php echo BASE_URL; ?>/public/register.php" class="btn btn-primary btn-lg px-4">
-                        <i class="fas fa-rocket"></i> Únete Gratis
+                        <i class="fas fa-rocket"></i> <?= $TEXTOS['unete_gratis'] ?>
                     </a>
                     <a href="<?php echo BASE_URL; ?>/public/explorar.php" class="btn btn-outline-light btn-lg px-4">
-                        <i class="fas fa-compass"></i> Explorar
+                        <i class="fas fa-compass"></i> <?= $TEXTOS['explorar'] ?>
                     </a>
                 </div>
             </div>
@@ -115,283 +116,27 @@ $stats = $result_stats->fetch_assoc();
                         <span class="stat-icon"><i class="fas fa-book"></i></span>
                         <span>
                             <span class="stat-number"><?php echo number_format($stats['total_libros'] + $stats['total_comics']); ?></span>
-                            <span class="stat-label">Obras</span>
+                            <span class="stat-label"><?= $TEXTOS['obras'] ?></span>
                         </span>
                     </div>
                     <div>
                         <span class="stat-icon"><i class="fas fa-user-friends"></i></span>
                         <span>
                             <span class="stat-number"><?php echo number_format($stats['total_usuarios']); ?></span>
-                            <span class="stat-label">Lectores</span>
+                            <span class="stat-label"><?= $TEXTOS['lectores'] ?></span>
                         </span>
                     </div>
                     <div>
                         <span class="stat-icon"><i class="fas fa-tags"></i></span>
                         <span>
                             <span class="stat-number"><?php echo $stats['total_categorias']; ?></span>
-                            <span class="stat-label">Géneros</span>
+                            <span class="stat-label"><?= $TEXTOS['generos'] ?></span>
                         </span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</section>
-
-<!-- Explora categorías -->
-<section class="explore-section">
-  <div class="container">
-    <h2 class="section-title">Explora por género</h2>
-    <div class="row justify-content-center align-items-stretch g-4">
-      <!-- Literatura -->
-      <div class="col-12 col-md-6 col-lg-5 d-flex">
-        <div class="content-type-card literatura-card flex-fill">
-          <div class="card-icon">
-            <i class="fas fa-feather-alt"></i>
-          </div>
-          <h3>Literatura</h3>
-          <p>Novelas, poesía y relatos para todos los gustos.</p>
-          <div class="d-flex flex-column align-items-center gap-2 mt-4">
-            <span class="badge">
-              <i class="fas fa-book"></i>
-              <?php echo number_format($stats['total_libros']); ?> OBRAS
-            </span>
-            <a href="literatura.php" class="explore-btn">
-              <i class="fas fa-arrow-right"></i> Ver Literatura
-            </a>
-          </div>
-        </div>
-      </div>
-      <!-- Cómics y Manga -->
-      <div class="col-12 col-md-6 col-lg-5 d-flex">
-        <div class="content-type-card comics-card flex-fill">
-          <div class="card-icon">
-            <i class="fas fa-palette"></i>
-          </div>
-          <h3>Cómics y Manga</h3>
-          <p>Historietas, manga y aventuras gráficas.</p>
-          <div class="d-flex flex-column align-items-center gap-2 mt-4">
-            <span class="badge">
-              <i class="fas fa-image"></i>
-              <?php echo number_format($stats['total_comics']); ?> OBRAS
-            </span>
-            <a href="comics.php" class="explore-btn">
-              <i class="fas fa-arrow-right"></i> Ver Cómics
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Obras Destacadas -->
-<section class="featured-section">
-  <div class="container">
-    <div class="section-header">
-      <div>
-        <h2 class="section-title">
-          <span class="icon-star"><i class="fas fa-star"></i></span>
-          Obras Destacadas
-        </h2>
-        <div class="section-subtitle">
-          Selección especial para ti
-        </div>
-      </div>
-      <a href="explorar.php" class="view-all-link">
-        <span class="icon-view"><i class="fas fa-eye"></i></span>
-        Ver todas
-      </a>
-    </div>
-    <div class="row g-4">
-      <?php if($result_destacados && $result_destacados->num_rows > 0): ?>
-        <?php while($obra = $result_destacados->fetch_assoc()): ?>
-          <div class="col-12 col-md-6 col-lg-4 d-flex">
-            <a href="<?= BASE_URL ?>/public/obra.php?id=<?= $obra['id'] ?>&tipo=<?= $obra['tipo'] ?>" class="featured-card obra-card flex-fill text-decoration-none">
-              <div class="obra-image">
-                <img src="<?= htmlspecialchars($obra['portada'] ?? 'default.jpg') ?>" alt="<?= htmlspecialchars($obra['titulo']) ?>" class="img-fluid rounded-4 shadow" style="object-fit:cover; width:100%;height:230px;max-height:230px;">
-              </div>
-              <div class="obra-content py-3">
-                <div class="obra-badges mb-2">
-                  <span class="badge badge-libro"><i class="fas fa-book"></i> <?= ucfirst($obra['tipo']) ?></span>
-                  <?php
-                  // Muestra las categorías (multi)
-                  if ($obra['tipo'] === 'libro') {
-                    $cats_q = $conexion->query("SELECT c.nombre FROM libro_categorias lc JOIN categorias c ON lc.categoria_id = c.id WHERE lc.libro_id = {$obra['id']}");
-                  } else {
-                    $cats_q = $conexion->query("SELECT c.nombre FROM comic_categorias cc JOIN categorias c ON cc.categoria_id = c.id WHERE cc.comic_id = {$obra['id']}");
-                  }
-                  while($cat = $cats_q->fetch_assoc()) {
-                    echo '<span class="badge badge-categoria">'.htmlspecialchars($cat['nombre']).'</span> ';
-                  }
-                  ?>
-                  <?php if(!empty($obra['publico_adulto'])): ?>
-                    <span class="badge badge-adulto"><i class="fas fa-exclamation-triangle"></i> +18</span>
-                  <?php endif; ?>
-                </div>
-                <div class="obra-title"><?= htmlspecialchars($obra['titulo']) ?></div>
-                <div class="obra-author">por <?= htmlspecialchars($obra['autor']) ?></div>
-                <div class="obra-description"><?= htmlspecialchars($obra['descripcion']) ?></div>
-                <div class="obra-stats mt-2">
-                  <span class="stat"><i class="fas fa-eye"></i> <?= (int)$obra['visitas'] ?></span>
-                  <span class="stat"><i class="fas fa-heart"></i> <?= (int)($obra['valoracion'] ?? 0) ?></span>
-                </div>
-              </div>
-            </a>
-          </div>
-        <?php endwhile; ?>
-      <?php else: ?>
-        <div class="col-12">
-          <div class="empty-featured">
-            <div class="big-icon">
-              <i class="fas fa-star"></i>
-            </div>
-            <div class="empty-title">
-              ¡Próximamente obras destacadas!
-            </div>
-            <div class="empty-desc">
-              Estamos preparando contenido increíble para ti
-            </div>
-          </div>
-        </div>
-      <?php endif; ?>
-    </div>
-  </div>
-</section>
-
-<!-- Tabs de Recientes, Populares, Categorías -->
-<section class="dynamic-content py-5 bg-light">
-  <div class="container">
-    <div class="content-tabs bg-white rounded-4 p-4 shadow-sm" data-aos="fade-up">
-      <div class="tab-buttons d-flex gap-3 mb-4 border-bottom justify-content-center">
-        <button class="tab-btn btn btn-link active" data-tab="recientes">
-          <i class="fas fa-clock"></i> <span class="fw-semibold">Recientes</span>
-        </button>
-        <button class="tab-btn btn btn-link" data-tab="populares">
-          <i class="fas fa-fire"></i> <span class="fw-semibold">Populares</span>
-        </button>
-        <button class="tab-btn btn btn-link" data-tab="categorias">
-          <i class="fas fa-tags"></i> <span class="fw-semibold">Categorías</span>
-        </button>
-      </div>
-      <!-- Tab Recientes -->
-      <div class="tab-content active" id="tab-recientes">
-        <div class="row obras-carousel g-4 justify-content-start">
-          <?php if ($result_recientes && $result_recientes->num_rows > 0): ?>
-            <?php while ($obra = $result_recientes->fetch_assoc()): ?>
-              <div class="col-12 col-sm-6 col-md-4 col-lg-3 d-flex">
-                <a href="<?= BASE_URL ?>/public/obra.php?id=<?= $obra['id'] ?>&tipo=<?= $obra['tipo'] ?>" class="recent-card-link w-100 text-decoration-none">
-                  <div class="recent-card position-relative w-100">
-                    <div class="recent-image mb-2">
-                      <?php if (!empty($obra['portada'])): ?>
-                        <img src="<?= BASE_URL ?>/uploads/portadas/<?= htmlspecialchars($obra['portada']) ?>"
-                          alt="<?= htmlspecialchars($obra['titulo']) ?>" class="portada-obra">
-                      <?php else: ?>
-                        <div class="recent-placeholder d-flex align-items-center justify-content-center portada-obra">
-                          <i class="fas fa-book fa-2x text-muted"></i>
-                        </div>
-                      <?php endif; ?>
-                    </div>
-                    <div class="recent-title"><?= htmlspecialchars($obra['titulo']) ?></div>
-                    <div class="recent-author">
-                      <i class="fas fa-user"></i> <?= htmlspecialchars($obra['autor']) ?>
-                    </div>
-                    <div class="recent-categorias mb-2">
-                      <?php
-                      if ($obra['tipo'] === 'libro') {
-                        $cats_q = $conexion->query("SELECT c.nombre FROM libro_categorias lc JOIN categorias c ON lc.categoria_id=c.id WHERE lc.libro_id={$obra['id']}");
-                      } else {
-                        $cats_q = $conexion->query("SELECT c.nombre FROM comic_categorias cc JOIN categorias c ON cc.categoria_id=c.id WHERE cc.comic_id={$obra['id']}");
-                      }
-                      while($cat = $cats_q->fetch_assoc()) {
-                        echo '<span class="badge badge-categoria me-1">'.htmlspecialchars($cat['nombre']).'</span>';
-                      }
-                      ?>
-                    </div>
-                    <span class="badge recent-type-badge"><?= strtoupper($obra['tipo']) ?></span>
-                  </div>
-                </a>
-              </div>
-            <?php endwhile; ?>
-          <?php else: ?>
-            <div class="col-12 text-center text-muted py-5">No hay obras recientes aún.</div>
-          <?php endif; ?>
-        </div>
-      </div>
-
-      <!-- Tab Populares -->
-      <div class="tab-content" id="tab-populares">
-        <div class="row obras-carousel g-4 justify-content-start">
-          <?php if ($result_populares && $result_populares->num_rows > 0): ?>
-            <?php while ($obra = $result_populares->fetch_assoc()): ?>
-              <div class="col-12 col-sm-6 col-md-4 col-lg-3 d-flex">
-                <a href="<?= BASE_URL ?>/public/obra.php?id=<?= $obra['id'] ?>&tipo=<?= $obra['tipo'] ?>" class="recent-card-link w-100 text-decoration-none">
-                  <div class="recent-card position-relative w-100">
-                    <div class="recent-image mb-2">
-                      <?php if (!empty($obra['portada'])): ?>
-                        <img src="<?= BASE_URL ?>/uploads/portadas/<?= htmlspecialchars($obra['portada']) ?>"
-                          alt="<?= htmlspecialchars($obra['titulo']) ?>" class="portada-obra">
-                      <?php else: ?>
-                        <div class="recent-placeholder d-flex align-items-center justify-content-center portada-obra">
-                          <i class="fas fa-book fa-2x text-muted"></i>
-                        </div>
-                      <?php endif; ?>
-                    </div>
-                    <div class="recent-title"><?= htmlspecialchars($obra['titulo']) ?></div>
-                    <div class="recent-author">
-                      <i class="fas fa-user"></i> <?= htmlspecialchars($obra['autor']) ?>
-                    </div>
-                    <div class="mini-stats d-flex justify-content-center gap-2 mb-1">
-                      <span><i class="fas fa-eye"></i> <?= number_format($obra['visitas'] ?? 0) ?></span>
-                    </div>
-                    <div class="recent-categorias mb-2">
-                      <?php
-                      if ($obra['tipo'] === 'libro') {
-                        $cats_q = $conexion->query("SELECT c.nombre FROM libro_categorias lc JOIN categorias c ON lc.categoria_id=c.id WHERE lc.libro_id={$obra['id']}");
-                      } else {
-                        $cats_q = $conexion->query("SELECT c.nombre FROM comic_categorias cc JOIN categorias c ON cc.categoria_id=c.id WHERE cc.comic_id={$obra['id']}");
-                      }
-                      while($cat = $cats_q->fetch_assoc()) {
-                        echo '<span class="badge badge-categoria me-1">'.htmlspecialchars($cat['nombre']).'</span>';
-                      }
-                      ?>
-                    </div>
-                    <span class="badge recent-type-badge"><?= strtoupper($obra['tipo']) ?></span>
-                  </div>
-                </a>
-              </div>
-            <?php endwhile; ?>
-          <?php else: ?>
-            <div class="col-12 text-center text-muted py-5">No hay obras populares aún.</div>
-          <?php endif; ?>
-        </div>
-      </div>
-
-      <!-- Tab Categorías -->
-      <div class="tab-content" id="tab-categorias">
-        <div class="row categorias-grid g-3">
-          <?php if ($result_categorias && $result_categorias->num_rows > 0): ?>
-            <?php while ($categoria = $result_categorias->fetch_assoc()): ?>
-              <div class="col-12 col-md-6 col-lg-4">
-                <a href="<?= BASE_URL ?>/public/categoria.php?id=<?= $categoria['id']; ?>&tipo=<?= $categoria['tipo']; ?>" 
-                  class="categoria-item d-flex align-items-center gap-3 p-3 bg-light rounded-3 text-decoration-none text-dark shadow-sm h-100">
-                  <div class="categoria-icon d-flex align-items-center justify-content-center">
-                    <i class="fas <?= $categoria['tipo'] == 'libro' ? 'fa-book' : 'fa-book-open'; ?>"></i>
-                  </div>
-                  <div class="categoria-info">
-                    <h4 class="mb-1"><?= htmlspecialchars($categoria['nombre']); ?></h4>
-                    <span class="categoria-count small"><?= $categoria['total_obras']; ?> obras</span>
-                  </div>
-                </a>
-              </div>
-            <?php endwhile; ?>
-          <?php else: ?>
-            <div class="col-12 text-center text-muted py-5">No hay categorías con obras aún.</div>
-          <?php endif; ?>
-        </div>
-      </div>
-    </div>
-  </div>
 </section>
 
 <style>
@@ -706,12 +451,268 @@ $stats = $result_stats->fetch_assoc();
 }
 </style>
 
+<!-- Explora categorías -->
+<section class="explore-section">
+  <div class="container">
+    <h2 class="section-title"><?= $TEXTOS['explora_genero'] ?></h2>
+    <div class="row justify-content-center align-items-stretch g-4">
+      <!-- Literatura -->
+      <div class="col-12 col-md-6 col-lg-5 d-flex">
+        <div class="content-type-card literatura-card flex-fill">
+          <div class="card-icon">
+            <i class="fas fa-feather-alt"></i>
+          </div>
+          <h3><?= $TEXTOS['literatura'] ?></h3>
+          <p><?= $TEXTOS['literatura_desc'] ?></p>
+          <div class="d-flex flex-column align-items-center gap-2 mt-4">
+            <span class="badge">
+              <i class="fas fa-book"></i>
+              <?php echo number_format($stats['total_libros']); ?> <?= strtoupper($TEXTOS['obras']) ?>
+            </span>
+            <a href="literatura.php" class="explore-btn">
+              <i class="fas fa-arrow-right"></i> <?= $TEXTOS['ver_literatura'] ?>
+            </a>
+          </div>
+        </div>
+      </div>
+      <!-- Cómics y Manga -->
+      <div class="col-12 col-md-6 col-lg-5 d-flex">
+        <div class="content-type-card comics-card flex-fill">
+          <div class="card-icon">
+            <i class="fas fa-palette"></i>
+          </div>
+          <h3><?= $TEXTOS['comics_manga'] ?></h3>
+          <p><?= $TEXTOS['comics_manga_desc'] ?></p>
+          <div class="d-flex flex-column align-items-center gap-2 mt-4">
+            <span class="badge">
+              <i class="fas fa-image"></i>
+              <?php echo number_format($stats['total_comics']); ?> <?= strtoupper($TEXTOS['obras']) ?>
+            </span>
+            <a href="comics.php" class="explore-btn">
+              <i class="fas fa-arrow-right"></i> <?= $TEXTOS['ver_comics'] ?>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Obras Destacadas -->
+<section class="featured-section">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <h2 class="section-title">
+          <span class="icon-star"><i class="fas fa-star"></i></span>
+          <?= $TEXTOS['obras_destacadas'] ?>
+        </h2>
+        <div class="section-subtitle">
+          <?= $TEXTOS['seleccion_especial'] ?>
+        </div>
+      </div>
+      <a href="explorar.php" class="view-all-link">
+        <span class="icon-view"><i class="fas fa-eye"></i></span>
+        <?= $TEXTOS['ver_todas'] ?>
+      </a>
+    </div>
+    <div class="row g-4">
+      <?php if($result_destacados && $result_destacados->num_rows > 0): ?>
+        <?php while($obra = $result_destacados->fetch_assoc()): ?>
+          <div class="col-12 col-md-6 col-lg-4 d-flex">
+            <a href="<?= BASE_URL ?>/public/obra.php?id=<?= $obra['id'] ?>&tipo=<?= $obra['tipo'] ?>" class="featured-card obra-card flex-fill text-decoration-none">
+              <div class="obra-image">
+                <img src="<?= htmlspecialchars($obra['portada'] ?? 'default.jpg') ?>" alt="<?= htmlspecialchars($obra['titulo']) ?>" class="img-fluid rounded-4 shadow" style="object-fit:cover; width:100%;height:210px;">
+              </div>
+              <div class="obra-content py-3">
+                <div class="obra-badges mb-2">
+                  <span class="badge badge-libro"><i class="fas fa-book"></i> <?= ucfirst($obra['tipo']) ?></span>
+                  <?php
+                  // Muestra las categorías (multi)
+                  if ($obra['tipo'] === 'libro') {
+                    $cats_q = $conexion->query("SELECT c.nombre FROM libro_categorias lc JOIN categorias c ON lc.categoria_id = c.id WHERE lc.libro_id = {$obra['id']}");
+                  } else {
+                    $cats_q = $conexion->query("SELECT c.nombre FROM comic_categorias cc JOIN categorias c ON cc.categoria_id = c.id WHERE cc.comic_id = {$obra['id']}");
+                  }
+                  while($cat = $cats_q->fetch_assoc()) {
+                    echo '<span class="badge badge-categoria">'.htmlspecialchars($cat['nombre']).'</span> ';
+                  }
+                  ?>
+                  <?php if(!empty($obra['publico_adulto'])): ?>
+                    <span class="badge badge-adulto"><i class="fas fa-exclamation-triangle"></i> +18</span>
+                  <?php endif; ?>
+                </div>
+                <div class="obra-title"><?= htmlspecialchars($obra['titulo']) ?></div>
+                <div class="obra-author"><?= $TEXTOS['por'] ?? 'por' ?> <?= htmlspecialchars($obra['autor']) ?></div>
+                <div class="obra-description"><?= htmlspecialchars($obra['descripcion']) ?></div>
+                <div class="obra-stats mt-2">
+                  <span class="stat"><i class="fas fa-eye"></i> <?= (int)$obra['visitas'] ?></span>
+                  <span class="stat"><i class="fas fa-heart"></i> <?= (int)($obra['valoracion'] ?? 0) ?></span>
+                </div>
+              </div>
+            </a>
+          </div>
+        <?php endwhile; ?>
+      <?php else: ?>
+        <div class="col-12">
+          <div class="empty-featured">
+            <div class="big-icon">
+              <i class="fas fa-star"></i>
+            </div>
+            <div class="empty-title">
+              <?= $TEXTOS['proximamente_destacadas'] ?>
+            </div>
+            <div class="empty-desc">
+              <?= $TEXTOS['preparando_contenido'] ?>
+            </div>
+          </div>
+        </div>
+      <?php endif; ?>
+    </div>
+  </div>
+</section>
+
+<!-- Tabs de Recientes, Populares, Categorías -->
+<section class="dynamic-content py-5 bg-light">
+  <div class="container">
+    <div class="content-tabs bg-white rounded-4 p-4 shadow-sm" data-aos="fade-up">
+      <div class="tab-buttons d-flex gap-3 mb-4 border-bottom justify-content-center">
+        <button class="tab-btn btn btn-link active" data-tab="recientes">
+          <i class="fas fa-clock"></i> <span class="fw-semibold"><?= $TEXTOS['recientes'] ?></span>
+        </button>
+        <button class="tab-btn btn btn-link" data-tab="populares">
+          <i class="fas fa-fire"></i> <span class="fw-semibold"><?= $TEXTOS['populares'] ?></span>
+        </button>
+        <button class="tab-btn btn btn-link" data-tab="categorias">
+          <i class="fas fa-tags"></i> <span class="fw-semibold"><?= $TEXTOS['categorias'] ?></span>
+        </button>
+      </div>
+      <!-- Tab Recientes -->
+      <div class="tab-content active" id="tab-recientes">
+        <div class="row obras-carousel g-4 justify-content-start">
+          <?php if ($result_recientes && $result_recientes->num_rows > 0): ?>
+            <?php while ($obra = $result_recientes->fetch_assoc()): ?>
+              <div class="col-12 col-sm-6 col-md-4 col-lg-3 d-flex">
+                <a href="<?= BASE_URL ?>/public/obra.php?id=<?= $obra['id'] ?>&tipo=<?= $obra['tipo'] ?>" class="recent-card-link w-100 text-decoration-none">
+                  <div class="recent-card position-relative w-100">
+                    <div class="recent-image mb-2">
+                      <?php if (!empty($obra['portada'])): ?>
+                        <img src="<?= BASE_URL ?>/uploads/portadas/<?= htmlspecialchars($obra['portada']) ?>"
+                          alt="<?= htmlspecialchars($obra['titulo']) ?>" class="portada-obra">
+                      <?php else: ?>
+                        <div class="recent-placeholder d-flex align-items-center justify-content-center portada-obra">
+                          <i class="fas fa-book fa-2x text-muted"></i>
+                        </div>
+                      <?php endif; ?>
+                    </div>
+                    <div class="recent-title"><?= htmlspecialchars($obra['titulo']) ?></div>
+                    <div class="recent-author">
+                      <i class="fas fa-user"></i> <?= htmlspecialchars($obra['autor']) ?>
+                    </div>
+                    <div class="recent-categorias mb-2">
+                      <?php
+                      if ($obra['tipo'] === 'libro') {
+                        $cats_q = $conexion->query("SELECT c.nombre FROM libro_categorias lc JOIN categorias c ON lc.categoria_id=c.id WHERE lc.libro_id={$obra['id']}");
+                      } else {
+                        $cats_q = $conexion->query("SELECT c.nombre FROM comic_categorias cc JOIN categorias c ON cc.categoria_id=c.id WHERE cc.comic_id={$obra['id']}");
+                      }
+                      while($cat = $cats_q->fetch_assoc()) {
+                        echo '<span class="badge badge-categoria me-1">'.htmlspecialchars($cat['nombre']).'</span>';
+                      }
+                      ?>
+                    </div>
+                    <span class="badge recent-type-badge"><?= strtoupper($obra['tipo']) ?></span>
+                  </div>
+                </a>
+              </div>
+            <?php endwhile; ?>
+          <?php else: ?>
+            <div class="col-12 text-center text-muted py-5"><?= $TEXTOS['no_hay_recientes'] ?></div>
+          <?php endif; ?>
+        </div>
+      </div>
+
+      <!-- Tab Populares -->
+      <div class="tab-content" id="tab-populares">
+        <div class="row obras-carousel g-4 justify-content-start">
+          <?php if ($result_populares && $result_populares->num_rows > 0): ?>
+            <?php while ($obra = $result_populares->fetch_assoc()): ?>
+              <div class="col-12 col-sm-6 col-md-4 col-lg-3 d-flex">
+                <a href="<?= BASE_URL ?>/public/obra.php?id=<?= $obra['id'] ?>&tipo=<?= $obra['tipo'] ?>" class="recent-card-link w-100 text-decoration-none">
+                  <div class="recent-card position-relative w-100">
+                    <div class="recent-image mb-2">
+                      <?php if (!empty($obra['portada'])): ?>
+                        <img src="<?= BASE_URL ?>/uploads/portadas/<?= htmlspecialchars($obra['portada']) ?>"
+                          alt="<?= htmlspecialchars($obra['titulo']) ?>" class="portada-obra">
+                      <?php else: ?>
+                        <div class="recent-placeholder d-flex align-items-center justify-content-center portada-obra">
+                          <i class="fas fa-book fa-2x text-muted"></i>
+                        </div>
+                      <?php endif; ?>
+                    </div>
+                    <div class="recent-title"><?= htmlspecialchars($obra['titulo']) ?></div>
+                    <div class="recent-author">
+                      <i class="fas fa-user"></i> <?= htmlspecialchars($obra['autor']) ?>
+                    </div>
+                    <div class="mini-stats d-flex justify-content-center gap-2 mb-1">
+                      <span><i class="fas fa-eye"></i> <?= number_format($obra['visitas'] ?? 0) ?></span>
+                    </div>
+                    <div class="recent-categorias mb-2">
+                      <?php
+                      if ($obra['tipo'] === 'libro') {
+                        $cats_q = $conexion->query("SELECT c.nombre FROM libro_categorias lc JOIN categorias c ON lc.categoria_id=c.id WHERE lc.libro_id={$obra['id']}");
+                      } else {
+                        $cats_q = $conexion->query("SELECT c.nombre FROM comic_categorias cc JOIN categorias c ON cc.categoria_id=c.id WHERE cc.comic_id={$obra['id']}");
+                      }
+                      while($cat = $cats_q->fetch_assoc()) {
+                        echo '<span class="badge badge-categoria me-1">'.htmlspecialchars($cat['nombre']).'</span>';
+                      }
+                      ?>
+                    </div>
+                    <span class="badge recent-type-badge"><?= strtoupper($obra['tipo']) ?></span>
+                  </div>
+                </a>
+              </div>
+            <?php endwhile; ?>
+          <?php else: ?>
+            <div class="col-12 text-center text-muted py-5"><?= $TEXTOS['no_hay_populares'] ?></div>
+          <?php endif; ?>
+        </div>
+      </div>
+
+      <!-- Tab Categorías -->
+      <div class="tab-content" id="tab-categorias">
+        <div class="row categorias-grid g-3">
+          <?php if ($result_categorias && $result_categorias->num_rows > 0): ?>
+            <?php while ($categoria = $result_categorias->fetch_assoc()): ?>
+              <div class="col-12 col-md-6 col-lg-4">
+                <a href="<?= BASE_URL ?>/public/categoria.php?id=<?= $categoria['id']; ?>&tipo=<?= $categoria['tipo']; ?>" 
+                  class="categoria-item d-flex align-items-center gap-3 p-3 bg-light rounded-3 text-decoration-none text-dark shadow-sm h-100">
+                  <div class="categoria-icon d-flex align-items-center justify-content-center">
+                    <i class="fas <?= $categoria['tipo'] == 'libro' ? 'fa-book' : 'fa-book-open'; ?>"></i>
+                  </div>
+                  <div class="categoria-info">
+                    <h4 class="mb-1"><?= htmlspecialchars($categoria['nombre']); ?></h4>
+                    <span class="categoria-count small"><?= $categoria['total_obras']; ?> <?= $TEXTOS['obras'] ?></span>
+                  </div>
+                </a>
+              </div>
+            <?php endwhile; ?>
+          <?php else: ?>
+            <div class="col-12 text-center text-muted py-5"><?= $TEXTOS['no_hay_categorias'] ?></div>
+          <?php endif; ?>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- Características -->
 <section class="features-section py-5">
     <div class="container">
         <div class="section-header text-center mb-5" data-aos="fade-up">
-            <h2 class="section-title">¿Por qué elegir InkVerse?</h2>
-            <p class="section-subtitle">Ventajas únicas para lectores y creadores</p>
+            <h2 class="section-title"><?= $TEXTOS['porque_inkverse'] ?></h2>
+            <p class="section-subtitle"><?= $TEXTOS['ventajas_inkverse'] ?></p>
         </div>
         <div class="row features-grid g-4">
             <div class="col-md-6 col-lg-4">
@@ -719,8 +720,8 @@ $stats = $result_stats->fetch_assoc();
                     <div class="feature-icon mx-auto mb-3">
                         <i class="fas fa-upload"></i>
                     </div>
-                    <h3>Publica Fácilmente</h3>
-                    <p>Comparte tus historias con lectores de todo el mundo en minutos.</p>
+                    <h3><?= $TEXTOS['publica_facil'] ?></h3>
+                    <p><?= $TEXTOS['publica_facil_desc'] ?></p>
                 </div>
             </div>
             <div class="col-md-6 col-lg-4">
@@ -728,8 +729,8 @@ $stats = $result_stats->fetch_assoc();
                     <div class="feature-icon mx-auto mb-3">
                         <i class="fas fa-users"></i>
                     </div>
-                    <h3>Comunidad Activa</h3>
-                    <p>Conecta con autores y lectores. Recibe feedback y participa en foros.</p>
+                    <h3><?= $TEXTOS['comunidad_activa'] ?></h3>
+                    <p><?= $TEXTOS['comunidad_activa_desc'] ?></p>
                 </div>
             </div>
             <div class="col-md-6 col-lg-4">
@@ -737,8 +738,8 @@ $stats = $result_stats->fetch_assoc();
                     <div class="feature-icon mx-auto mb-3">
                         <i class="fas fa-palette"></i>
                     </div>
-                    <h3>Sección de Arte</h3>
-                    <p>Comparte y descubre arte inspirado en tus obras favoritas.</p>
+                    <h3><?= $TEXTOS['seccion_arte'] ?></h3>
+                    <p><?= $TEXTOS['seccion_arte_desc'] ?></p>
                 </div>
             </div>
             <div class="col-md-6 col-lg-4">
@@ -746,8 +747,8 @@ $stats = $result_stats->fetch_assoc();
                     <div class="feature-icon mx-auto mb-3">
                         <i class="fas fa-mobile-alt"></i>
                     </div>
-                    <h3>Acceso Multiplataforma</h3>
-                    <p>Lee y publica desde cualquier dispositivo, móvil o escritorio.</p>
+                    <h3><?= $TEXTOS['acceso_multiplataforma'] ?></h3>
+                    <p><?= $TEXTOS['acceso_multiplataforma_desc'] ?></p>
                 </div>
             </div>
             <div class="col-md-6 col-lg-4">
@@ -755,8 +756,8 @@ $stats = $result_stats->fetch_assoc();
                     <div class="feature-icon mx-auto mb-3">
                         <i class="fas fa-heart"></i>
                     </div>
-                    <h3>Sistema de Favoritos</h3>
-                    <p>Guarda tus obras favoritas y accede a ellas rápidamente.</p>
+                    <h3><?= $TEXTOS['favoritos_sistema'] ?></h3>
+                    <p><?= $TEXTOS['favoritos_sistema_desc'] ?></p>
                 </div>
             </div>
             <div class="col-md-6 col-lg-4">
@@ -764,8 +765,8 @@ $stats = $result_stats->fetch_assoc();
                     <div class="feature-icon mx-auto mb-3">
                         <i class="fas fa-comments"></i>
                     </div>
-                    <h3>Interacción Social</h3>
-                    <p>Comenta, valora y comparte opiniones con otros usuarios.</p>
+                    <h3><?= $TEXTOS['interaccion_social'] ?></h3>
+                    <p><?= $TEXTOS['interaccion_social_desc'] ?></p>
                 </div>
             </div>
         </div>
@@ -781,14 +782,14 @@ $stats = $result_stats->fetch_assoc();
             <div class="cta-icon mx-auto mb-4">
                 <i class="fas fa-rocket"></i>
             </div>
-            <h2 class="mb-3">¿Listo para comenzar tu aventura?</h2>
-            <p class="mb-4 fs-4">Regístrate gratis y accede al universo InkVerse.</p>
+            <h2 class="mb-3"><?= $TEXTOS['cta_titulo'] ?></h2>
+            <p class="mb-4 fs-4"><?= $TEXTOS['cta_subtitulo'] ?></p>
             <div class="cta-buttons d-flex justify-content-center flex-wrap gap-3">
                 <a href="<?php echo BASE_URL; ?>/public/register.php" class="btn btn-primary btn-lg">
-                    <i class="fas fa-user-plus"></i> Crear Cuenta Gratis
+                    <i class="fas fa-user-plus"></i> <?= $TEXTOS['crear_cuenta_gratis'] ?>
                 </a>
                 <a href="<?php echo BASE_URL; ?>/public/login.php" class="btn btn-outline-light btn-lg">
-                    <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                    <i class="fas fa-sign-in-alt"></i> <?= $TEXTOS['iniciar_sesion'] ?>
                 </a>
             </div>
         </div>
@@ -801,18 +802,18 @@ $stats = $result_stats->fetch_assoc();
             <div class="cta-icon-premium mx-auto mb-4">
                 <i class="fas fa-gem"></i>
             </div>
-            <h2 class="mb-3 fw-bold">¡Próximamente plan premium InkVerse Plus!</h2>
-            <p class="mb-4 fs-4">Prepárate para desbloquear ventajas exclusivas</p>
+            <h2 class="mb-3 fw-bold"><?= $TEXTOS['proximamente_premium'] ?></h2>
+            <p class="mb-4 fs-4"><?= $TEXTOS['preparate_premium'] ?></p>
             <ul class="premium-features-list text-start mx-auto mb-4">
-                <li><i class="fas fa-star"></i> Lectura sin anuncios</li>
-                <li><i class="fas fa-cloud-download-alt"></i> Descarga de libros y cómics</li>
-                <li><i class="fas fa-eye"></i> Estadísticas avanzadas</li>
-                <li><i class="fas fa-rocket"></i> Obras y capítulos exclusivos</li>
-                <li><i class="fas fa-user-shield"></i> Insignia de usuario premium</li>
+                <li><i class="fas fa-star"></i> <?= $TEXTOS['lectura_sin_anuncios'] ?></li>
+                <li><i class="fas fa-cloud-download-alt"></i> <?= $TEXTOS['descarga_libros'] ?></li>
+                <li><i class="fas fa-eye"></i> <?= $TEXTOS['estadisticas_avanzadas'] ?></li>
+                <li><i class="fas fa-rocket"></i> <?= $TEXTOS['obras_exclusivas'] ?></li>
+                <li><i class="fas fa-user-shield"></i> <?= $TEXTOS['insignia_premium'] ?></li>
             </ul>
             <div class="cta-buttons d-flex justify-content-center flex-wrap gap-3">
                 <button class="btn btn-warning btn-lg text-white fw-bold" disabled>
-                    <i class="fas fa-gem"></i> ¡Muy pronto!
+                    <i class="fas fa-gem"></i> <?= $TEXTOS['muy_pronto'] ?>
                 </button>
             </div>
         </div>

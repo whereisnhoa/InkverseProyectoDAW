@@ -1,38 +1,202 @@
-
 <?php
-// TRADUCCIÓN AL ESPAÑOL
-return [
-    'select_language' => 'Seleccionar Idioma',
-    'inicio' => 'Inicio',
-    'explorar' => 'Explorar',
-    'categorias' => 'Categorías',
-    'literatura' => 'Literatura',
-    'ver_todas_obras' => 'Ver todas las obras',
-    'ver_todas_categorias' => 'Ver todas las categorías',
-    'comic_manga' => 'Cómic/Manga',
-    'comunidad' => 'Comunidad',
-    'participar' => 'Participar',
-    'foros_discusion' => 'Foros de discusión',
-    'grupos_lectura' => 'Grupos de lectura',
-    'eventos' => 'Eventos',
-    'contenido' => 'Contenido',
-    'galeria_arte' => 'Galería de arte',
-    'recomendaciones' => 'Recomendaciones',
-    'noticias_novedades' => 'Noticias y novedades',
-    'buscar_obras' => 'Buscar obras...',
-    'mis_favoritos' => 'Mis favoritos',
-    'notificaciones' => 'Notificaciones',
-    'marcar_todas_leidas' => 'Marcar todas como leídas',
-    'no_notificaciones' => 'No tienes notificaciones',
-    'ver_todas' => 'Ver todas',
-    'cambiar_modo' => 'Cambiar modo oscuro/claro',
-    'mi_perfil' => 'Mi Perfil',
-    'mis_obras' => 'Mis Obras',
-    'favoritos' => 'Favoritos',
-    'nueva_obra' => 'Nueva Obra',
-    'cerrar_sesion' => 'Cerrar Sesión',
-    'iniciar_sesion' => 'Iniciar Sesión',
-    'registrarse' => 'Registrarse',
-];
 
-?>
+$TEXTOS = array();
+
+// index.php, header.php, footer.php
+$TEXTOS['descubre_historias'] = 'Descubre<br>historias y mundos';
+$TEXTOS['universo_literatura'] = 'Tu universo de literatura, cómics y manga';
+$TEXTOS['explora_comparte'] = 'Explora, comparte y disfruta de la lectura sin límites. Únete a una comunidad vibrante de lectores y creadores.';
+$TEXTOS['unete_gratis'] = 'Únete Gratis';
+$TEXTOS['explorar'] = 'Explorar';
+$TEXTOS['obras'] = 'Obras';
+$TEXTOS['lectores'] = 'Lectores';
+$TEXTOS['generos'] = 'Géneros';
+$TEXTOS['explora_genero'] = 'Explora por género';
+$TEXTOS['literatura'] = 'Literatura';
+$TEXTOS['literatura_desc'] = 'Novelas, poesía y relatos para todos los gustos.';
+$TEXTOS['ver_literatura'] = 'Ver Literatura';
+$TEXTOS['comics_manga'] = 'Cómics y Manga';
+$TEXTOS['comics_manga_desc'] = 'Historietas, manga y aventuras gráficas.';
+$TEXTOS['ver_comics'] = 'Ver Cómics';
+$TEXTOS['obras_destacadas'] = 'Obras Destacadas';
+$TEXTOS['seleccion_especial'] = 'Selección especial para ti';
+$TEXTOS['ver_todas'] = 'Ver todas';
+$TEXTOS['proximamente_destacadas'] = '¡Próximamente obras destacadas!';
+$TEXTOS['preparando_contenido'] = 'Estamos preparando contenido increíble para ti';
+$TEXTOS['recientes'] = 'Recientes';
+$TEXTOS['populares'] = 'Populares';
+$TEXTOS['categorias'] = 'Categorías';
+$TEXTOS['no_hay_recientes'] = 'No hay obras recientes aún.';
+$TEXTOS['no_hay_populares'] = 'No hay obras populares aún.';
+$TEXTOS['no_hay_categorias'] = 'No hay categorías con obras aún.';
+$TEXTOS['porque_inkverse'] = '¿Por qué elegir InkVerse?';
+$TEXTOS['ventajas_inkverse'] = 'Ventajas únicas para lectores y creadores';
+$TEXTOS['publica_facil'] = 'Publica Fácilmente';
+$TEXTOS['publica_facil_desc'] = 'Comparte tus historias con lectores de todo el mundo en minutos.';
+$TEXTOS['comunidad_activa'] = 'Comunidad Activa';
+$TEXTOS['comunidad_activa_desc'] = 'Conecta con autores y lectores. Recibe feedback y participa en foros.';
+$TEXTOS['seccion_arte'] = 'Sección de Arte';
+$TEXTOS['seccion_arte_desc'] = 'Comparte y descubre arte inspirado en tus obras favoritas.';
+$TEXTOS['acceso_multiplataforma'] = 'Acceso Multiplataforma';
+$TEXTOS['acceso_multiplataforma_desc'] = 'Lee y publica desde cualquier dispositivo, móvil o escritorio.';
+$TEXTOS['favoritos_sistema'] = 'Sistema de Favoritos';
+$TEXTOS['favoritos_sistema_desc'] = 'Guarda tus obras favoritas y accede a ellas rápidamente.';
+$TEXTOS['interaccion_social'] = 'Interacción Social';
+$TEXTOS['interaccion_social_desc'] = 'Comenta, valora y comparte opiniones con otros usuarios.';
+$TEXTOS['cta_titulo'] = '¿Listo para comenzar tu aventura?';
+$TEXTOS['cta_subtitulo'] = 'Regístrate gratis y accede al universo InkVerse.';
+$TEXTOS['crear_cuenta_gratis'] = 'Crear Cuenta Gratis';
+$TEXTOS['iniciar_sesion'] = 'Iniciar Sesión';
+$TEXTOS['proximamente_premium'] = '¡Próximamente plan premium InkVerse Plus!';
+$TEXTOS['preparate_premium'] = 'Prepárate para desbloquear ventajas exclusivas';
+$TEXTOS['lectura_sin_anuncios'] = 'Lectura sin anuncios';
+$TEXTOS['descarga_libros'] = 'Descarga de libros y cómics';
+$TEXTOS['estadisticas_avanzadas'] = 'Estadísticas avanzadas';
+$TEXTOS['obras_exclusivas'] = 'Obras y capítulos exclusivos';
+$TEXTOS['insignia_premium'] = 'Insignia de usuario premium';
+$TEXTOS['muy_pronto'] = '¡Muy pronto!';
+$TEXTOS['por'] = 'por';
+
+// Footer y navegación
+$TEXTOS['footer_slogan'] = 'Plataforma para compartir y descubrir obras literarias, cómics y manga. Un espacio para lectores y creadores.';
+$TEXTOS['explorar_seccion'] = 'Explorar';
+$TEXTOS['inicio'] = 'Inicio';
+$TEXTOS['busqueda_avanzada'] = 'Búsqueda Avanzada';
+$TEXTOS['cuenta'] = 'Cuenta';
+$TEXTOS['mi_perfil'] = 'Mi Perfil';
+$TEXTOS['mis_obras'] = 'Mis Obras';
+$TEXTOS['favoritos'] = 'Favoritos';
+$TEXTOS['publicar_obra'] = 'Publicar Obra';
+$TEXTOS['cerrar_sesion'] = 'Cerrar Sesión';
+$TEXTOS['registrarse'] = 'Registrarse';
+$TEXTOS['comunidad'] = 'Comunidad';
+$TEXTOS['foros_discusion'] = 'Foros de Discusión';
+$TEXTOS['grupos_lectura'] = 'Grupos de Lectura';
+$TEXTOS['eventos'] = 'Eventos';
+$TEXTOS['galeria_arte'] = 'Galería de Arte';
+$TEXTOS['noticias'] = 'Noticias';
+$TEXTOS['footer_acerca'] = 'Acerca de Nosotros';
+$TEXTOS['footer_terminos'] = 'Términos';
+$TEXTOS['footer_privacidad'] = 'Privacidad';
+$TEXTOS['footer_cookies'] = 'Cookies';
+$TEXTOS['footer_contacto'] = 'Contacto';
+$TEXTOS['todos_derechos'] = 'Todos los derechos reservados';
+
+$TEXTOS['mis_obras_publicadas'] = 'Mis obras publicadas';
+$TEXTOS['mis_obras_subtitulo'] = 'Aquí puedes ver y gestionar tus obras publicadas.';
+$TEXTOS['publicar_nueva_obra'] = 'Publicar nueva obra';
+$TEXTOS['libros'] = 'Libros';
+$TEXTOS['no_libros_publicados'] = 'No has publicado ningún libro aún.';
+$TEXTOS['ver_libro'] = 'Ver libro';
+$TEXTOS['comics_manga'] = 'Cómics/Manga';
+$TEXTOS['no_comics_publicados'] = 'No has publicado ningún cómic aún.';
+$TEXTOS['ver_comic'] = 'Ver cómic';
+$TEXTOS['editar'] = 'Editar';
+$TEXTOS['publicado_el'] = 'Publicado el:';
+$TEXTOS['libro'] = 'Libro';
+$TEXTOS['portada_de'] = 'Portada de';
+
+$TEXTOS['test_titulo'] = 'Test: ¿Cuál es tu género favorito?';
+$TEXTOS['test_intro'] = 'Responde estas preguntas y descubre tu género o categoría favorita en InkVerse.';
+$TEXTOS['test_btn_enviar'] = 'Descubrir mi género favorito';
+$TEXTOS['test_resultado_intro'] = '¡Este es tu género favorito según tus respuestas!';
+$TEXTOS['test_resultado_recomendacion'] = 'Te recomendamos explorar obras de este género en nuestra plataforma.';
+
+$TEXTOS['test_genero_fantasia'] = 'Fantasía';
+$TEXTOS['test_genero_romance'] = 'Romance';
+$TEXTOS['test_genero_terror'] = 'Terror/Misterio';
+$TEXTOS['test_genero_scifi'] = 'Ciencia Ficción';
+$TEXTOS['test_genero_aventuras'] = 'Aventuras';
+$TEXTOS['test_genero_historico'] = 'Histórico';
+$TEXTOS['test_genero_humor'] = 'Humor';
+$TEXTOS['test_genero_sliceoflife'] = 'Slice of Life / Cotidiano';
+
+$TEXTOS['test_genero_fantasia_desc'] = 'Te encantan los mundos mágicos, los dragones y los poderes sobrenaturales.';
+$TEXTOS['test_genero_romance_desc'] = 'Disfrutas de historias de amor, emociones intensas y relaciones personales.';
+$TEXTOS['test_genero_terror_desc'] = 'Buscas emociones fuertes, suspense, misterio y adrenalina.';
+$TEXTOS['test_genero_scifi_desc'] = 'Te atraen los futuros posibles, la tecnología y los universos alternativos.';
+$TEXTOS['test_genero_aventuras_desc'] = 'Prefieres la acción, los viajes y los desafíos heroicos.';
+$TEXTOS['test_genero_historico_desc'] = 'Te fascina el pasado, los hechos históricos y las épocas lejanas.';
+$TEXTOS['test_genero_humor_desc'] = 'Te gusta reír y pasarlo bien con historias divertidas y personajes ingeniosos.';
+$TEXTOS['test_genero_sliceoflife_desc'] = 'Disfrutas de historias cotidianas, realistas y con las que te identificas.';
+
+$TEXTOS['test_pregunta1'] = '¿Dónde te gustaría que transcurriera la historia?';
+$TEXTOS['test_pregunta1_op1'] = 'En un mundo mágico o alternativo';
+$TEXTOS['test_pregunta1_op2'] = 'En una gran ciudad actual';
+$TEXTOS['test_pregunta1_op3'] = 'En un futuro lejano o en el espacio';
+$TEXTOS['test_pregunta1_op4'] = 'En una época histórica';
+$TEXTOS['test_pregunta1_op5'] = 'En un instituto o entorno cotidiano';
+$TEXTOS['test_pregunta1_op6'] = 'En una mansión misteriosa';
+$TEXTOS['test_pregunta1_op7'] = 'En medio de una aventura peligrosa';
+$TEXTOS['test_pregunta1_op8'] = 'Allí donde pueda reírme sin parar';
+
+$TEXTOS['test_pregunta2'] = '¿Qué protagonista prefieres?';
+$TEXTOS['test_pregunta2_op1'] = 'Un mago, heroína o criatura fantástica';
+$TEXTOS['test_pregunta2_op2'] = 'Un personaje común enfrentando el amor';
+$TEXTOS['test_pregunta2_op3'] = 'Un detective, científico o explorador espacial';
+$TEXTOS['test_pregunta2_op4'] = 'Un personaje real o inspirado en la historia';
+$TEXTOS['test_pregunta2_op5'] = 'Un estudiante o persona corriente';
+$TEXTOS['test_pregunta2_op6'] = 'Alguien con secretos oscuros o habilidades sobrenaturales';
+$TEXTOS['test_pregunta2_op7'] = 'Un aventurero o viajero incansable';
+$TEXTOS['test_pregunta2_op8'] = 'Un bromista o alguien con mucho sentido del humor';
+
+$TEXTOS['test_pregunta3'] = '¿Qué te atrae más de una obra?';
+$TEXTOS['test_pregunta3_op1'] = 'La magia, los poderes y la épica';
+$TEXTOS['test_pregunta3_op2'] = 'Las relaciones sentimentales';
+$TEXTOS['test_pregunta3_op3'] = 'El suspense, misterio o ciencia ficción';
+$TEXTOS['test_pregunta3_op4'] = 'Aprender sobre el pasado y costumbres antiguas';
+$TEXTOS['test_pregunta3_op5'] = 'La vida diaria y los sentimientos realistas';
+$TEXTOS['test_pregunta3_op6'] = 'Los sustos y la adrenalina';
+$TEXTOS['test_pregunta3_op7'] = 'La acción, los retos y la superación';
+$TEXTOS['test_pregunta3_op8'] = 'Las situaciones absurdas y los chistes';
+
+$TEXTOS['test_pregunta4'] = '¿Qué tipo de final prefieres?';
+$TEXTOS['test_pregunta4_op1'] = 'Una gran batalla o revelación mágica';
+$TEXTOS['test_pregunta4_op2'] = 'Un beso o una confesión de amor';
+$TEXTOS['test_pregunta4_op3'] = 'Un giro inesperado o solución científica';
+$TEXTOS['test_pregunta4_op4'] = 'Un desenlace fiel a la realidad histórica';
+$TEXTOS['test_pregunta4_op5'] = 'Un final abierto, cotidiano o reflexivo';
+$TEXTOS['test_pregunta4_op6'] = 'Un susto final o revelación terrorífica';
+$TEXTOS['test_pregunta4_op7'] = 'Un logro heroico o descubrimiento';
+$TEXTOS['test_pregunta4_op8'] = '¡Una carcajada final!';
+
+$TEXTOS['test_pregunta5'] = '¿Qué formato prefieres?';
+$TEXTOS['test_pregunta5_op1'] = 'Sagas de varios libros, cómics de aventuras largas';
+$TEXTOS['test_pregunta5_op2'] = 'Historias cortas, webtoons románticos';
+$TEXTOS['test_pregunta5_op3'] = 'Novelas de misterio o ciencia ficción, manga futurista';
+$TEXTOS['test_pregunta5_op4'] = 'Biografías, novelas históricas, crónicas';
+$TEXTOS['test_pregunta5_op5'] = 'Slice of life, historias cotidianas';
+$TEXTOS['test_pregunta5_op6'] = 'Cómics de terror, relatos espeluznantes';
+$TEXTOS['test_pregunta5_op7'] = 'Cómics de acción o aventuras, road trip';
+$TEXTOS['test_pregunta5_op8'] = 'Tiras cómicas, humor gráfico, parodias';
+
+$TEXTOS['test_pregunta6'] = '¿Qué emoción buscas al leer?';
+$TEXTOS['test_pregunta6_op1'] = 'Asombro y maravilla';
+$TEXTOS['test_pregunta6_op2'] = 'Ternura y emoción';
+$TEXTOS['test_pregunta6_op3'] = 'Intriga y sorpresa';
+$TEXTOS['test_pregunta6_op4'] = 'Curiosidad y aprendizaje';
+$TEXTOS['test_pregunta6_op5'] = 'Identificación y empatía';
+$TEXTOS['test_pregunta6_op6'] = 'Miedo y tensión';
+$TEXTOS['test_pregunta6_op7'] = 'Adrenalina y aventura';
+$TEXTOS['test_pregunta6_op8'] = 'Diversión y alegría';
+
+$TEXTOS['test_pregunta7'] = '¿Qué elemento no puede faltar en tu lectura ideal?';
+$TEXTOS['test_pregunta7_op1'] = 'Seres mágicos o fantásticos';
+$TEXTOS['test_pregunta7_op2'] = 'Un gran romance';
+$TEXTOS['test_pregunta7_op3'] = 'Tecnología avanzada o enigmas';
+$TEXTOS['test_pregunta7_op4'] = 'Datos históricos reales';
+$TEXTOS['test_pregunta7_op5'] = 'Situaciones cotidianas creíbles';
+$TEXTOS['test_pregunta7_op6'] = 'Escenas de miedo';
+$TEXTOS['test_pregunta7_op7'] = 'Viajes y descubrimientos';
+$TEXTOS['test_pregunta7_op8'] = 'Gags y situaciones cómicas';
+
+$TEXTOS['test_pregunta8'] = '¿Cuál de estas portadas te llama más la atención?';
+$TEXTOS['test_pregunta8_op1'] = 'Castillos, dragones y magia';
+$TEXTOS['test_pregunta8_op2'] = 'Parejas abrazadas o miradas intensas';
+$TEXTOS['test_pregunta8_op3'] = 'Robots, naves o portales misteriosos';
+$TEXTOS['test_pregunta8_op4'] = 'Escenarios históricos o personajes famosos';
+$TEXTOS['test_pregunta8_op5'] = 'Personas en la vida diaria';
+$TEXTOS['test_pregunta8_op6'] = 'Sombras, sangre o ojos inquietantes';
+$TEXTOS['test_pregunta8_op7'] = 'Personajes en movimiento, mapas o tesoros';
+$TEXTOS['test_pregunta8_op8'] = 'Dibujos divertidos o caricaturas';
+
