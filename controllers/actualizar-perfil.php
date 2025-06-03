@@ -19,8 +19,10 @@ $privacidad = in_array(($_POST['privacidad'] ?? 'publico'), ['publico','privado'
 $X = trim($_POST['X'] ?? '');
 $instagram = trim($_POST['instagram'] ?? '');
 $facebook = trim($_POST['facebook'] ?? '');
+$banner_color = trim($_POST['banner_color'] ?? '#4361ee');
+$eliminar_banner_img = isset($_POST['eliminar_banner_img']) && $_POST['eliminar_banner_img'] === "1";
 
-// Obtén avatar y banner actuales (CAMBIAR banner -> banner_img)
+// Obtén avatar y banner actuales
 $sql = "SELECT avatar, banner_img FROM usuarios WHERE id=?";
 $stmt = $conexion->prepare($sql);
 $stmt->bind_param("i", $usuario_id);
@@ -38,32 +40,50 @@ if (!empty($_FILES['avatar']['name'])) {
         $avatar_name = uniqid('avatar_') . '.' . $ext;
         $ruta_destino = __DIR__ . '/../uploads/avatars/' . $avatar_name;
         if (move_uploaded_file($_FILES['avatar']['tmp_name'], $ruta_destino)) {
-            $avatar_path = $avatar_name; // solo el nombre, no BASE_URL
+            // Elimina avatar anterior si no es el default y existe
+            if (!empty($avatar_actual) && file_exists(__DIR__ . '/../uploads/avatars/' . $avatar_actual)) {
+                @unlink(__DIR__ . '/../uploads/avatars/' . $avatar_actual);
+            }
+            $avatar_path = $avatar_name;
         }
     }
 }
 
-// --- Manejo de subida de banner ---
+// --- Manejo de subida/eliminación de banner ---
 $banner_path = $banner_actual;
-if (!empty($_FILES['banner']['name'])) {
-    $ext = strtolower(pathinfo($_FILES['banner']['name'], PATHINFO_EXTENSION));
-    if (in_array($ext, ['jpg','jpeg','png','gif']) && $_FILES['banner']['size'] <= 2*1024*1024) {
+// Eliminar banner si el usuario lo pidió
+if ($eliminar_banner_img && !empty($banner_actual) && file_exists(__DIR__ . '/../uploads/banners/' . $banner_actual)) {
+    @unlink(__DIR__ . '/../uploads/banners/' . $banner_actual);
+    $banner_path = null;
+}
+if (!empty($_FILES['banner_img']['name'])) {
+    $ext = strtolower(pathinfo($_FILES['banner_img']['name'], PATHINFO_EXTENSION));
+    if (in_array($ext, ['jpg','jpeg','png','gif']) && $_FILES['banner_img']['size'] <= 2*1024*1024) {
         $banner_name = uniqid('banner_') . '.' . $ext;
         $ruta_destino = __DIR__ . '/../uploads/banners/' . $banner_name;
-        if (move_uploaded_file($_FILES['banner']['tmp_name'], $ruta_destino)) {
-            $banner_path = $banner_name; // solo el nombre, no BASE_URL
+        if (move_uploaded_file($_FILES['banner_img']['tmp_name'], $ruta_destino)) {
+            // Elimina banner anterior si existe
+            if (!empty($banner_actual) && file_exists(__DIR__ . '/../uploads/banners/' . $banner_actual)) {
+                @unlink(__DIR__ . '/../uploads/banners/' . $banner_actual);
+            }
+            $banner_path = $banner_name;
         }
     }
 }
 
-// Actualiza usuario (CAMBIAR banner -> banner_img)
+// Sanear color hex
+if (!preg_match('/^#[a-f0-9]{6}$/i', $banner_color)) {
+    $banner_color = '#4361ee';
+}
+
+// Actualiza usuario
 $sql = "UPDATE usuarios SET
-    usuario=?, email=?, nombre=?, fecha_nacimiento=?, biografia=?, sitio_web=?, ubicacion=?, privacidad=?, avatar=?, banner_img=?, X=?, instagram=?, facebook=?
+    usuario=?, email=?, nombre=?, fecha_nacimiento=?, biografia=?, sitio_web=?, ubicacion=?, privacidad=?, avatar=?, banner_img=?, banner_color=?, X=?, instagram=?, facebook=?
     WHERE id=?";
 $stmt = $conexion->prepare($sql);
-$stmt->bind_param("sssssssssssssi",
+$stmt->bind_param("ssssssssssssssi",
     $usuario, $email, $nombre, $fecha_nacimiento, $biografia, $sitio_web, $ubicacion, $privacidad,
-    $avatar_path, $banner_path, $X, $instagram, $facebook, $usuario_id
+    $avatar_path, $banner_path, $banner_color, $X, $instagram, $facebook, $usuario_id
 );
 
 if ($stmt->execute()) {
