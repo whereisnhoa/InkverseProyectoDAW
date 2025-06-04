@@ -1,168 +1,218 @@
-
 <?php
-include '../includes/header.php';
-include_once('../includes/funciones.php');
+require_once('../includes/config.php');
+require_once('../includes/conexion.php');
+require_once('../includes/funciones.php');
+include_once('../includes/languages/es.php'); // Cambia según idioma
+session_start();
 
-// Verificar si hay un usuario logueado
-$usuario_logueado = isset($_SESSION['usuario_id']);
-
-// Obtener ID de la categoría
 $categoria_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
-
-if ($categoria_id <= 0) {
-    redirigirConMensaje(BASE_URL . '/comunidad/foros.php', 'Categoría no especificada correctamente.', 'error');
-    exit();
+if ($categoria_id < 1) {
+    header('Location: ' . BASE_URL . '/comunidad/');
+    exit;
 }
 
-// Obtener información de la categoría
-$sql_categoria = "SELECT * FROM categorias_foro WHERE id = ?";
-$stmt_categoria = $conexion->prepare($sql_categoria);
-$stmt_categoria->bind_param("i", $categoria_id);
-$stmt_categoria->execute();
-$result_categoria = $stmt_categoria->get_result();
-$categoria = $result_categoria->fetch_assoc();
+// Obtener datos de la categoría
+$sql_cat = "SELECT nombre, descripcion FROM categorias_foro WHERE id = ?";
+$stmt = $conexion->prepare($sql_cat);
+$stmt->bind_param("i", $categoria_id);
+$stmt->execute();
+$stmt->bind_result($nombre_categoria, $descripcion_categoria);
+$stmt->fetch();
+$stmt->close();
 
-if (!$categoria) {
-    redirigirConMensaje(BASE_URL . '/comunidad/foros.php', 'Categoría no encontrada.', 'error');
-    exit();
+if (!$nombre_categoria) {
+    include '../includes/header.php';
+    echo '<div class="foro-container"><div class="tema-noexiste">'.$TEXTOS['foro_categoria_no_encontrada'].'</div></div>';
+    include '../includes/footer.php';
+    exit;
 }
-
-// Configurar paginación
-$temas_por_pagina = 15;
-$pagina_actual = isset($_GET['pagina']) ? intval($_GET['pagina']) : 1;
-$offset = ($pagina_actual - 1) * $temas_por_pagina;
-
-// Obtener total de temas para la paginación
-$sql_total = "SELECT COUNT(*) as total FROM temas_foro WHERE categoria_id = ?";
-$stmt_total = $conexion->prepare($sql_total);
-$stmt_total->bind_param("i", $categoria_id);
-$stmt_total->execute();
-$total_temas = $stmt_total->get_result()->fetch_assoc()['total'];
-$total_paginas = ceil($total_temas / $temas_por_pagina);
 
 // Obtener temas de la categoría
-$sql_temas = "SELECT tf.*, u.usuario as autor_nombre,
-             (SELECT COUNT(*) FROM respuestas_foro WHERE tema_id = tf.id) as total_respuestas,
-             (SELECT MAX(fecha_creacion) FROM respuestas_foro WHERE tema_id = tf.id) as ultima_respuesta
-             FROM temas_foro tf
-             JOIN usuarios u ON tf.usuario_id = u.id
-             WHERE tf.categoria_id = ?
-             ORDER BY 
-                CASE WHEN tf.estado = 'destacado' THEN 0 ELSE 1 END,
-                tf.ultima_actividad DESC
-             LIMIT ?, ?";
-$stmt_temas = $conexion->prepare($sql_temas);
-$stmt_temas->bind_param("iii", $categoria_id, $offset, $temas_por_pagina);
-$stmt_temas->execute();
-$result_temas = $stmt_temas->get_result();
+$sql = "SELECT tf.id, tf.titulo, u.usuario AS autor, tf.ultima_actividad
+        FROM temas_foro tf
+        JOIN usuarios u ON tf.usuario_id = u.id
+        WHERE tf.categoria_id = ?
+        ORDER BY tf.ultima_actividad DESC";
+$stmt = $conexion->prepare($sql);
+$stmt->bind_param("i", $categoria_id);
+$stmt->execute();
+$result = $stmt->get_result();
+
+include '../includes/header.php';
 ?>
 
-<div class="container">
-    <div class="categoria-foro-header">
-        <h1>
-            <i class="fas <?php echo htmlspecialchars($categoria['icono']); ?>"></i>
-            <?php echo htmlspecialchars($categoria['nombre']); ?>
-        </h1>
-        <p><?php echo htmlspecialchars($categoria['descripcion']); ?></p>
-    </div>
-    
-    <?php if ($usuario_logueado): ?>
-        <div class="foro-acciones mb-4">
-            <a href="<?php echo BASE_URL; ?>/comunidad/nuevo_tema.php?categoria=<?php echo $categoria_id; ?>" class="btn">
-                <i class="fas fa-plus-circle"></i> Crear nuevo tema
-            </a>
+<link rel="stylesheet" href="<?php echo BASE_URL; ?>/css/comunidad.css">
+
+<style>
+.foro-categoria-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 70vh;
+    padding: 56px 0 60px 0;
+}
+.foro-categoria-card {
+    background: #fff;
+    border-radius: 32px;
+    box-shadow: 0 8px 44px #d0abf040, 0 2px 6px #fbefff44;
+    padding: 42px 38px 38px 38px;
+    max-width: 900px;
+    width: 100%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.foro-categoria-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 16px;
+}
+.foro-categoria-icon {
+    font-size: 2.2rem;
+    color: #d1b3fc;
+    margin-bottom: 8px;
+    filter: drop-shadow(0 2px 8px #fcb7ff66);
+}
+.foro-categoria-nombre {
+    font-size: 2.2rem;
+    font-weight: 900;
+    color: #d1b3fc;
+    text-shadow: 0 2px 14px #e6dbfa44;
+    margin-bottom: 0;
+    text-align: center;
+}
+.foro-categoria-desc {
+    font-size: 1.12rem;
+    color: #8762b0;
+    margin-bottom: 26px;
+    text-align: center;
+    max-width: 600px;
+}
+.foro-categoria-crear-btn {
+    background: linear-gradient(90deg, #a16ae8 0%, #fcb7ff 100%);
+    color: #fff;
+    font-weight: 700;
+    font-size: 1.09rem;
+    border: none;
+    border-radius: 16px;
+    padding: 14px 36px;
+    cursor: pointer;
+    margin: 0 auto 32px auto;
+    box-shadow: 0 2px 14px #d1b3fc55;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: filter .15s, transform .15s;
+}
+.foro-categoria-crear-btn:hover {
+    filter: brightness(1.08);
+    transform: scale(1.03);
+}
+
+/* Tabla */
+.foro-categoria-tabla-block {
+    width: 100%;
+    margin-top: 4px;
+}
+.foro-categoria-tabla {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 1.09rem;
+    background: none;
+    border-radius: 14px;
+    overflow: hidden;
+}
+.foro-categoria-tabla thead tr {
+    background: linear-gradient(90deg, #f4e2ff 0%, #fbefff 100%);
+}
+.foro-categoria-tabla th, .foro-categoria-tabla td {
+    padding: 18px 16px;
+    text-align: center;
+}
+.foro-categoria-tabla th {
+    color: #6e38b1;
+    font-size: 1.03rem;
+    font-weight: 800;
+    letter-spacing: .5px;
+    border-bottom: 2px solid #dabfff;
+    background: transparent;
+}
+.foro-categoria-tabla td {
+    border-bottom: 1px solid #f6ebff;
+    background: transparent;
+    vertical-align: middle;
+    transition: background .18s;
+}
+.foro-categoria-tabla tr:last-child td {
+    border-bottom: none;
+}
+.foro-categoria-tabla tbody tr:hover td {
+    background: linear-gradient(90deg, #f4e2ff22 0%, #fbefff22 100%);
+}
+.foro-categoria-tema-link {
+    color: #a16ae8;
+    font-weight: 700;
+    text-decoration: none;
+    transition: color .13s;
+    font-size: 1.07rem;
+    word-break: break-word;
+}
+.foro-categoria-tema-link:hover {
+    color: #6e38b1;
+    text-decoration: underline;
+}
+@media (max-width: 700px) {
+    .foro-categoria-card { padding: 20px 2vw; }
+    .foro-categoria-nombre { font-size: 1.28rem; }
+    .foro-categoria-tabla th, .foro-categoria-tabla td { font-size: 0.94rem; padding: 12px 4px; }
+    .foro-categoria-crear-btn { padding: 10px 10px; font-size: .97rem; }
+}
+</style>
+
+<div class="foro-categoria-container">
+    <div class="foro-categoria-card">
+        <div class="foro-categoria-header">
+            <span class="foro-categoria-icon"><i class="fas fa-comments"></i></span>
+            <h1 class="foro-categoria-nombre"><?php echo htmlspecialchars($nombre_categoria); ?></h1>
         </div>
-    <?php endif; ?>
-    
-    <!-- Lista de temas -->
-    <div class="temas-lista">
-        <?php if ($result_temas && $result_temas->num_rows > 0): ?>
-            <div class="temas-header">
-                <div class="tema-titulo">Tema</div>
-                <div class="tema-autor">Autor</div>
-                <div class="tema-stats">Estadísticas</div>
-                <div class="tema-actividad">Última actividad</div>
-            </div>
-            
-            <?php while ($tema = $result_temas->fetch_assoc()): ?>
-                <div class="tema-item">
-                    <div class="tema-titulo">
-                        <a href="<?php echo BASE_URL; ?>/comunidad/tema.php?id=<?php echo $tema['id']; ?>">
-                            <?php if ($tema['estado'] == 'destacado'): ?>
-                                <i class="fas fa-star tema-destacado" title="Tema destacado"></i>
-                            <?php elseif ($tema['estado'] == 'cerrado'): ?>
-                                <i class="fas fa-lock tema-cerrado" title="Tema cerrado"></i>
-                            <?php else: ?>
-                                <i class="fas fa-comments"></i>
-                            <?php endif; ?>
-                            <?php echo htmlspecialchars($tema['titulo']); ?>
-                        </a>
-                    </div>
-                    <div class="tema-autor">
-                        <?php echo htmlspecialchars($tema['autor_nombre']); ?>
-                    </div>
-                    <div class="tema-stats">
-                        <span title="Respuestas"><i class="fas fa-reply"></i> <?php echo $tema['total_respuestas']; ?></span>
-                        <span title="Vistas"><i class="fas fa-eye"></i> <?php echo $tema['vistas']; ?></span>
-                    </div>
-                    <div class="tema-actividad">
-                        <?php 
-                        $fecha_actividad = !empty($tema['ultima_respuesta']) ? $tema['ultima_respuesta'] : $tema['fecha_creacion'];
-                        echo date('d/m/Y H:i', strtotime($fecha_actividad)); 
-                        ?>
-                    </div>
-                </div>
-            <?php endwhile; ?>
-            
-            <!-- Paginación -->
-            <?php if ($total_paginas > 1): ?>
-                <div class="paginacion">
-                    <?php if ($pagina_actual > 1): ?>
-                        <a href="<?php echo BASE_URL; ?>/comunidad/categoria_foro.php?id=<?php echo $categoria_id; ?>&pagina=<?php echo $pagina_actual - 1; ?>" class="btn-pagina">
-                            <i class="fas fa-chevron-left"></i> Anterior
-                        </a>
-                    <?php endif; ?>
-                    
-                    <div class="paginas-numeros">
-                        <?php for ($i = 1; $i <= $total_paginas; $i++): ?>
-                            <a href="<?php echo BASE_URL; ?>/comunidad/categoria_foro.php?id=<?php echo $categoria_id; ?>&pagina=<?php echo $i; ?>" 
-                               class="btn-pagina <?php echo $i == $pagina_actual ? 'active' : ''; ?>">
-                                <?php echo $i; ?>
-                            </a>
-                        <?php endfor; ?>
-                    </div>
-                    
-                    <?php if ($pagina_actual < $total_paginas): ?>
-                        <a href="<?php echo BASE_URL; ?>/comunidad/categoria_foro.php?id=<?php echo $categoria_id; ?>&pagina=<?php echo $pagina_actual + 1; ?>" class="btn-pagina">
-                            Siguiente <i class="fas fa-chevron-right"></i>
-                        </a>
-                    <?php endif; ?>
-                </div>
-            <?php endif; ?>
-            
-        <?php else: ?>
-            <div class="no-temas">
-                <i class="fas fa-comments fa-3x"></i>
-                <h3>No hay temas en esta categoría</h3>
-                <p>Sé el primero en crear un tema de discusión.</p>
-                
-                <?php if ($usuario_logueado): ?>
-                    <a href="<?php echo BASE_URL; ?>/comunidad/nuevo_tema.php?categoria=<?php echo $categoria_id; ?>" class="btn mt-3">
-                        <i class="fas fa-plus-circle"></i> Crear nuevo tema
-                    </a>
-                <?php else: ?>
-                    <a href="<?php echo BASE_URL; ?>/public/login.php" class="btn mt-3">
-                        Iniciar sesión para crear un tema
-                    </a>
-                <?php endif; ?>
-            </div>
-        <?php endif; ?>
-    </div>
-    
-    <div class="mt-4">
-        <a href="<?php echo BASE_URL; ?>/comunidad/foros.php" class="btn btn-outline">
-            <i class="fas fa-arrow-left"></i> Volver a los foros
+        <div class="foro-categoria-desc">
+            <?php echo htmlspecialchars($descripcion_categoria ? $descripcion_categoria : $TEXTOS['foro_categoria_default_desc']); ?>
+        </div>
+        <a href="nuevo_tema.php?cat=<?php echo $categoria_id; ?>" class="foro-categoria-crear-btn">
+            <i class="fas fa-plus"></i> <?php echo $TEXTOS['foros_nuevo_tema']; ?>
         </a>
+        <div class="foro-categoria-tabla-block">
+            <table class="foro-categoria-tabla">
+                <thead>
+                    <tr>
+                        <th><?php echo $TEXTOS['foros_col_tema']; ?></th>
+                        <th><?php echo $TEXTOS['foros_col_autor']; ?></th>
+                        <th><?php echo $TEXTOS['foros_col_actividad']; ?></th>
+                    </tr>
+                </thead>
+                <tbody>
+                <?php if ($result && $result->num_rows > 0): ?>
+                    <?php while($tema = $result->fetch_assoc()): ?>
+                        <tr>
+                            <td>
+                                <a class="foro-categoria-tema-link" href="tema.php?id=<?php echo $tema['id']; ?>">
+                                    <?php echo htmlspecialchars($tema['titulo']); ?>
+                                </a>
+                            </td>
+                            <td><?php echo htmlspecialchars($tema['autor']); ?></td>
+                            <td><?php echo date('d/m/Y H:i', strtotime($tema['ultima_actividad'])); ?></td>
+                        </tr>
+                    <?php endwhile; ?>
+                <?php else: ?>
+                    <tr><td colspan="3"><?php echo $TEXTOS['foros_no_temas']; ?></td></tr>
+                <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 

@@ -183,4 +183,16 @@ function subirArchivo($archivo, $directorio, $tipos_permitidos = ['jpg', 'jpeg',
 
     return $nombre_archivo;
 }
+
+/**
+ * Crear notificaciones
+ */
+function crearNotificacion($usuario_id, $tipo, $mensaje, $url = null) {
+    global $conexion;
+    $sql = "INSERT INTO notificaciones (usuario_id, tipo, mensaje, url, fecha_creacion, leida) VALUES (?, ?, ?, ?, NOW(), 0)";
+    $stmt = $conexion->prepare($sql);
+    $stmt->bind_param("isss", $usuario_id, $tipo, $mensaje, $url);
+    return $stmt->execute();
+}
+
 ?>
