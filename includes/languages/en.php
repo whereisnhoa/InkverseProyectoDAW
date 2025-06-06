@@ -469,3 +469,12 @@ $TEXTOS['galeria_comentarios'] = 'Comments';
 $TEXTOS['galeria_escribe_comentario'] = 'Write a comment...';
 $TEXTOS['galeria_comentar'] = 'Comment';
 $TEXTOS['galeria_no_comentarios'] = 'No comments yet. Be the first!';
+
+$TEXTOS['categoria_no_encontrada'] = 'Category not found';
+$TEXTOS['categoria_sin_descripcion'] = 'No description.';
+$TEXTOS['categoria_obras_recientes'] = 'Recent works';
+$TEXTOS['categoria_no_obras_recientes'] = 'No recent works in this category.';
+$TEXTOS['categoria_recomendadas'] = 'Recommended';
+$TEXTOS['categoria_no_recomendadas'] = 'No recommendations yet.';
+$TEXTOS['categoria_todas_obras'] = 'All works';
+$TEXTOS['categoria_no_obras'] = 'No works in this category.';

@@ -492,3 +492,12 @@ $TEXTOS['galeria_comentarios'] = 'Comentarios';
 $TEXTOS['galeria_escribe_comentario'] = 'Escribe un comentario...';
 $TEXTOS['galeria_comentar'] = 'Comentar';
 $TEXTOS['galeria_no_comentarios'] = 'No hay comentarios aún. ¡Sé el primero en comentar!';
+
+$TEXTOS['categoria_no_encontrada'] = 'Categoría no encontrada';
+$TEXTOS['categoria_sin_descripcion'] = 'Sin descripción.';
+$TEXTOS['categoria_obras_recientes'] = 'Obras recientes';
+$TEXTOS['categoria_no_obras_recientes'] = 'No hay obras recientes en esta categoría.';
+$TEXTOS['categoria_recomendadas'] = 'Recomendadas';
+$TEXTOS['categoria_no_recomendadas'] = 'No hay recomendaciones aún.';
+$TEXTOS['categoria_todas_obras'] = 'Todas las obras';
+$TEXTOS['categoria_no_obras'] = 'No hay obras en esta categoría.';

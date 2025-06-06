@@ -743,7 +743,6 @@ footer .container {
     .footer-grid { gap: 12px;}
 }
 
-/* === EXTRA: Para que los formularios y botones del header/footer sean bootstrap-friendly === */
 footer .btn, .footer-section .btn, .main-header .btn {
     border-radius: 8px;
     font-weight: 500;
@@ -939,8 +938,7 @@ footer .btn, .footer-section .btn, .main-header .btn {
   6. Index.php
 ==================================*/
 
-/* --- Sección Explora por género --- */
-/* ========== EXPLORA POR GÉNERO (MEJORADO) ========== */
+/* ========== EXPLORA POR GÉNERO ========== */
 .explore-section {
     background: linear-gradient(180deg, #f8faff 0%, #f6f7fb 45%, #f7f8fa 100%);
     padding: 80px 0 60px 0;
@@ -1338,7 +1336,7 @@ footer .btn, .footer-section .btn, .main-header .btn {
     color: #fff;
 }
 
-/* ========== RESPONSIVE TWEAKS ========== */
+/* ========== RESPONSIVE ========== */
 @media (max-width: 900px) {
     .explore-section, .featured-section, .dynamic-content, .features-section, .cta-section {
         padding-left: 0;
@@ -3487,7 +3485,7 @@ footer .btn, .footer-section .btn, .main-header .btn {
     to   { transform: scale(1) translateY(0); opacity: 1; }
 }
 
-/* Botón gradiente Ver (solo icono, cuadrado y efecto hover) */
+/* Botón gradiente Ver */
 .ver-btn-grad {
     display: inline-flex;
     align-items: center;
@@ -3795,4 +3793,85 @@ footer .btn, .footer-section .btn, .main-header .btn {
 .comics-carousel-multigrid .carousel-control-prev,
 .comics-carousel-multigrid .carousel-control-next {
     width: 6%;
+}
+
+/* ========== CATEGORÍA HEADER ADVANCED ========== */
+.categoria-header-advanced {
+    display: flex;
+    align-items: center;
+    gap: 34px;
+    background: linear-gradient(120deg, #6a95e9 0%, #a179e9 100%);
+    color: #fff;
+    border-radius: 30px;
+    box-shadow: 0 6px 22px #6a95e945, 0 1.5px 5px #a179e930;
+    padding: 38px 48px;
+    margin-bottom: 44px;
+    margin-top: 60px;
+    min-height: 140px;
+}
+.categoria-header-icon-gradient {
+    background: linear-gradient(135deg, #ffe082 20%, #a179e9 80%);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 90px;
+    min-height: 90px;
+    font-size: 2.6rem;
+    box-shadow: 0 4px 18px #c86bfa33;
+    color: #fff;
+}
+.categoria-header-content h1 {
+    font-size: 2.5rem;
+    font-weight: 900;
+    letter-spacing: -1.2px;
+    margin-bottom: 10px;
+    color: #fff;
+    text-shadow: 0 2px 8px #a179e950;
+}
+.categoria-header-content p {
+    font-size: 1.18rem;
+    color: #e0e8ff;
+    margin: 0;
+    font-weight: 400;
+}
+@media(max-width: 900px) {
+    .categoria-header-advanced { flex-direction: column; gap: 18px; padding: 24px 5vw; }
+    .categoria-header-icon-gradient { min-width: 70px; min-height: 70px; font-size:2rem;}
+    .categoria-header-content h1 { font-size:1.6rem; }
+}
+.seccion-obras { margin-bottom: 36px; }
+.section-title {
+    font-size: 1.35rem;
+    color: var(--primary-color);
+    font-weight: 800;
+    margin-bottom: 18px;
+    letter-spacing: -.5px;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+.section-icon {
+    color: var(--secondary-color);
+    font-size: 1.22em;
+    margin-right: 4px;
+}
+.obras-listado-advanced {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 28px;
+    margin-bottom: 8px;
+}
+.no-obras-advanced {
+    background: #fff7e7;
+    color: #8e99c7;
+    font-size: 1.09em;
+    padding: 23px 12px;
+    border-radius: 18px;
+    text-align: center;
+    margin-bottom: 0;
+    box-shadow: 0 2px 10px #ffe7b1;
+}
+@media(max-width: 700px) {
+    .obras-listado-advanced { grid-template-columns: 1fr; gap: 15px;}
 }

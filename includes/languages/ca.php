@@ -491,3 +491,12 @@ $TEXTOS['galeria_comentarios'] = "Comentaris";
 $TEXTOS['galeria_escribe_comentario'] = "Escriu un comentari...";
 $TEXTOS['galeria_comentar'] = "Comentar";
 $TEXTOS['galeria_no_comentarios'] = "Encara no hi ha comentaris. Sigues el primer!";
+
+$TEXTOS['categoria_no_encontrada'] = 'Categoria no trobada';
+$TEXTOS['categoria_sin_descripcion'] = 'Sense descripció.';
+$TEXTOS['categoria_obras_recientes'] = 'Obres recents';
+$TEXTOS['categoria_no_obras_recientes'] = 'No hi ha obres recents en aquesta categoria.';
+$TEXTOS['categoria_recomendadas'] = 'Recomanades';
+$TEXTOS['categoria_no_recomendadas'] = 'Encara no hi ha recomanacions.';
+$TEXTOS['categoria_todas_obras'] = 'Totes les obres';
+$TEXTOS['categoria_no_obras'] = 'No hi ha obres en aquesta categoria.';
