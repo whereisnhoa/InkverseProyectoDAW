@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 03-06-2025 a las 01:04:19
+-- Tiempo de generación: 07-06-2025 a las 01:20:09
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -39,8 +39,10 @@ CREATE TABLE `biblioteca` (
 --
 
 INSERT INTO `biblioteca` (`usuario_id`, `obra_id`, `estado`, `tipo`) VALUES
-(1, 5, 'leyendo', 'libro'),
-(1, 1, 'planeado', 'libro');
+(1, 2, 'abandonado', 'libro'),
+(1, 3, 'abandonado', 'libro'),
+(1, 1, 'espera', 'libro'),
+(1, 5, 'leyendo', 'libro');
 
 -- --------------------------------------------------------
 
@@ -157,8 +159,25 @@ INSERT INTO `categorias` (`id`, `nombre`, `descripcion`, `tipo`) VALUES
 CREATE TABLE `categorias_arte` (
   `id` int(11) NOT NULL,
   `nombre` varchar(100) NOT NULL,
-  `descripcion` text DEFAULT NULL
+  `descripcion` text DEFAULT NULL,
+  `icono` varchar(50) NOT NULL DEFAULT 'fa-tag'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `categorias_arte`
+--
+
+INSERT INTO `categorias_arte` (`id`, `nombre`, `descripcion`, `icono`) VALUES
+(1, 'Ilustración', NULL, 'fa-paint-brush'),
+(2, 'Portada', NULL, 'fa-book-open'),
+(3, 'Concept Art', NULL, 'fa-magic'),
+(4, 'Fanart', NULL, 'fa-star'),
+(5, 'Tira Cómica', NULL, 'fa-grin-squint'),
+(6, 'Boceto', NULL, 'fa-pencil-alt'),
+(7, '3D', NULL, 'fa-cube'),
+(8, 'Fotografía', NULL, 'fa-camera-retro'),
+(9, 'Digital', NULL, 'fa-tablet-alt'),
+(10, 'Tradicional', NULL, 'fa-brush');
 
 -- --------------------------------------------------------
 
@@ -169,8 +188,19 @@ CREATE TABLE `categorias_arte` (
 CREATE TABLE `categorias_foro` (
   `id` int(11) NOT NULL,
   `nombre` varchar(100) NOT NULL,
-  `descripcion` text DEFAULT NULL
+  `descripcion` text DEFAULT NULL,
+  `icono` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `categorias_foro`
+--
+
+INSERT INTO `categorias_foro` (`id`, `nombre`, `descripcion`, `icono`) VALUES
+(1, 'Literatura', 'Discute sobre novelas, relatos, poesía y más.', 'fa-book-open'),
+(2, 'Cómics', 'Todo sobre cómics, manga, webtoons y novela gráfica.', 'fa-book'),
+(3, 'Recomendaciones', 'Pide y comparte recomendaciones de lectura.', 'fa-star'),
+(4, 'General', 'Temas variados de la comunidad lectora.', 'fa-comments');
 
 -- --------------------------------------------------------
 
@@ -187,6 +217,18 @@ CREATE TABLE `comentarios` (
   `fecha` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Volcado de datos para la tabla `comentarios`
+--
+
+INSERT INTO `comentarios` (`id`, `usuario_id`, `tipo_contenido`, `contenido_id`, `comentario`, `fecha`) VALUES
+(1, 1, 'libro', 3, '!!!', '2025-06-06 21:07:59'),
+(2, 1, 'libro', 2, '!!!', '2025-06-06 21:11:00'),
+(3, 1, 'libro', 1, 'hola', '2025-06-06 22:23:38'),
+(4, 1, 'libro', 3, 'hola', '2025-06-06 23:04:09'),
+(5, 1, 'libro', 5, '<3', '2025-06-06 23:18:27'),
+(6, 1, 'libro', 5, 'holaa', '2025-06-06 23:37:49');
+
 -- --------------------------------------------------------
 
 --
@@ -198,8 +240,29 @@ CREATE TABLE `comentarios_arte` (
   `usuario_id` int(11) NOT NULL,
   `arte_id` int(11) NOT NULL,
   `comentario` text NOT NULL,
+  `fecha_comentario` datetime NOT NULL DEFAULT current_timestamp(),
   `fecha` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `comentarios_arte`
+--
+
+INSERT INTO `comentarios_arte` (`id`, `usuario_id`, `arte_id`, `comentario`, `fecha_comentario`, `fecha`) VALUES
+(1, 1, 3, '&lt;3', '2025-06-05 14:48:50', '2025-06-05 14:48:50'),
+(2, 1, 6, '!!!', '2025-06-06 18:13:32', '2025-06-06 18:13:32'),
+(3, 1, 6, '!!!', '2025-06-06 18:14:18', '2025-06-06 18:14:18'),
+(4, 1, 6, '!!!', '2025-06-06 18:14:19', '2025-06-06 18:14:19'),
+(5, 1, 6, '!!!', '2025-06-06 18:14:19', '2025-06-06 18:14:19'),
+(6, 1, 6, '!!!', '2025-06-06 18:14:19', '2025-06-06 18:14:19'),
+(7, 1, 6, '!!!', '2025-06-06 18:14:20', '2025-06-06 18:14:20'),
+(8, 1, 6, '!!!', '2025-06-06 18:14:20', '2025-06-06 18:14:20'),
+(9, 1, 6, '!!!', '2025-06-06 18:14:20', '2025-06-06 18:14:20'),
+(10, 1, 6, '!!!', '2025-06-06 18:14:21', '2025-06-06 18:14:21'),
+(11, 1, 6, '!!!', '2025-06-06 18:14:21', '2025-06-06 18:14:21'),
+(12, 1, 6, '!!!', '2025-06-06 18:14:21', '2025-06-06 18:14:21'),
+(13, 1, 6, '!!!', '2025-06-06 18:14:57', '2025-06-06 18:14:57'),
+(14, 1, 9, ':0', '2025-06-06 18:24:48', '2025-06-06 18:24:48');
 
 -- --------------------------------------------------------
 
@@ -247,6 +310,14 @@ CREATE TABLE `favoritos` (
   `fecha_agregado` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Volcado de datos para la tabla `favoritos`
+--
+
+INSERT INTO `favoritos` (`id`, `usuario_id`, `tipo_contenido`, `contenido_id`, `fecha_agregado`) VALUES
+(50, 1, 'libro', 3, '2025-06-07 00:42:02'),
+(51, 1, 'libro', 5, '2025-06-07 00:47:26');
+
 -- --------------------------------------------------------
 
 --
@@ -260,8 +331,25 @@ CREATE TABLE `galeria_arte` (
   `titulo` varchar(255) NOT NULL,
   `descripcion` text DEFAULT NULL,
   `imagen` varchar(255) DEFAULT NULL,
+  `thumbnail` varchar(255) DEFAULT NULL,
+  `publico_adulto` tinyint(1) NOT NULL DEFAULT 0,
+  `me_gusta` int(11) NOT NULL DEFAULT 0,
   `fecha_subida` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `galeria_arte`
+--
+
+INSERT INTO `galeria_arte` (`id`, `usuario_id`, `categoria_id`, `titulo`, `descripcion`, `imagen`, `thumbnail`, `publico_adulto`, `me_gusta`, `fecha_subida`) VALUES
+(1, 1, 1, 'Medusa', 'Ilustración de Medusa', '/cozitas/proyecto/uploads/arte/arte_684171f463ff7.jpg', NULL, 0, 0, '2025-06-05 12:31:16'),
+(2, 1, 6, 'Medusa boceto', 'El boceto de la ilustración de Medusa', '/cozitas/proyecto/uploads/arte/arte_68417325e43d9.jpg', NULL, 0, 0, '2025-06-05 12:36:21'),
+(3, 1, 4, 'artwork', '', '/cozitas/proyecto/uploads/arte/arte_6841857410704.jpg', NULL, 0, 1, '2025-06-05 13:54:28'),
+(4, 1, 4, 'artwork', '', '/cozitas/proyecto/uploads/arte/arte_6842d631b8080.jpg', NULL, 0, 1, '2025-06-06 13:51:13'),
+(5, 1, 4, 'artwork', '', '/cozitas/proyecto/uploads/arte/arte_6842d6776c322.jpg', NULL, 0, 0, '2025-06-06 13:52:23'),
+(6, 1, 1, 'oreo', '', '/cozitas/proyecto/uploads/arte/arte_6842d831e856b.jpg', NULL, 0, 0, '2025-06-06 13:59:45'),
+(8, 1, 9, 'oreo', '', '/cozitas/proyecto/uploads/arte/arte_6842d97252cd4.jpg', NULL, 1, 0, '2025-06-06 14:05:06'),
+(9, 1, 1, 'aot', '', '/cozitas/proyecto/uploads/arte/arte_6842de0763ebe.jpg', NULL, 0, 1, '2025-06-06 14:24:39');
 
 -- --------------------------------------------------------
 
@@ -351,6 +439,15 @@ CREATE TABLE `me_gusta_arte` (
   `fecha` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Volcado de datos para la tabla `me_gusta_arte`
+--
+
+INSERT INTO `me_gusta_arte` (`id`, `usuario_id`, `arte_id`, `fecha`) VALUES
+(4, 1, 3, '2025-06-05 13:54:34'),
+(5, 1, 4, '2025-06-06 13:51:47'),
+(7, 1, 9, '2025-06-06 22:26:04');
+
 -- --------------------------------------------------------
 
 --
@@ -391,8 +488,37 @@ CREATE TABLE `respuestas_foro` (
   `tema_id` int(11) NOT NULL,
   `usuario_id` int(11) NOT NULL,
   `contenido` text NOT NULL,
-  `fecha` datetime DEFAULT current_timestamp()
+  `fecha` datetime DEFAULT current_timestamp(),
+  `respuesta_a` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `respuestas_foro`
+--
+
+INSERT INTO `respuestas_foro` (`id`, `tema_id`, `usuario_id`, `contenido`, `fecha`, `respuesta_a`) VALUES
+(19, 6, 1, '!!!', '2025-06-04 17:29:40', NULL),
+(20, 6, 1, 'hii', '2025-06-04 21:35:39', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `respuestas_likes`
+--
+
+CREATE TABLE `respuestas_likes` (
+  `id` int(11) NOT NULL,
+  `respuesta_id` int(11) NOT NULL,
+  `usuario_id` int(11) NOT NULL,
+  `fecha` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `respuestas_likes`
+--
+
+INSERT INTO `respuestas_likes` (`id`, `respuesta_id`, `usuario_id`, `fecha`) VALUES
+(17, 19, 1, '2025-06-04 20:28:24');
 
 -- --------------------------------------------------------
 
@@ -419,8 +545,21 @@ CREATE TABLE `temas_foro` (
   `categoria_id` int(11) DEFAULT NULL,
   `titulo` varchar(255) NOT NULL,
   `contenido` text NOT NULL,
-  `fecha` datetime DEFAULT current_timestamp()
+  `fecha` datetime DEFAULT current_timestamp(),
+  `ultima_actividad` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `temas_foro`
+--
+
+INSERT INTO `temas_foro` (`id`, `usuario_id`, `categoria_id`, `titulo`, `contenido`, `fecha`, `ultima_actividad`) VALUES
+(6, 1, 1, '¿Qué novela te marcó en la adolescencia?', '¡Me gustaría saber qué libro te cambió la vida en tu juventud!', '2025-06-04 13:25:24', '2025-06-04 21:35:39'),
+(7, 2, 2, '¿Marvel o DC? Debate sano', '¿Con cuál universo te quedas y por qué?', '2025-06-04 13:25:24', '2025-06-04 13:25:24'),
+(8, 3, 3, 'Busco recomendaciones de fantasía épica', '¿Algún libro tipo Tolkien o Sanderson para recomendar?', '2025-06-04 13:25:24', '2025-06-04 13:25:24'),
+(9, 1, 4, '¿Qué opinan de los e-books?', '¿Prefieren leer en papel o en digital? ¡Debatan!', '2025-06-04 13:25:24', '2025-06-04 13:25:24'),
+(10, 2, 1, 'Club de lectura junio 2025', '¡Proponed títulos para nuestra próxima lectura conjunta!', '2025-06-04 13:25:24', '2025-06-04 13:25:24'),
+(16, 1, 1, 'La historia de Medusa', '¿Qué opináis de la historia de Medusa?', '2025-06-04 22:08:21', '2025-06-04 22:08:21');
 
 -- --------------------------------------------------------
 
@@ -448,15 +587,19 @@ CREATE TABLE `usuarios` (
   `privacidad` enum('publico','privado') DEFAULT 'publico',
   `X` varchar(255) DEFAULT NULL,
   `instagram` varchar(255) DEFAULT NULL,
-  `facebook` varchar(255) DEFAULT NULL
+  `facebook` varchar(255) DEFAULT NULL,
+  `genero_favorito` varchar(32) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `usuarios`
 --
 
-INSERT INTO `usuarios` (`id`, `usuario`, `email`, `password`, `fecha_registro`, `fecha_nacimiento`, `nombre`, `biografia`, `email_verificado`, `token_verificacion`, `token_recuperacion`, `avatar`, `banner_color`, `banner_img`, `sitio_web`, `ubicacion`, `privacidad`, `X`, `instagram`, `facebook`) VALUES
-(1, 'whereisnhoa', 'ainhoalr1203@gmail.com', '$2y$10$9ktkNqrnhFDpX0GEA0joN.X23sleu8VfCXA2BYP7Mh.7MYRuGT/ZS', '2025-05-31 22:36:53', '2003-12-11', 'Ainhoa', 'Esto es la biografía.', 1, NULL, 'dd551ac1a9f142d2603b9d2824bb14d5a17c29d74c102d7844a3c39415be24b3', 'avatar_683cba1367225.jpg', '#eec144', NULL, '', 'San Roque, Cádiz (España)', 'publico', '', 'https://instagram.com/whereisnhoa', '');
+INSERT INTO `usuarios` (`id`, `usuario`, `email`, `password`, `fecha_registro`, `fecha_nacimiento`, `nombre`, `biografia`, `email_verificado`, `token_verificacion`, `token_recuperacion`, `avatar`, `banner_color`, `banner_img`, `sitio_web`, `ubicacion`, `privacidad`, `X`, `instagram`, `facebook`, `genero_favorito`) VALUES
+(1, 'whereisnhoa', 'ainhoalr1203@gmail.com', '$2y$10$9ktkNqrnhFDpX0GEA0joN.X23sleu8VfCXA2BYP7Mh.7MYRuGT/ZS', '2025-05-31 22:36:53', '2003-12-11', 'Ainhoa', 'Esto es la biografía. hola', 1, NULL, '722f21e233942c9b1612249b0680fe1416774db8ef42511108d43e930ed396da', 'avatar_683cba1367225.jpg', '#eec144', 'banner_683e6455cd33b.gif', '', 'San Roque, Cádiz (España)', 'publico', '', 'https://instagram.com/whereisnhoa', '', 'fantasia'),
+(2, 'María', 'maria@email.com', 'Macarr0nes#', '2025-06-04 13:25:24', NULL, NULL, NULL, 0, NULL, NULL, NULL, '#4361ee', NULL, NULL, NULL, 'publico', NULL, NULL, NULL, NULL),
+(3, 'Ander', 'ander@email.com', 'Macarr0nes#', '2025-06-04 13:25:24', NULL, NULL, NULL, 0, NULL, NULL, NULL, '#4361ee', NULL, NULL, NULL, 'publico', NULL, NULL, NULL, NULL),
+(4, 'Sergio', 'sergio@email.com', 'Macarr0nes#', '2025-06-04 13:25:24', NULL, NULL, NULL, 0, NULL, NULL, NULL, '#4361ee', NULL, NULL, NULL, 'publico', NULL, NULL, NULL, NULL);
 
 --
 -- Índices para tablas volcadas
@@ -601,6 +744,14 @@ ALTER TABLE `respuestas_foro`
   ADD KEY `usuario_id` (`usuario_id`);
 
 --
+-- Indices de la tabla `respuestas_likes`
+--
+ALTER TABLE `respuestas_likes`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `unique_like` (`respuesta_id`,`usuario_id`),
+  ADD KEY `usuario_id` (`usuario_id`);
+
+--
 -- Indices de la tabla `seguidores`
 --
 ALTER TABLE `seguidores`
@@ -649,25 +800,25 @@ ALTER TABLE `categorias`
 -- AUTO_INCREMENT de la tabla `categorias_arte`
 --
 ALTER TABLE `categorias_arte`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT de la tabla `categorias_foro`
 --
 ALTER TABLE `categorias_foro`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT de la tabla `comentarios`
 --
 ALTER TABLE `comentarios`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT de la tabla `comentarios_arte`
 --
 ALTER TABLE `comentarios_arte`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT de la tabla `comics`
@@ -679,13 +830,13 @@ ALTER TABLE `comics`
 -- AUTO_INCREMENT de la tabla `favoritos`
 --
 ALTER TABLE `favoritos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
 
 --
 -- AUTO_INCREMENT de la tabla `galeria_arte`
 --
 ALTER TABLE `galeria_arte`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT de la tabla `libros`
@@ -703,7 +854,7 @@ ALTER TABLE `mensajes`
 -- AUTO_INCREMENT de la tabla `me_gusta_arte`
 --
 ALTER TABLE `me_gusta_arte`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT de la tabla `notificaciones`
@@ -721,7 +872,13 @@ ALTER TABLE `obras`
 -- AUTO_INCREMENT de la tabla `respuestas_foro`
 --
 ALTER TABLE `respuestas_foro`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+
+--
+-- AUTO_INCREMENT de la tabla `respuestas_likes`
+--
+ALTER TABLE `respuestas_likes`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT de la tabla `seguidores`
@@ -733,13 +890,13 @@ ALTER TABLE `seguidores`
 -- AUTO_INCREMENT de la tabla `temas_foro`
 --
 ALTER TABLE `temas_foro`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- Restricciones para tablas volcadas
@@ -836,6 +993,13 @@ ALTER TABLE `notificaciones`
 ALTER TABLE `respuestas_foro`
   ADD CONSTRAINT `respuestas_foro_ibfk_1` FOREIGN KEY (`tema_id`) REFERENCES `temas_foro` (`id`),
   ADD CONSTRAINT `respuestas_foro_ibfk_2` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`);
+
+--
+-- Filtros para la tabla `respuestas_likes`
+--
+ALTER TABLE `respuestas_likes`
+  ADD CONSTRAINT `respuestas_likes_ibfk_1` FOREIGN KEY (`respuesta_id`) REFERENCES `respuestas_foro` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `respuestas_likes_ibfk_2` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE;
 
 --
 -- Filtros para la tabla `seguidores`
