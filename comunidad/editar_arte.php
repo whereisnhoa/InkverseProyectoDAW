@@ -6,45 +6,37 @@ session_start();
 $usuario_logueado = isset($_SESSION['usuario_id']);
 $arte_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
-// Procesar submit 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // validaciones
+// Lógica de guardado ANTES de cualquier salida
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $usuario_logueado) {
+    $titulo = limpiarDatos($_POST['titulo'] ?? '');
+    $descripcion = limpiarDatos($_POST['descripcion'] ?? '');
+    $publico_adulto = isset($_POST['publico_adulto']) ? 1 : 0;
+    $sql_update = "UPDATE galeria_arte SET titulo = ?, descripcion = ?, publico_adulto = ? WHERE id = ? AND usuario_id = ?";
+    $stmt_update = $conexion->prepare($sql_update);
+    $stmt_update->bind_param("ssiii", $titulo, $descripcion, $publico_adulto, $arte_id, $_SESSION['usuario_id']);
+    $stmt_update->execute();
     header('Location: ver_arte.php?id=' . $arte_id);
     exit();
 }
 
-// incluir header
-include '../includes/header.php';
-
-// Seguridad básica
+// Validaciones y carga de datos
 if (!$usuario_logueado || $arte_id <= 0) {
     header('Location: arte.php');
     exit();
 }
 
-// Obtener obra
 $sql = "SELECT * FROM galeria_arte WHERE id = ? AND usuario_id = ?";
 $stmt = $conexion->prepare($sql);
 $stmt->bind_param("ii", $arte_id, $_SESSION['usuario_id']);
 $stmt->execute();
 $arte = $stmt->get_result()->fetch_assoc();
+
 if (!$arte) {
-    echo "<div style='margin:2em auto;max-width:400px;color:red;'>No tienes permiso para editar esta obra, o no existe.</div>";
-    include '../includes/footer.php';
+    header('Location: arte.php');
     exit();
 }
 
-// Procesar submit
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $titulo = limpiarDatos($_POST['titulo']);
-    $descripcion = limpiarDatos($_POST['descripcion']);
-    $sql_update = "UPDATE galeria_arte SET titulo = ?, descripcion = ? WHERE id = ? AND usuario_id = ?";
-    $stmt_update = $conexion->prepare($sql_update);
-    $stmt_update->bind_param("ssii", $titulo, $descripcion, $arte_id, $_SESSION['usuario_id']);
-    $stmt_update->execute();
-    header('Location: ver_arte.php?id=' . $arte_id);
-    exit();
-}
+include '../includes/header.php';
 ?>
 <link rel="stylesheet" href="<?php echo BASE_URL; ?>/css/comunidad.css">
 <style>
@@ -130,6 +122,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   min-height: 80px;
   resize: vertical;
 }
+.editar-arte-form .checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 10px;
+}
+.editar-arte-form input[type="checkbox"] {
+  accent-color: #a16ae8;
+  width: 18px;
+  height: 18px;
+}
 .editar-arte-form button[type="submit"] {
   width: 100%;
   background: linear-gradient(90deg,#fcb7ff 40%, #a16ae8 120%);
@@ -178,6 +181,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <input type="text" name="titulo" id="titulo" value="<?= htmlspecialchars($arte['titulo']) ?>" required maxlength="80">
       <label for="descripcion">Descripción</label>
       <textarea name="descripcion" id="descripcion" rows="5" maxlength="600"><?= htmlspecialchars($arte['descripcion']) ?></textarea>
+      <div class="checkbox-group">
+        <input type="checkbox" id="publico_adulto" name="publico_adulto" value="1" <?= $arte['publico_adulto'] ? "checked" : "" ?>>
+        <label for="publico_adulto" style="margin-bottom:0;font-weight:600;color:#a16ae8;cursor:pointer;">
+          Contenido para adultos (+18)
+        </label>
+      </div>
       <button type="submit">Guardar cambios</button>
     </form>
     <a href="ver_arte.php?id=<?= $arte_id ?>" class="editar-arte-cancel">Cancelar</a>

@@ -5,7 +5,7 @@ if (!isset($_SESSION['usuario_id'])) { redirigirConMensaje('login.php', $TEXTOS[
 $sql_categorias = "SELECT * FROM categorias_arte ORDER BY nombre";
 $result_categorias = $conexion->query($sql_categorias);
 ?>
-<link rel="stylesheet" href="<?php echo BASE_URL; ?>/css/comunidad.css">
+<link rel="stylesheet" href="<?php echo BASE_URL; ?>../css/comunidad.css">
 
 <div class="arte-upload-form-container">
   <h1 class="arte-title"><?= $TEXTOS['galeria_subir_titulo'] ?? 'Subir nueva obra de arte'; ?></h1>

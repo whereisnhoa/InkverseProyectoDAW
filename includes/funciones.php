@@ -195,4 +195,3 @@ function crearNotificacion($usuario_id, $tipo, $mensaje, $url = null) {
     return $stmt->execute();
 }
 
-?>

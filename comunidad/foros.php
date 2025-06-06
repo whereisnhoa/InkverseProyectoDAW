@@ -48,7 +48,7 @@ $result_temas_recientes = $conexion->query($sql_temas_recientes);
 
 ?>
 
-<link rel="stylesheet" href="<?php echo BASE_URL; ?>/css/comunidad.css">
+<link rel="stylesheet" href="<?php echo BASE_URL; ?>../css/comunidad.css">
 
 <div class="foro-container">
 

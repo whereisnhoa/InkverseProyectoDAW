@@ -1,15 +1,20 @@
 <?php
-include '../includes/header.php';
 include_once('../includes/funciones.php');
+include '../includes/conexion.php';
+session_start();
+
 $usuario_logueado = isset($_SESSION['usuario_id']);
 $arte_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 if ($arte_id <= 0) { redirigirConMensaje('arte.php', $TEXTOS['galeria_error_id'],'error'); exit(); }
+
 $sql = "SELECT ga.*, ca.nombre as categoria_nombre, ca.icono as categoria_icono, u.usuario as autor_nombre, u.id as autor_id
   FROM galeria_arte ga
   JOIN categorias_arte ca ON ga.categoria_id = ca.id
   JOIN usuarios u ON ga.usuario_id = u.id
   WHERE ga.id = ?";
-$stmt = $conexion->prepare($sql); $stmt->bind_param("i",$arte_id); $stmt->execute();
+$stmt = $conexion->prepare($sql); 
+$stmt->bind_param("i",$arte_id); 
+$stmt->execute();
 $arte = $stmt->get_result()->fetch_assoc();
 if(!$arte){ redirigirConMensaje('arte.php', $TEXTOS['galeria_obra_no_encontrada'],'error'); exit(); }
 if ($arte['publico_adulto'] && (!$usuario_logueado || (isset($_SESSION['edad']) && $_SESSION['edad'] < 18))) {
@@ -23,8 +28,12 @@ if($usuario_logueado){
   $ha_dado_like = $stmt_like->get_result()->num_rows > 0;
 }
 $sqlc = "SELECT c.*, u.usuario as nombre_usuario FROM comentarios_arte c JOIN usuarios u ON c.usuario_id = u.id WHERE c.arte_id=? ORDER BY c.fecha_comentario DESC";
-$stmtc = $conexion->prepare($sqlc); $stmtc->bind_param("i", $arte_id); $stmtc->execute();
+$stmtc = $conexion->prepare($sqlc); 
+$stmtc->bind_param("i", $arte_id); 
+$stmtc->execute();
 $comentarios = $stmtc->get_result();
+
+include '../includes/header.php';
 ?>
 <link rel="stylesheet" href="<?php echo BASE_URL; ?>/css/comunidad.css">
 <style>

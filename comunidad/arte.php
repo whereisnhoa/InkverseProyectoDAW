@@ -1,3 +1,4 @@
+
 <?php
 include '../includes/header.php';
 include_once('../includes/funciones.php');
@@ -31,8 +32,7 @@ $result_stats = $conexion->query("SELECT categoria_id, COUNT(*) as cuenta FROM g
 while($row = $result_stats->fetch_assoc()) $stats_categoria[$row['categoria_id']] = $row['cuenta'];
 ?>
 
-<link rel="stylesheet" href="<?php echo BASE_URL; ?>/css/arte.css">
-
+<link rel="stylesheet" href="<?php echo BASE_URL; ?>/css/comunidad.css">
 <style>
 body {
   background: linear-gradient(120deg, #f6f3ff 0%, #e3f0ff 100%);
@@ -273,6 +273,31 @@ body {
   font-weight: 600;
   letter-spacing: .1px;
 }
+
+/* Censura para obras +18 */
+.censura-arte {
+  filter: blur(22px) grayscale(0.5) brightness(1.2);
+  position: relative;
+  pointer-events: none;
+  user-select: none;
+}
+.censura-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(38, 24, 65, 0.65);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+  font-weight: bold;
+  font-size: 1.2em;
+  letter-spacing: 1px;
+  z-index: 2;
+  border-radius: 34px 34px 0 0;
+  text-shadow: 0 2px 12px #000c;
+  pointer-events: none;
+  user-select: none;
+}
 </style>
 
 <div class="arte-header">
@@ -311,8 +336,15 @@ body {
 <div class="arte-masonry">
 <?php if($result_arte && $result_arte->num_rows>0): foreach($result_arte as $arte): ?>
   <div class="arte-card">
-    <a href="ver_arte.php?id=<?= $arte['id'] ?>" class="arte-card-link">
-      <img class="arte-img-top" src="<?= htmlspecialchars($arte['thumbnail']?:$arte['imagen']) ?>" alt="<?= htmlspecialchars($arte['titulo']) ?>">
+    <a href="ver_arte.php?id=<?= $arte['id'] ?>" class="arte-card-link" style="position:relative;">
+      <div style="position:relative;">
+        <img class="arte-img-top<?= $arte['publico_adulto'] ? ' censura-arte' : '' ?>" src="<?= htmlspecialchars($arte['thumbnail']?:$arte['imagen']) ?>" alt="<?= htmlspecialchars($arte['titulo']) ?>">
+        <?php if($arte['publico_adulto']): ?>
+          <div class="censura-overlay">
+            <i class="fas fa-eye-slash"></i> Contenido +18
+          </div>
+        <?php endif; ?>
+      </div>
       <div class="arte-card-content">
         <div class="arte-title"><?= htmlspecialchars($arte['titulo']) ?></div>
         <div class="arte-author">
@@ -328,11 +360,9 @@ body {
       </div>
     </a>
     <div class="arte-comentarios-sec">
-      <form action="ver_arte.php?id=<?= $arte['id'] ?>#comentar" method="get">
-        <button class="arte-like-btn" type="submit" style="background:transparent;border:none;">
-          <i class="fas fa-comment"></i> <?= $TEXTOS['galeria_comentar']??'Comentar'; ?>
-        </button>
-      </form>
+      <a href="ver_arte.php?id=<?= $arte['id'] ?>#comentar" class="arte-like-btn" style="background:transparent;border:none;">
+  <i class="fas fa-comment"></i> <?= $TEXTOS['galeria_comentar']??'Comentar'; ?>
+</a>
     </div>
   </div>
 <?php endforeach; else: ?>
