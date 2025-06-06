@@ -1,39 +1,34 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
-// Cambia la ruta según tu estructura real
+error_reporting(0);
+ini_set('display_errors', 0);
 require_once(__DIR__ . '/../includes/conexion.php');
+require_once(__DIR__ . '/../includes/config.php');
 header('Content-Type: application/json');
 
 $contenido_id = isset($_GET['contenido_id']) ? intval($_GET['contenido_id']) : 0;
-$tipo_contenido = isset($_GET['tipo_contenido']) ? $_GET['tipo_contenido'] : '';
+$tipo_contenido = $_GET['tipo_contenido'] ?? '';
+if ($tipo_contenido === 'libros') $tipo_contenido = 'libro';
+if ($tipo_contenido === 'comics') $tipo_contenido = 'comic';
 
-if (!$contenido_id || !in_array($tipo_contenido, array('libro','comic'))) {
+if (!$contenido_id || ($tipo_contenido !== 'libro' && $tipo_contenido !== 'comic')) {
     echo json_encode([]);
     exit;
 }
 
-$sql = "SELECT c.contenido, c.fecha, u.usuario FROM comentarios c
-        JOIN usuarios u ON c.usuario_id = u.id
-        WHERE c.contenido_id = ? AND c.tipo_contenido = ?
-        ORDER BY c.fecha ASC";
-$stmt = $conexion->prepare($sql);
-if (!$stmt) {
-    echo json_encode(['error' => $conexion->error]);
-    exit;
-}
+$stmt = $conexion->prepare("SELECT c.comentario, c.fecha, u.usuario, u.avatar FROM comentarios c JOIN usuarios u ON c.usuario_id = u.id WHERE c.contenido_id = ? AND c.tipo_contenido = ? ORDER BY c.fecha DESC");
 $stmt->bind_param("is", $contenido_id, $tipo_contenido);
 $stmt->execute();
 $res = $stmt->get_result();
-$comentarios = array();
+$out = [];
 while($row = $res->fetch_assoc()) {
-    $comentarios[] = array(
+    $avatarUrl = !empty($row['avatar'])
+        ? BASE_URL . '/uploads/avatars/' . $row['avatar']
+        : BASE_URL . '/img/avatar_default.png';
+    $out[] = [
         'usuario' => htmlspecialchars($row['usuario']),
+        'avatar' => $avatarUrl,
         'fecha' => date('d/m/Y H:i', strtotime($row['fecha'])),
-        'contenido' => nl2br(htmlspecialchars($row['contenido']))
-    );
+        'contenido' => nl2br(htmlspecialchars($row['comentario']))
+    ];
 }
-echo json_encode($comentarios);
-exit;
+echo json_encode($out);

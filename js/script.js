@@ -346,7 +346,7 @@ function displayRandomContent(obra, container) {
 }
 
 // =============================
-// 8. Formularios (validación básica)
+// 8. Formularios 
 // =============================
 function initializeForms() {
   const forms = document.querySelectorAll("form[data-validate]");
@@ -455,7 +455,7 @@ function initializeFavoritos() {
 
 function toggleFavorito(obraId, tipo, button = null) {
   if (!obraId || !tipo) {
-    showAlert("Error: Datos de obra inválidos", "error");
+    // No mostrar nada
     return;
   }
   fetch("controllers/procesar-favorito.php", {
@@ -468,22 +468,24 @@ function toggleFavorito(obraId, tipo, button = null) {
   })
     .then((response) => response.json())
     .then((data) => {
-      if (data.success) {
+      if (typeof data.agregado !== "undefined") {
         if (button) updateFavoritoButton(button, data.agregado);
         document.querySelectorAll(`[data-obra-id="${obraId}"][data-tipo="${tipo}"]`).forEach((btn) => {
           if (btn !== button) updateFavoritoButton(btn, data.agregado);
         });
-        showAlert(data.mensaje, data.agregado ? "success" : "info");
-      } else {
-        showAlert(data.mensaje || "Error al procesar favorito", "error");
+      } else if (data.mensaje === "No autenticado") {
+        showAlert("Debes iniciar sesión para añadir a favoritos", "error");
       }
+      // NO showAlert, NO toast, NO error genérico
     })
-    .catch((error) => showAlert("Error de conexión", "error"));
+    .catch((error) => {
+      // NO mensaje de error
+    });
 }
 
 function quitarDeFavoritos(obraId, tipo, button = null) {
   if (!obraId || !tipo) {
-    showAlert("Error: Datos de obra inválidos", "error");
+    // No mostrar nada
     return;
   }
   fetch("controllers/procesar-favorito.php", {
@@ -512,12 +514,12 @@ function quitarDeFavoritos(obraId, tipo, button = null) {
         } else if (button) {
           updateFavoritoButton(button, false);
         }
-        showAlert(data.mensaje, "success");
-      } else {
-        showAlert(data.mensaje || "Error al quitar de favoritos", "error");
       }
+      // NO showAlert, NO toast, NO error
     })
-    .catch((error) => showAlert("Error de conexión", "error"));
+    .catch((error) => {
+      // NO mensaje de error
+    });
 }
 
 function updateFavoritoButton(button, isFavorito) {

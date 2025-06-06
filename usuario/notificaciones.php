@@ -7,6 +7,9 @@ require_once(__DIR__ . '/../includes/config.php');
 require_once(__DIR__ . '/../includes/funciones.php');
 require_once(__DIR__ . '/../includes/conexion.php');
 
+// Cargar idioma
+require_once(__DIR__ . '/../includes/idioma.php');
+
 // Verificar que el usuario esté logueado
 verificarLogin();
 
@@ -49,7 +52,7 @@ $total_paginas = ceil($total_notificaciones / $notificaciones_por_pagina);
 // Obtener notificaciones paginadas
 $sql = "SELECT * FROM notificaciones 
         $sql_where 
-        ORDER BY fecha_creacion DESC 
+        ORDER BY fecha DESC 
         LIMIT ?, ?";
 $params[] = $offset;
 $params[] = $notificaciones_por_pagina;
@@ -63,7 +66,7 @@ $notificaciones = $stmt->get_result();
 // Obtener estadísticas
 $sql_stats = "SELECT 
                 COUNT(*) as total,
-                SUM(CASE WHEN leida = 0 THEN 1 ELSE 0 END) as no_leidas,
+                SUM(CASE WHEN leido = 0 THEN 1 ELSE 0 END) as no_leidas,
                 SUM(CASE WHEN tipo = 'comentario' THEN 1 ELSE 0 END) as comentarios,
                 SUM(CASE WHEN tipo = 'like' THEN 1 ELSE 0 END) as likes,
                 SUM(CASE WHEN tipo = 'nueva_obra' THEN 1 ELSE 0 END) as nuevas_obras
@@ -82,18 +85,18 @@ include_once(__DIR__ . '/../includes/header.php');
         <!-- Header de la página -->
         <div class="page-header">
             <div class="page-title">
-                <h1><i class="fas fa-bell"></i> Mis Notificaciones</h1>
-                <p>Mantente al día con toda la actividad de tu cuenta</p>
+                <h1><i class="fas fa-bell"></i> <?php echo $TEXTOS['notificaciones_titulo']; ?></h1>
+                <p><?php echo $TEXTOS['notificaciones_subtitulo']; ?></p>
             </div>
             <div class="page-actions">
                 <?php if ($stats['no_leidas'] > 0): ?>
                     <a href="<?php echo BASE_URL; ?>/controllers/procesar-notificaciones.php?accion=marcar_todas_leidas" 
                        class="btn btn-primary" id="marcar-todas-leidas">
-                        <i class="fas fa-check-double"></i> Marcar todas como leídas
+                        <i class="fas fa-check-double"></i> <?php echo $TEXTOS['marcar_todas_leidas']; ?>
                     </a>
                 <?php endif; ?>
                 <button class="btn btn-outline" id="btn-configuracion">
-                    <i class="fas fa-cog"></i> Configuración
+                    <i class="fas fa-cog"></i> <?php echo $TEXTOS['configuracion']; ?>
                 </button>
             </div>
         </div>
@@ -106,7 +109,7 @@ include_once(__DIR__ . '/../includes/header.php');
                 </div>
                 <div class="stat-content">
                     <span class="stat-number"><?php echo $stats['total']; ?></span>
-                    <span class="stat-label">Total</span>
+                    <span class="stat-label"><?php echo $TEXTOS['total']; ?></span>
                 </div>
             </div>
             
@@ -116,7 +119,7 @@ include_once(__DIR__ . '/../includes/header.php');
                 </div>
                 <div class="stat-content">
                     <span class="stat-number"><?php echo $stats['no_leidas']; ?></span>
-                    <span class="stat-label">Sin leer</span>
+                    <span class="stat-label"><?php echo $TEXTOS['sin_leer']; ?></span>
                 </div>
             </div>
             
@@ -126,7 +129,7 @@ include_once(__DIR__ . '/../includes/header.php');
                 </div>
                 <div class="stat-content">
                     <span class="stat-number"><?php echo $stats['comentarios']; ?></span>
-                    <span class="stat-label">Comentarios</span>
+                    <span class="stat-label"><?php echo $TEXTOS['comentarios']; ?></span>
                 </div>
             </div>
             
@@ -136,7 +139,7 @@ include_once(__DIR__ . '/../includes/header.php');
                 </div>
                 <div class="stat-content">
                     <span class="stat-number"><?php echo $stats['likes']; ?></span>
-                    <span class="stat-label">Me gusta</span>
+                    <span class="stat-label"><?php echo $TEXTOS['me_gusta']; ?></span>
                 </div>
             </div>
         </div>
@@ -145,32 +148,32 @@ include_once(__DIR__ . '/../includes/header.php');
         <div class="filtros-container">
             <form method="GET" class="filtros-form">
                 <div class="filtro-grupo">
-                    <label for="tipo">Tipo:</label>
+                    <label for="tipo"><?php echo $TEXTOS['tipo']; ?></label>
                     <select name="tipo" id="tipo">
-                        <option value="todas" <?php echo $filtro_tipo === 'todas' ? 'selected' : ''; ?>>Todas</option>
-                        <option value="comentario" <?php echo $filtro_tipo === 'comentario' ? 'selected' : ''; ?>>Comentarios</option>
-                        <option value="like" <?php echo $filtro_tipo === 'like' ? 'selected' : ''; ?>>Me gusta</option>
-                        <option value="respuesta_foro" <?php echo $filtro_tipo === 'respuesta_foro' ? 'selected' : ''; ?>>Respuestas foro</option>
-                        <option value="nueva_obra" <?php echo $filtro_tipo === 'nueva_obra' ? 'selected' : ''; ?>>Nuevas obras</option>
-                        <option value="sistema" <?php echo $filtro_tipo === 'sistema' ? 'selected' : ''; ?>>Sistema</option>
+                        <option value="todas" <?php echo $filtro_tipo === 'todas' ? 'selected' : ''; ?>><?php echo $TEXTOS['todas']; ?></option>
+                        <option value="comentario" <?php echo $filtro_tipo === 'comentario' ? 'selected' : ''; ?>><?php echo $TEXTOS['comentario']; ?></option>
+                        <option value="like" <?php echo $filtro_tipo === 'like' ? 'selected' : ''; ?>><?php echo $TEXTOS['like']; ?></option>
+                        <option value="respuesta_foro" <?php echo $filtro_tipo === 'respuesta_foro' ? 'selected' : ''; ?>><?php echo $TEXTOS['respuesta_foro']; ?></option>
+                        <option value="nueva_obra" <?php echo $filtro_tipo === 'nueva_obra' ? 'selected' : ''; ?>><?php echo $TEXTOS['nueva_obra']; ?></option>
+                        <option value="sistema" <?php echo $filtro_tipo === 'sistema' ? 'selected' : ''; ?>><?php echo $TEXTOS['sistema']; ?></option>
                     </select>
                 </div>
 
                 <div class="filtro-grupo">
-                    <label for="leidas">Estado:</label>
+                    <label for="leidas"><?php echo $TEXTOS['estado']; ?></label>
                     <select name="leidas" id="leidas">
-                        <option value="todas" <?php echo $filtro_leidas === 'todas' ? 'selected' : ''; ?>>Todas</option>
-                        <option value="no_leidas" <?php echo $filtro_leidas === 'no_leidas' ? 'selected' : ''; ?>>Sin leer</option>
-                        <option value="leidas" <?php echo $filtro_leidas === 'leidas' ? 'selected' : ''; ?>>Leídas</option>
+                        <option value="todas" <?php echo $filtro_leidas === 'todas' ? 'selected' : ''; ?>><?php echo $TEXTOS['todas']; ?></option>
+                        <option value="no_leidas" <?php echo $filtro_leidas === 'no_leidas' ? 'selected' : ''; ?>><?php echo $TEXTOS['no_leidas']; ?></option>
+                        <option value="leidas" <?php echo $filtro_leidas === 'leidas' ? 'selected' : ''; ?>><?php echo $TEXTOS['leidas']; ?></option>
                     </select>
                 </div>
 
                 <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-filter"></i> Filtrar
+                    <i class="fas fa-filter"></i> <?php echo $TEXTOS['filtrar']; ?>
                 </button>
                 
                 <a href="<?php echo BASE_URL; ?>/usuario/notificaciones.php" class="btn btn-outline">
-                    <i class="fas fa-times"></i> Limpiar
+                    <i class="fas fa-times"></i> <?php echo $TEXTOS['limpiar']; ?>
                 </a>
             </form>
         </div>
@@ -186,7 +189,6 @@ include_once(__DIR__ . '/../includes/header.php');
                             <?php
                             $icon_class = 'bell';
                             $icon_color = '#4361ee';
-                            
                             switch ($notificacion['tipo']) {
                                 case 'comentario':
                                     $icon_class = 'comment';
@@ -217,21 +219,19 @@ include_once(__DIR__ . '/../includes/header.php');
                             <div class="notificacion-mensaje">
                                 <?php echo htmlspecialchars($notificacion['mensaje']); ?>
                             </div>
-                            
                             <div class="notificacion-meta">
                                 <span class="notificacion-tiempo">
                                     <i class="fas fa-clock"></i>
-                                    <?php echo time_elapsed_string($notificacion['fecha_creacion']); ?>
+                                    <?php echo time_elapsed_string($notificacion['fecha']); ?>
                                 </span>
-                                
                                 <span class="notificacion-tipo">
                                     <?php
                                     $tipos = [
-                                        'comentario' => 'Comentario',
-                                        'like' => 'Me gusta',
-                                        'respuesta_foro' => 'Respuesta foro',
-                                        'nueva_obra' => 'Nueva obra',
-                                        'sistema' => 'Sistema'
+                                        'comentario' => $TEXTOS['comentario'],
+                                        'like' => $TEXTOS['like'],
+                                        'respuesta_foro' => $TEXTOS['respuesta_foro'],
+                                        'nueva_obra' => $TEXTOS['nueva_obra'],
+                                        'sistema' => $TEXTOS['sistema']
                                     ];
                                     echo $tipos[$notificacion['tipo']] ?? 'Notificación';
                                     ?>
@@ -243,21 +243,21 @@ include_once(__DIR__ . '/../includes/header.php');
                             <?php if (!$notificacion['leida']): ?>
                                 <button class="btn-accion btn-marcar-leida" 
                                         data-notificacion-id="<?php echo $notificacion['id']; ?>"
-                                        title="Marcar como leída">
+                                        title="<?php echo $TEXTOS['marcar_leida']; ?>">
                                     <i class="fas fa-check"></i>
                                 </button>
                             <?php endif; ?>
                             
                             <?php if (!empty($notificacion['url'])): ?>
                                 <a href="<?php echo htmlspecialchars($notificacion['url']); ?>" 
-                                   class="btn-accion btn-ver" title="Ver">
+                                   class="btn-accion btn-ver" title="<?php echo $TEXTOS['ver']; ?>">
                                     <i class="fas fa-external-link-alt"></i>
                                 </a>
                             <?php endif; ?>
                             
                             <button class="btn-accion btn-eliminar" 
                                     data-notificacion-id="<?php echo $notificacion['id']; ?>"
-                                    title="Eliminar">
+                                    title="<?php echo $TEXTOS['eliminar']; ?>">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
@@ -271,7 +271,7 @@ include_once(__DIR__ . '/../includes/header.php');
                     <?php if ($pagina_actual > 1): ?>
                         <a href="?pagina=<?php echo $pagina_actual - 1; ?>&tipo=<?php echo $filtro_tipo; ?>&leidas=<?php echo $filtro_leidas; ?>" 
                            class="btn-pagina">
-                            <i class="fas fa-chevron-left"></i> Anterior
+                            <i class="fas fa-chevron-left"></i> <?php echo $TEXTOS['anterior']; ?>
                         </a>
                     <?php endif; ?>
                     
@@ -305,7 +305,7 @@ include_once(__DIR__ . '/../includes/header.php');
                     <?php if ($pagina_actual < $total_paginas): ?>
                         <a href="?pagina=<?php echo $pagina_actual + 1; ?>&tipo=<?php echo $filtro_tipo; ?>&leidas=<?php echo $filtro_leidas; ?>" 
                            class="btn-pagina">
-                            Siguiente <i class="fas fa-chevron-right"></i>
+                            <?php echo $TEXTOS['siguiente']; ?> <i class="fas fa-chevron-right"></i>
                         </a>
                     <?php endif; ?>
                 </div>
@@ -316,11 +316,11 @@ include_once(__DIR__ . '/../includes/header.php');
                 <div class="no-notificaciones-icon">
                     <i class="fas fa-bell-slash"></i>
                 </div>
-                <h3>No tienes notificaciones</h3>
-                <p>Cuando recibas notificaciones sobre comentarios, me gusta o nuevas obras, aparecerán aquí.</p>
+                <h3><?php echo $TEXTOS['no_notificaciones']; ?></h3>
+                <p><?php echo $TEXTOS['no_notificaciones_desc']; ?></p>
                 <div class="no-notificaciones-acciones">
                     <a href="<?php echo BASE_URL; ?>/public/explorar.php" class="btn btn-primary">
-                        <i class="fas fa-compass"></i> Explorar contenido
+                        <i class="fas fa-compass"></i> <?php echo $TEXTOS['explorar_contenido']; ?>
                     </a>
                 </div>
             </div>
@@ -332,55 +332,55 @@ include_once(__DIR__ . '/../includes/header.php');
 <div id="modal-configuracion" class="modal">
     <div class="modal-contenido">
         <div class="modal-header">
-            <h3>Configuración de notificaciones</h3>
+            <h3><?php echo $TEXTOS['config_titulo']; ?></h3>
             <button class="btn-cerrar-modal">&times;</button>
         </div>
         <div class="modal-body">
             <form id="form-configuracion">
                 <div class="config-grupo">
-                    <h4>Tipos de notificaciones</h4>
+                    <h4><?php echo $TEXTOS['tipos_notificaciones']; ?></h4>
                     <label class="checkbox-label">
                         <input type="checkbox" name="comentarios" checked>
                         <span class="checkmark"></span>
-                        Comentarios en mis obras
+                        <?php echo $TEXTOS['noti_comentarios']; ?>
                     </label>
                     <label class="checkbox-label">
                         <input type="checkbox" name="likes" checked>
                         <span class="checkmark"></span>
-                        Me gusta en mis obras
+                        <?php echo $TEXTOS['noti_likes']; ?>
                     </label>
                     <label class="checkbox-label">
                         <input type="checkbox" name="respuestas" checked>
                         <span class="checkmark"></span>
-                        Respuestas en foros
+                        <?php echo $TEXTOS['noti_respuestas']; ?>
                     </label>
                     <label class="checkbox-label">
                         <input type="checkbox" name="nuevas_obras" checked>
                         <span class="checkmark"></span>
-                        Nuevas obras de autores seguidos
+                        <?php echo $TEXTOS['noti_nuevas_obras']; ?>
                     </label>
                 </div>
                 
                 <div class="config-grupo">
-                    <h4>Frecuencia de limpieza</h4>
+                    <h4><?php echo $TEXTOS['frecuencia_limpieza']; ?></h4>
                     <select name="limpieza">
-                        <option value="nunca">Nunca eliminar automáticamente</option>
-                        <option value="30">Eliminar después de 30 días</option>
-                        <option value="60">Eliminar después de 60 días</option>
-                        <option value="90">Eliminar después de 90 días</option>
+                        <option value="nunca"><?php echo $TEXTOS['nunca_eliminar']; ?></option>
+                        <option value="30"><?php echo $TEXTOS['eliminar_30']; ?></option>
+                        <option value="60"><?php echo $TEXTOS['eliminar_60']; ?></option>
+                        <option value="90"><?php echo $TEXTOS['eliminar_90']; ?></option>
                     </select>
                 </div>
             </form>
         </div>
         <div class="modal-footer">
-            <button class="btn btn-outline" id="cancelar-config">Cancelar</button>
-            <button class="btn btn-primary" id="guardar-config">Guardar cambios</button>
+            <button class="btn btn-outline" id="cancelar-config"><?php echo $TEXTOS['cancelar']; ?></button>
+            <button class="btn btn-primary" id="guardar-config"><?php echo $TEXTOS['guardar_cambios']; ?></button>
         </div>
     </div>
 </div>
 
-<!-- Estilos CSS -->
 <style>
+
 .notificaciones-container {
     max-width: 1000px;
     margin: 0 auto;
@@ -878,44 +878,37 @@ include_once(__DIR__ . '/../includes/header.php');
         order: 2;
     }
 }
+
 </style>
 
-<!-- JavaScript -->
+<!-- JavaScript y animaciones para la página -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Manejar botones de marcar como leída
     document.querySelectorAll('.btn-marcar-leida').forEach(button => {
         button.addEventListener('click', function() {
             const notificacionId = this.dataset.notificacionId;
             marcarComoLeida(notificacionId);
         });
     });
-    
-    // Manejar botones de eliminar
     document.querySelectorAll('.btn-eliminar').forEach(button => {
         button.addEventListener('click', function() {
             const notificacionId = this.dataset.notificacionId;
-            if (confirm('¿Estás seguro de que quieres eliminar esta notificación?')) {
+            if (confirm('<?php echo $TEXTOS['confirmar_eliminar'] ?? "¿Estás seguro de que quieres eliminar esta notificación?"; ?>')) {
                 eliminarNotificacion(notificacionId);
             }
         });
     });
-    
-    // Modal de configuración
     const modal = document.getElementById('modal-configuracion');
     const btnConfig = document.getElementById('btn-configuracion');
     const btnCerrar = document.querySelector('.btn-cerrar-modal');
     const btnCancelar = document.getElementById('cancelar-config');
-    
     btnConfig.addEventListener('click', () => modal.style.display = 'block');
     btnCerrar.addEventListener('click', () => modal.style.display = 'none');
     btnCancelar.addEventListener('click', () => modal.style.display = 'none');
-    
     window.addEventListener('click', (e) => {
         if (e.target === modal) modal.style.display = 'none';
     });
-    
-    // Funciones AJAX
+
     function marcarComoLeida(notificacionId) {
         fetch('<?php echo BASE_URL; ?>/controllers/procesar-notificaciones.php', {
             method: 'POST',
@@ -929,12 +922,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 item.classList.remove('no-leida');
                 item.classList.add('leida');
                 item.querySelector('.btn-marcar-leida').remove();
-                mostrarMensaje('Notificación marcada como leída', 'success');
+                mostrarMensaje('<?php echo $TEXTOS['marcada_leida']; ?>', 'success');
             }
         })
         .catch(error => console.error('Error:', error));
     }
-    
     function eliminarNotificacion(notificacionId) {
         fetch('<?php echo BASE_URL; ?>/controllers/procesar-notificaciones.php', {
             method: 'POST',
@@ -947,12 +939,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 const item = document.querySelector(`[data-notificacion-id="${notificacionId}"]`);
                 item.style.animation = 'fadeOut 0.3s ease-out';
                 setTimeout(() => item.remove(), 300);
-                mostrarMensaje('Notificación eliminada', 'success');
+                mostrarMensaje('<?php echo $TEXTOS['eliminada']; ?>', 'success');
             }
         })
         .catch(error => console.error('Error:', error));
     }
-    
     function mostrarMensaje(mensaje, tipo) {
         const alerta = document.createElement('div');
         alerta.className = `alerta alerta-${tipo}`;
@@ -967,8 +958,6 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(() => alerta.remove(), 3000);
     }
 });
-
-// Animaciones CSS
 const style = document.createElement('style');
 style.textContent = `
     @keyframes fadeOut {

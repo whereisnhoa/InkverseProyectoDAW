@@ -4,25 +4,26 @@ require_once(__DIR__ . '/../includes/config.php');
 require_once(__DIR__ . '/../includes/conexion.php');
 require_once(__DIR__ . '/../includes/funciones.php');
 
-$idioma = isset($_SESSION['idioma']) ? $_SESSION['idioma'] : 'es';
+// Cargar idioma
+$idioma = $_SESSION['idioma'] ?? 'es';
 $archivo_idioma = __DIR__ . "/../includes/languages/" . $idioma . ".php";
 if (!file_exists($archivo_idioma)) $archivo_idioma = __DIR__ . "/../includes/languages/es.php";
 require_once($archivo_idioma);
 
 include(__DIR__ . '/../includes/header.php');
 
-$usuario_id = isset($_SESSION['usuario_id']) ? $_SESSION['usuario_id'] : null;
+$usuario_id = $_SESSION['usuario_id'] ?? null;
 $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
-$tipo = isset($_GET['tipo']) ? $_GET['tipo'] : '';
+$tipo = $_GET['tipo'] ?? '';
 $capSeleccionado = isset($_GET['cap']) ? intval($_GET['cap']) : 1;
 
 if (!$id || ($tipo !== 'libro' && $tipo !== 'comic')) {
-    echo "<div class='alerta alerta-error'>" . (isset($TEXTOS['obra_no_encontrada']) ? $TEXTOS['obra_no_encontrada'] : 'Obra no encontrada.') . "</div>";
+    echo "<div class='alerta alerta-error'>" . ($TEXTOS['obra_no_encontrada'] ?? 'Obra no encontrada.') . "</div>";
     include(__DIR__ . '/../includes/footer.php');
     exit();
 }
 
-// --- OBTENER DATOS DE LA OBRA ---
+// === OBTENER DATOS DE LA OBRA ===
 if ($tipo === 'libro') {
     $stmt = $conexion->prepare("SELECT l.*, c.nombre AS categoria_nombre, u.usuario AS autor_nombre, l.portada, l.categoria_id
         FROM libros AS l
@@ -47,45 +48,49 @@ $obra = $result->fetch_assoc();
 $stmt->close();
 
 if (!$obra) {
-    echo "<div class='alerta alerta-error'>" . (isset($TEXTOS['obra_no_encontrada']) ? $TEXTOS['obra_no_encontrada'] : 'Obra no encontrada.') . "</div>";
+    echo "<div class='alerta alerta-error'>" . ($TEXTOS['obra_no_encontrada'] ?? 'Obra no encontrada.') . "</div>";
     include(__DIR__ . '/../includes/footer.php');
     exit();
 }
 
-// --- OBTENER CATEGORÍA REAL (siempre la toma, aunque el LEFT JOIN falle) ---
-function obtenerNombreCategoria($conexion, $categoria_id) {
-    if (!$categoria_id) return 'Sin categoría';
-    $stmt_cat = $conexion->prepare("SELECT nombre FROM categorias WHERE id = ?");
-    $stmt_cat->bind_param("i", $categoria_id);
-    $stmt_cat->execute();
-    $res = $stmt_cat->get_result();
-    $row = $res->fetch_assoc();
-    $stmt_cat->close();
-    if ($row && isset($row['nombre']) && trim($row['nombre']) !== '') {
-        return htmlspecialchars($row['nombre']);
+// --- OBTENER CATEGORÍA REAL (si tiene relación N:M)
+function obtenerNombreCategoria($conexion, $obra_id, $tipo) {
+    if ($tipo === 'libro') {
+        $sql = "SELECT c.nombre FROM libro_categorias lc JOIN categorias c ON lc.categoria_id = c.id WHERE lc.libro_id = ? LIMIT 1";
+    } else {
+        $sql = "SELECT c.nombre FROM comic_categorias cc JOIN categorias c ON cc.categoria_id = c.id WHERE cc.comic_id = ? LIMIT 1";
     }
-    return 'Sin categoría';
+    $stmt = $conexion->prepare($sql);
+    $stmt->bind_param("i", $obra_id);
+    $stmt->execute();
+    $res = $stmt->get_result();
+    $row = $res->fetch_assoc();
+    $stmt->close();
+    return $row && !empty($row['nombre']) ? htmlspecialchars($row['nombre']) : ($GLOBALS['TEXTOS']['sin_categoria'] ?? 'Sin categoría');
 }
-$categoria = (isset($obra['categoria_nombre']) && trim($obra['categoria_nombre']) !== '' && $obra['categoria_nombre'] !== null)
-    ? htmlspecialchars($obra['categoria_nombre'])
-    : ((isset($obra['categoria_id']) && $obra['categoria_id']) 
-        ? obtenerNombreCategoria($conexion, $obra['categoria_id']) 
-        : (isset($TEXTOS['sin_categoria']) ? $TEXTOS['sin_categoria'] : 'Sin categoría'));
+$categoria = obtenerNombreCategoria($conexion, $id, $tipo);
 
-// --- DATOS SEGUROS RESTO ---
-$titulo = htmlspecialchars(isset($obra['titulo']) ? $obra['titulo'] : (isset($TEXTOS['sin_titulo']) ? $TEXTOS['sin_titulo'] : 'Sin título'));
-$autor = htmlspecialchars(isset($obra['autor_nombre']) && $obra['autor_nombre'] ? $obra['autor_nombre'] : (isset($TEXTOS['autor_desconocido']) ? $TEXTOS['autor_desconocido'] : 'Anónimo'));
-$fecha = (isset($obra['fecha_subida']) && $obra['fecha_subida']) ? date('d/m/Y', strtotime($obra['fecha_subida'])) : '';
-$descripcion = (isset($obra['descripcion']) && $obra['descripcion']) ? nl2br(htmlspecialchars($obra['descripcion'])) : (isset($TEXTOS['sin_descripcion']) ? $TEXTOS['sin_descripcion'] : 'Sin descripción.');
-$portada = (isset($obra['portada']) && $obra['portada'] && strpos($obra['portada'], '/uploads/') === false)
+$titulo = htmlspecialchars($obra['titulo'] ?? ($TEXTOS['sin_titulo'] ?? 'Sin título'));
+// MEJOR AUTOR: Prioriza autor_nombre, luego autor, luego "Anónimo"
+if (!empty($obra['autor_nombre'])) {
+    $autor = htmlspecialchars($obra['autor_nombre']);
+} elseif (!empty($obra['autor'])) {
+    $autor = htmlspecialchars($obra['autor']);
+} else {
+    $autor = $TEXTOS['autor_desconocido'] ?? 'Anónimo';
+}
+$fecha = (!empty($obra['fecha_subida'])) ? date('d/m/Y', strtotime($obra['fecha_subida'])) : '';
+$descripcion = !empty($obra['descripcion']) ? nl2br(htmlspecialchars($obra['descripcion'])) : ($TEXTOS['sin_descripcion'] ?? 'Sin descripción.');
+$portada = (!empty($obra['portada']) && strpos($obra['portada'], '/uploads/') === false)
     ? BASE_URL . '/uploads/portadas/' . $obra['portada']
-    : ((isset($obra['portada']) && $obra['portada']) ? BASE_URL . $obra['portada'] : BASE_URL . '/img/portada_default.png');
+    : (!empty($obra['portada']) ? BASE_URL . $obra['portada'] : BASE_URL . '/img/portada_default.png');
 
 // --- FAVORITOS ---
+$tipo_favorito = ($tipo === 'libro' || $tipo === 'comic') ? $tipo : '';
 $esFavorito = false;
-if ($usuario_id) {
+if ($usuario_id && $tipo_favorito && $id) {
     $stmtFav = $conexion->prepare("SELECT 1 FROM favoritos WHERE usuario_id = ? AND tipo_contenido = ? AND contenido_id = ?");
-    $stmtFav->bind_param("isi", $usuario_id, $tipo, $id);
+    $stmtFav->bind_param("isi", $usuario_id, $tipo_favorito, $id);
     $stmtFav->execute();
     $stmtFav->store_result();
     $esFavorito = $stmtFav->num_rows > 0;
@@ -98,14 +103,14 @@ $stmt_count->bind_param("i", $id);
 $stmt_count->execute();
 $resCount = $stmt_count->get_result();
 $totalCaps = $resCount->fetch_assoc();
-$totalCaps = isset($totalCaps['total']) ? $totalCaps['total'] : 0;
+$totalCaps = $totalCaps['total'] ?? 0;
 $stmt_count->close();
 
 $stmt_titulos = $conexion->prepare("SELECT numero, titulo FROM $tablaCap WHERE $colObra = ? ORDER BY numero ASC");
 $stmt_titulos->bind_param("i", $id);
 $stmt_titulos->execute();
 $resTitulos = $stmt_titulos->get_result();
-$listaCapitulos = array();
+$listaCapitulos = [];
 while ($row = $resTitulos->fetch_assoc()) {
     $listaCapitulos[] = $row;
 }
@@ -120,15 +125,15 @@ $stmt_cap->close();
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-<div class="obra-detalle-container">
-    <div class="obra-header">
-        <img class="obra-portada-detalle" src="<?php echo htmlspecialchars($portada); ?>" alt="Portada de <?php echo $titulo; ?>">
-        <div class="obra-header-info">
-            <h1 class="obra-titulo"><?php echo $titulo; ?></h1>
+<div class="obra-detalle-mainbox glass-card">
+    <div class="obra-detalle-flex">
+        <img class="obra-portada-detalle neon-border" src="<?php echo htmlspecialchars($portada); ?>" alt="Portada de <?php echo $titulo; ?>">
+        <div class="obra-detalle-datos">
+            <h1 class="obra-titulo gradient-text"><?php echo $titulo; ?></h1>
             <div class="obra-meta">
-                <span class="obra-categoria"><?php echo strtoupper($categoria); ?></span>
+                <span class="obra-categoria badge-cat"><?php echo strtoupper($categoria); ?></span>
                 <span class="obra-autor-fecha">
-                    <?php echo (isset($TEXTOS['por']) ? $TEXTOS['por'] : 'Por'); ?> <b><?php echo $autor; ?></b><?php echo $fecha ? " · $fecha" : ""; ?>
+                    <?php echo ($TEXTOS['por'] ?? 'Por'); ?> <b><?php echo $autor; ?></b><?php echo $fecha ? " · $fecha" : ""; ?>
                 </span>
             </div>
             <div class="obra-actions-row">
@@ -136,19 +141,23 @@ $stmt_cap->close();
                     <button id="btn-favorito"
                         class="btn-favorito<?php echo $esFavorito ? ' favorited' : ''; ?>"
                         data-obra-id="<?php echo $id; ?>"
-                        data-tipo="<?php echo $tipo; ?>"
+                        data-tipo_contenido="<?php echo $tipo; ?>"
                         type="button"
-                        title="<?php echo $esFavorito ? (isset($TEXTOS['quitar_favorito']) ? $TEXTOS['quitar_favorito'] : 'Quitar de favoritos') : (isset($TEXTOS['anadir_favorito']) ? $TEXTOS['anadir_favorito'] : 'Añadir a favoritos'); ?>">
+                        title="<?php echo $esFavorito ? ($TEXTOS['quitar_favorito'] ?? 'Quitar de favoritos') : ($TEXTOS['anadir_favorito'] ?? 'Añadir a favoritos'); ?>">
                         <i class="<?php echo $esFavorito ? 'fas' : 'far'; ?> fa-heart"></i>
+                        <span class="fav-txt">
+                          <?php echo $esFavorito ? ($TEXTOS['quitar_favorito'] ?? 'Quitar de favoritos') : ($TEXTOS['anadir_favorito'] ?? 'Añadir a favoritos'); ?>
+                        </span>
                     </button>
                 <?php else: ?>
-                    <button class="btn-favorito" type="button" onclick="window.location.href='<?php echo BASE_URL; ?>/public/login.php'">
+                    <button class="btn-favorito" type="button" onclick="window.location.href='<?php echo BASE_URL; ?>../public/login.php'">
                         <i class="far fa-heart"></i>
+                        <span class="fav-txt"><?php echo $TEXTOS['anadir_favorito'] ?? 'Añadir a favoritos'; ?></span>
                     </button>
                 <?php endif; ?>
                 <button class="btn btn-compartir"
                     type="button"
-                    title="<?php echo isset($TEXTOS['compartir']) ? htmlspecialchars($TEXTOS['compartir']) : 'Compartir'; ?>"
+                    title="<?php echo htmlspecialchars($TEXTOS['compartir'] ?? 'Compartir'); ?>"
                     data-url="<?php echo BASE_URL; ?>/public/obra.php?id=<?php echo $id; ?>&tipo=<?php echo $tipo; ?>"
                     data-titulo="<?php echo htmlspecialchars($titulo); ?>">
                     <i class="fas fa-share"></i>
@@ -156,7 +165,7 @@ $stmt_cap->close();
             </div>
         </div>
     </div>
-    <div class="obra-sinopsis">
+    <div class="obra-sinopsis glass-sinopsis">
         <?php echo $descripcion; ?>
     </div>
 
@@ -165,36 +174,36 @@ $stmt_cap->close();
             <div class="capitulo-paginacion">
                 <?php if ($capSeleccionado > 1): ?>
                     <a href="obra.php?id=<?php echo $id; ?>&tipo=<?php echo $tipo; ?>&cap=<?php echo $capSeleccionado-1; ?>">
-                        <i class="fas fa-arrow-left"></i> <?php echo isset($TEXTOS['anterior']) ? $TEXTOS['anterior'] : 'Anterior'; ?>
+                        <i class="fas fa-arrow-left"></i> <?php echo $TEXTOS['anterior'] ?? 'Anterior'; ?>
                     </a>
                 <?php else: ?>
-                    <button disabled><i class="fas fa-arrow-left"></i> <?php echo isset($TEXTOS['anterior']) ? $TEXTOS['anterior'] : 'Anterior'; ?></button>
+                    <button disabled><i class="fas fa-arrow-left"></i> <?php echo $TEXTOS['anterior'] ?? 'Anterior'; ?></button>
                 <?php endif; ?>
 
                 <span class="paginacion-info">
                     <?php
-                    $capitulo_de = isset($TEXTOS['capitulo_de']) ? $TEXTOS['capitulo_de'] : 'Capítulo %d de %d';
+                    $capitulo_de = $TEXTOS['capitulo_de'] ?? 'Capítulo %d de %d';
                     echo sprintf($capitulo_de, $capSeleccionado, $totalCaps);
                     ?>
                 </span>
 
                 <?php if ($capSeleccionado < $totalCaps): ?>
                     <a href="obra.php?id=<?php echo $id; ?>&tipo=<?php echo $tipo; ?>&cap=<?php echo $capSeleccionado+1; ?>">
-                        <?php echo isset($TEXTOS['siguiente']) ? $TEXTOS['siguiente'] : 'Siguiente'; ?> <i class="fas fa-arrow-right"></i>
+                        <?php echo $TEXTOS['siguiente'] ?? 'Siguiente'; ?> <i class="fas fa-arrow-right"></i>
                     </a>
                 <?php else: ?>
-                    <button disabled><?php echo isset($TEXTOS['siguiente']) ? $TEXTOS['siguiente'] : 'Siguiente'; ?> <i class="fas fa-arrow-right"></i></button>
+                    <button disabled><?php echo $TEXTOS['siguiente'] ?? 'Siguiente'; ?> <i class="fas fa-arrow-right"></i></button>
                 <?php endif; ?>
             </div>
 
             <form class="capitulo-selector-form" method="get" action="">
                 <input type="hidden" name="id" value="<?php echo $id; ?>">
                 <input type="hidden" name="tipo" value="<?php echo $tipo; ?>">
-                <label for="cap"><?php echo isset($TEXTOS['ir_a_capitulo']) ? htmlspecialchars($TEXTOS['ir_a_capitulo']) : 'Ir al capítulo:'; ?></label>
+                <label for="cap"><?php echo htmlspecialchars($TEXTOS['ir_a_capitulo'] ?? 'Ir al capítulo:'); ?></label>
                 <select name="cap" id="cap" onchange="this.form.submit()">
                     <?php foreach ($listaCapitulos as $cap): ?>
                         <option value="<?php echo $cap['numero']; ?>"<?php if ($capSeleccionado == $cap['numero']) echo ' selected'; ?>>
-                            <?php echo (isset($TEXTOS['capitulo']) ? $TEXTOS['capitulo'] : 'Capítulo') . ' ' . intval($cap['numero']); ?>
+                            <?php echo ($TEXTOS['capitulo'] ?? 'Capítulo') . ' ' . intval($cap['numero']); ?>
                             <?php echo $cap['titulo'] ? ' - ' . htmlspecialchars($cap['titulo']) : ''; ?>
                         </option>
                     <?php endforeach; ?>
@@ -202,13 +211,13 @@ $stmt_cap->close();
                 <noscript><button type="submit">Ir</button></noscript>
             </form>
 
-            <div class="obra-capitulo">
+            <div class="obra-capitulo glass-chapter">
                 <h3>
-                    <?php echo (isset($TEXTOS['capitulo']) ? $TEXTOS['capitulo'] : 'Capítulo') . ' ' . intval($capitulo['numero']); ?><?php echo $capitulo['titulo'] ? ": " . htmlspecialchars($capitulo['titulo']) : ""; ?>
+                    <?php echo ($TEXTOS['capitulo'] ?? 'Capítulo') . ' ' . intval($capitulo['numero']); ?><?php echo $capitulo['titulo'] ? ": " . htmlspecialchars($capitulo['titulo']) : ''; ?>
                 </h3>
                 <?php if ($tipo === 'libro'): ?>
                     <div class="capitulo-texto">
-                        <?php echo nl2br(htmlspecialchars(isset($capitulo['contenido']) ? $capitulo['contenido'] : '')); ?>
+                        <?php echo nl2br(htmlspecialchars($capitulo['contenido'] ?? '')); ?>
                     </div>
                 <?php else: ?>
                     <?php if (isset($capitulo['imagen']) && $capitulo['imagen']): ?>
@@ -217,7 +226,7 @@ $stmt_cap->close();
                         </div>
                     <?php else: ?>
                         <div class="capitulo-texto">
-                            <?php echo nl2br(htmlspecialchars(isset($capitulo['contenido']) ? $capitulo['contenido'] : '')); ?>
+                            <?php echo nl2br(htmlspecialchars($capitulo['contenido'] ?? '')); ?>
                         </div>
                     <?php endif; ?>
                 <?php endif; ?>
@@ -226,7 +235,7 @@ $stmt_cap->close();
     <?php endif; ?>
 
     <div class="obra-comentarios">
-        <h2><?php echo isset($TEXTOS['comentarios']) ? htmlspecialchars($TEXTOS['comentarios']) : 'Comentarios'; ?></h2>
+        <h2 class="comentarios-h2"><i class="far fa-comments"></i> <?php echo htmlspecialchars($TEXTOS['comentarios'] ?? 'Comentarios'); ?></h2>
         <div class="obra-comentarios-lista" id="comentarios-lista">
             <!-- Comentarios AJAX -->
         </div>
@@ -235,113 +244,261 @@ $stmt_cap->close();
             <input type="hidden" name="csrf_token" value="<?php echo generarTokenCSRF(); ?>">
             <input type="hidden" name="contenido_id" value="<?php echo $id; ?>">
             <input type="hidden" name="tipo_contenido" value="<?php echo htmlspecialchars($tipo); ?>">
-            <textarea name="contenido" rows="3" placeholder="<?php echo isset($TEXTOS['escribe_comentario']) ? htmlspecialchars($TEXTOS['escribe_comentario']) : 'Escribe tu comentario...'; ?>" required></textarea>
-            <button type="submit" class="btn btn-gradient" style="margin-top:8px;"><?php echo isset($TEXTOS['enviar']) ? htmlspecialchars($TEXTOS['enviar']) : 'Enviar'; ?></button>
+            <textarea name="contenido" rows="3" maxlength="650" placeholder="<?php echo htmlspecialchars($TEXTOS['escribe_comentario'] ?? 'Escribe tu comentario...'); ?>" required></textarea>
+            <button type="submit" class="btn btn-gradient" style="margin-top:8px;"><?php echo htmlspecialchars($TEXTOS['enviar'] ?? 'Enviar'); ?></button>
         </form>
         <?php else: ?>
         <div class="comentario-login-msg">
-            <a href="<?php echo BASE_URL; ?>/public/login.php" class="btn btn-gradient"><?php echo isset($TEXTOS['inicia_para_comentar']) ? htmlspecialchars($TEXTOS['inicia_para_comentar']) : 'Inicia sesión para comentar'; ?></a>
+            <a href="<?php echo BASE_URL; ?>/public/login.php" class="btn btn-gradient"><?php echo htmlspecialchars($TEXTOS['inicia_para_comentar'] ?? 'Inicia sesión para comentar'); ?></a>
         </div>
         <?php endif; ?>
     </div>
+    <div id="alerta-flotante" style="display:none; position:fixed;top:25px;right:30px;z-index:3002;min-width:220px;"
+         class="alerta-flotante"></div>
 </div>
 
 <style>
-body { background: #fafbfc; }
-.obra-detalle-container { max-width: 950px; margin: 38px auto 0 auto; background: #fff; border-radius: 18px; box-shadow: 0 6px 24px #7b2ff211; padding: 28px 24px 32px 24px; }
-.obra-header { display: flex; flex-wrap: wrap; gap: 26px; align-items: flex-start; }
-.obra-portada-detalle { width: 220px; height: 320px; object-fit: cover; border-radius: 14px; background: #f3f3f9; box-shadow: 0 2px 6px #7b2ff21a; }
-.obra-header-info { flex: 1; }
-.obra-titulo { font-size: 2.3rem; margin: 0 0 12px 0; color: #333; font-weight: 800;}
-.obra-meta { display: flex; gap: 20px; align-items: center; margin-bottom: 10px; }
-.obra-categoria { background: #e3e6ff; color: #7b2ff2; padding: 7px 16px; border-radius: 13px; font-size: 1.08rem; font-weight: 700; letter-spacing: 1px;}
-.obra-autor-fecha { color: #888; font-size: 1.04rem;}
-.obra-actions-row { margin-top: 18px; display: flex; gap: 14px;}
-.btn-favorito { background: #fff; color: #e74c3c; border: 2px solid #f8d7da; border-radius: 50%; width: 46px; height: 46px; font-size: 22px; display: flex; align-items: center; justify-content: center; transition: background 0.13s, color 0.13s, border 0.13s;}
-.btn-favorito.favorited, .btn-favorito:hover { background: #e74c3c; color: #fff; border-color: #e74c3c; }
-.btn.btn-compartir { background: #fff; color: #7b2ff2; border: 2px solid #d9c5fc; border-radius: 50%; width: 46px; height: 46px; font-size: 21px; display: flex; align-items: center; justify-content: center; transition: background 0.13s, color 0.13s, border 0.13s;}
+body {
+    background: linear-gradient(120deg, #e0e0ff 45%, #f8e7ff 100%);
+    font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+}
+.glass-card {
+    max-width: 1100px;
+    margin: 50px auto 0 auto;
+    background: rgba(255, 255, 255, 0.66);
+    border-radius: 2.2rem;
+    box-shadow: 0 12px 50px #7b2ff222, 0 1.5px 6px #7b2ff211;
+    padding: 38px 36px 38px 36px;
+    backdrop-filter: blur(10px);
+    border: 1.7px solid #ededfc;
+    transition: box-shadow .22s;
+}
+.obra-detalle-flex {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 46px;
+    align-items: flex-start;
+}
+.obra-portada-detalle {
+    width: 290px; height: 400px;
+    object-fit: cover;
+    border-radius: 2rem;
+    background: #f3f3f9;
+    box-shadow: 0 4px 18px #a179e933;
+    border:3px solid #e4e1fa;
+    transition: box-shadow .18s, border .18s;
+}
+.neon-border {
+    box-shadow: 0 0 0 2px #7b2ff2aa, 0 0 16px 1.5px #a179e9aa;
+    border:3px solid #a179e9;
+}
+.obra-detalle-datos {
+    flex: 1;
+    min-width: 220px;
+    padding-top: 3px;
+}
+.gradient-text {
+    background: linear-gradient(90deg, #7b2ff2 20%, #f357a8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 3rem;
+    font-weight: 900;
+    margin: 0 0 10px 0;
+    letter-spacing: 1px;
+}
+.obra-meta { display: flex; gap: 27px; align-items: center; margin-bottom: 14px; }
+.badge-cat {
+    background: linear-gradient(90deg, #eceaff 0%, #d8f3ff 100%);
+    color: #7b2ff2;
+    padding: 8px 20px;
+    border-radius: 16px;
+    font-size: 1.13rem;
+    font-weight: 900;
+    letter-spacing: 1px;
+    border: 1.5px solid #e4e1fa;
+    box-shadow: 0 2px 7px #a179e920;
+    text-shadow: 0px 1px 0 #fff;
+}
+.obra-autor-fecha { color: #7b88b2; font-size: 1.16rem;}
+.obra-actions-row { margin-top: 22px; display: flex; gap: 18px;}
+.btn-favorito {
+    background: linear-gradient(90deg, #ff6464 0%, #ff8f8f 100%);
+    color: #fff; border: none;
+    border-radius: 32px;
+    min-width: 58px; height: 54px; font-size: 1.26rem;
+    display: flex; align-items: center; gap: 13px; padding: 0 26px 0 21px;
+    cursor: pointer; font-weight: 900; box-shadow: 0 2px 15px #e74c3c15; letter-spacing: .5px; transition: all .17s;
+    outline: none; position: relative;
+}
+.btn-favorito .fav-txt { color: #fff; font-size: 1.18rem; font-weight: 900; letter-spacing: .4px;}
+.btn-favorito.favorited, .btn-favorito:hover {
+    background: linear-gradient(90deg, #7b2ff2 0%, #f357a8 100%);
+    color: #fff;
+}
+.btn-favorito.favorited .fav-txt, .btn-favorito:hover .fav-txt {
+    color: #fff;
+}
+.btn.btn-compartir {
+    background: #fff; color: #7b2ff2; border: 2px solid #e9dafe; border-radius: 50%;
+    width: 54px; height: 54px; font-size: 27px; display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 2px 14px #7b2ff215; transition: all .18s;
+}
 .btn.btn-compartir:hover { background: #7b2ff2; color: #fff; }
-.obra-sinopsis { margin: 26px 0 30px 0; font-size: 1.12rem; color: #444; line-height: 1.6; }
-.obra-capitulos { margin: 28px 0 38px 0; }
-.capitulo-paginacion { display: flex; gap: 18px; justify-content: flex-start; align-items: center; margin-bottom: 16px; }
-.capitulo-paginacion a, .capitulo-paginacion button { background: #f7f5ff; color: #7b2ff2; border: none; border-radius: 12px; padding: 9px 17px; font-weight: 600; font-size: 1.04rem; transition: all .16s;}
+.obra-sinopsis {
+    margin: 36px 0 30px 0;
+    font-size: 1.22rem;
+    color: #303049;
+    line-height: 1.8;
+    background: #f7f7fd;
+    padding: 27px 32px;
+    border-radius: 20px;
+    font-weight: 500;
+    letter-spacing: .01em;
+    border: 1.5px solid #edeaff;
+    box-shadow: 0 2px 19px #7b2ff209;
+}
+.glass-sinopsis {
+    background: rgba(242,242,255,0.63);
+    border: 1.5px solid #e0d5ff;
+    box-shadow: 0 0 19px #d6bfff18;
+    backdrop-filter: blur(4px);
+}
+.obra-capitulos { margin: 30px 0 42px 0; }
+.capitulo-paginacion { display: flex; gap: 18px; justify-content: flex-start; align-items: center; margin-bottom: 18px; }
+.capitulo-paginacion a, .capitulo-paginacion button {
+    background: linear-gradient(90deg, #edeaff 0%, #d8f3ff 100%);
+    color: #7b2ff2;
+    border: none;
+    border-radius: 15px;
+    padding: 11px 26px;
+    font-weight: 800; font-size: 1.09rem;
+    transition: all .14s;
+    box-shadow: 0 1px 7px #7b2ff215;
+}
 .capitulo-paginacion a:hover { background: #7b2ff2; color: #fff; }
-.capitulo-paginacion .paginacion-info { color: #555; font-size: 1.05rem; font-weight: 600; margin: 0 14px;}
+.capitulo-paginacion .paginacion-info { color: #555; font-size: 1.09rem; font-weight: 700; margin: 0 16px;}
 .capitulo-selector-form { margin-bottom: 18px; }
-.capitulo-selector-form label { font-weight: 600; }
-.capitulo-selector-form select { border-radius: 7px; padding: 7px 15px; font-size: 1.04rem;}
-.obra-capitulo h3 { font-size: 1.27rem; color: #7b2ff2; }
-.capitulo-texto { margin: 20px 0 8px 0; font-size: 1.11rem; color: #333; line-height: 1.7;}
-.capitulo-imagen img { max-width: 100%; border-radius: 10px; box-shadow: 0 2px 10px #2222;}
-.obra-comentarios { margin-top: 42px; }
-.obra-comentarios-lista { margin-bottom: 25px; }
-.comentario-item { background: #f8f8ff; border-radius: 11px; margin-bottom: 15px; padding: 15px 16px 8px 14px; box-shadow: 0 1px 5px #7b2ff205;}
-.comentario-header { display: flex; align-items: center; gap: 10px; margin-bottom: 5px;}
-.comentario-usuario { font-weight: 700; color: #7b2ff2;}
-.comentario-fecha { color: #999; font-size: 0.98rem;}
-.comentario-contenido { color: #333; font-size: 1.07rem;}
-#form-comentario textarea { width: 100%; border-radius: 7px; border: 1px solid #e2d8f7; padding: 9px 13px; font-size: 1.09rem;}
-.btn.btn-gradient { background: linear-gradient(90deg, #7b2ff2 0%, #f357a8 100%); color: #fff; border: none; border-radius: 10px; padding: 10px 28px; font-size: 1.01rem; font-weight: 700; margin-top: 7px;}
+.capitulo-selector-form label { font-weight: 700; }
+.capitulo-selector-form select { border-radius: 8px; padding: 7px 22px; font-size: 1.13rem;}
+.obra-capitulo h3 { font-size: 1.35rem; color: #7b2ff2; }
+.capitulo-texto { margin: 19px 0 8px 0; font-size: 1.23rem; color: #232a54; line-height: 1.77;}
+.glass-chapter {
+    background: rgba(255,255,255,0.7);
+    border-radius: 16px;
+    box-shadow: 0 1px 11px #a179e912;
+    border: 1.3px solid #edeaff;
+    padding: 22px 26px;
+}
+.capitulo-imagen img { max-width: 100%; border-radius: 13px; box-shadow: 0 2px 10px #2222;}
+.obra-comentarios { margin-top: 58px; }
+.comentarios-h2 { margin-bottom: 18px; color: #7b2ff2; font-size: 1.5rem; font-weight: 900; letter-spacing: 0.2px;}
+.obra-comentarios-lista { margin-bottom: 27px; }
+.comentario-item {
+    background: rgba(242,242,255,0.63);
+    border-radius: 16px;
+    margin-bottom: 22px;
+    padding: 18px 19px 10px 19px;
+    box-shadow: 0 1px 9px #7b2ff209;
+    border: 1.3px solid #e8e6fd;
+}
+.comentario-header {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 5px;
+}
+.comentario-avatar {
+    width: 37px;
+    height: 37px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 10px;
+    background: #f2f2f2;
+    border: 2px solid #eaeaea;
+}
+.comentario-usuario { font-weight: 900; color: #7b2ff2; font-size: 1.11rem;}
+.comentario-fecha { color: #999; font-size: 1.01rem;}
+.comentario-contenido { color: #232a54; font-size: 1.15rem;}
+#form-comentario textarea {
+    width: 100%; border-radius: 9px; border: 1.8px solid #e2d8f7; padding: 13px 17px; font-size: 1.17rem; background: #fafaff;
+    box-shadow: 0 1px 7px #7b2ff209;
+}
+.btn.btn-gradient {
+    background: linear-gradient(90deg, #7b2ff2 0%, #f357a8 100%);
+    color: #fff; border: none; border-radius: 12px; padding: 13px 36px; font-size: 1.13rem; font-weight: 700; margin-top: 8px;
+    transition: background .17s;
+    box-shadow: 0 1px 7px #f357a820;
+}
 .btn.btn-gradient:hover { background: linear-gradient(90deg, #f357a8 0%, #7b2ff2 100%);}
 .comentario-login-msg { margin-top: 16px; }
-@media (max-width: 900px) {
-    .obra-detalle-container { padding: 2vw 3vw; }
-    .obra-header { flex-direction: column; align-items: flex-start;}
-    .obra-portada-detalle { width: 100%; max-width: 260px; height: auto; margin-bottom: 15px;}
+.alerta-flotante {font-size:1.13rem; font-weight:800;}
+@media (max-width: 1100px) {
+    .glass-card {padding: 2vw 3vw;}
+    .obra-detalle-flex { flex-direction: column; gap: 20px;}
+    .obra-portada-detalle { width: 100%; max-width: 330px; height: auto; margin-bottom: 17px;}
+}
+@media (max-width: 700px) {
+    .glass-card {padding: 0.7rem;}
+    .obra-portada-detalle {max-width:90vw;}
+    .obra-sinopsis {padding: 15px;}
+    .glass-chapter {padding: 12px;}
 }
 </style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Favoritos AJAX
     var btnFavorito = document.getElementById('btn-favorito');
     if (btnFavorito) {
         btnFavorito.addEventListener('click', function() {
             var obraId = this.getAttribute('data-obra-id');
-            var tipo = this.getAttribute('data-tipo');
+            var tipo = this.getAttribute('data-tipo_contenido');
+            if (tipo === 'libros') tipo = 'libro';
+            if (tipo === 'comics') tipo = 'comic';
             fetch('<?php echo BASE_URL; ?>/controllers/procesar-favorito.php', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-                body: 'accion=toggle&contenido_id=' + obraId + '&tipo_contenido=' + tipo
+                body: 'accion=toggle&contenido_id=' + encodeURIComponent(obraId) + '&tipo_contenido=' + encodeURIComponent(tipo)
             })
-            .then(function(r){return r.json()})
+            .then(r => r.json())
             .then(function(data) {
-                if (data.success) {
+                if (typeof data.agregado !== "undefined") {
                     btnFavorito.classList.toggle('favorited', !!data.agregado);
                     btnFavorito.firstElementChild.className = data.agregado ? 'fas fa-heart' : 'far fa-heart';
+                    btnFavorito.querySelector('.fav-txt').textContent = data.agregado
+                        ? "<?php echo addslashes($TEXTOS['quitar_favorito'] ?? 'Quitar de favoritos'); ?>"
+                        : "<?php echo addslashes($TEXTOS['anadir_favorito'] ?? 'Añadir a favoritos'); ?>";
                 }
             });
         });
     }
-    // Compartir
+
+    // Compartir y comentarios igual que antes...
     var compartirBtns = document.querySelectorAll('.btn-compartir');
-    for (var i = 0; i < compartirBtns.length; i++) {
-        compartirBtns[i].addEventListener('click', function() {
+    compartirBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
             var url = this.getAttribute('data-url');
             var titulo = this.getAttribute('data-titulo');
             if (navigator.share) {
                 navigator.share({ title: titulo, text: titulo, url: url });
             } else {
-                navigator.clipboard.writeText(url).then(function() {
-                    alert('<?php echo isset($TEXTOS['copiado_portapapeles']) ? addslashes($TEXTOS['copiado_portapapeles']) : "Enlace copiado al portapapeles"; ?>');
-                });
+                navigator.clipboard.writeText(url);
             }
         });
-    }
+    });
 
-    // =================== COMENTARIOS ===================
     function cargarComentarios() {
         fetch('<?php echo BASE_URL; ?>/controllers/listar-comentarios.php?contenido_id=<?php echo $id; ?>&tipo_contenido=<?php echo $tipo; ?>')
-        .then(function(r){return r.json()})
+        .then(r => r.json())
         .then(function(data) {
             var html = '';
             if (data.length === 0) {
-                html = "<div class='comentario-item'><?php echo isset($TEXTOS['sin_comentarios']) ? addslashes($TEXTOS['sin_comentarios']) : "Aún no hay comentarios."; ?></div>";
+                html = "<div class='comentario-item'><?php echo addslashes($TEXTOS['sin_comentarios'] ?? "Aún no hay comentarios."); ?></div>";
             } else {
                 for(var i=0;i<data.length;i++){
                     var com = data[i];
                     html += '<div class="comentario-item">'+
                         '<div class="comentario-header">'+
+                            '<img class="comentario-avatar" src="'+com.avatar+'" alt="avatar" />'+
                             '<span class="comentario-usuario">'+com.usuario+'</span>'+
                             '<span class="comentario-fecha">'+com.fecha+'</span>'+
                         '</div>'+
@@ -354,7 +511,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     cargarComentarios();
 
-    // Envío AJAX comentario
     var formComentario = document.getElementById('form-comentario');
     if (formComentario) {
         formComentario.addEventListener('submit', function(e) {
@@ -364,13 +520,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 method: 'POST',
                 body: new URLSearchParams(Array.from(formData))
             })
-            .then(function(r){return r.json()})
+            .then(r => r.json())
             .then(function(data) {
                 if (data.success) {
                     cargarComentarios();
                     formComentario.reset();
-                } else {
-                    alert(data.mensaje || '<?php echo isset($TEXTOS['error_comentario']) ? addslashes($TEXTOS['error_comentario']) : "Error al enviar comentario"; ?>');
                 }
             });
         });
