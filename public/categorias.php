@@ -4,37 +4,44 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 require_once(__DIR__ . '/../includes/header.php');
-include_once(__DIR__ . '/../includes/conexion.php');
+require_once(__DIR__ . '/../includes/conexion.php');
+require_once(__DIR__ . '/../includes/idioma.php');
 
-// Libros
-$sql_categorias_libros = "SELECT c.id, c.nombre, c.descripcion, 
-                          COUNT(l.id) as total_obras,
-                          AVG(l.valoracion) as valoracion_promedio,
-                          MAX(l.fecha_subida) as ultima_obra,
-                          (SELECT l2.portada FROM libros l2 WHERE l2.categoria_id = c.id AND l2.portada IS NOT NULL ORDER BY l2.fecha_subida DESC LIMIT 1) as portada_ejemplo
-                          FROM categorias c 
-                          LEFT JOIN libros l ON c.id = l.categoria_id 
-                          WHERE c.tipo = 'libro' 
-                          GROUP BY c.id, c.nombre, c.descripcion 
-                          ORDER BY total_obras DESC, c.nombre";
+// Libros (consulta usando la relación N:M libro_categorias)
+$sql_categorias_libros = "SELECT 
+    c.id, 
+    c.nombre, 
+    c.descripcion, 
+    COUNT(lc.libro_id) AS total_obras,
+    (SELECT AVG(l.valoracion) FROM libros l JOIN libro_categorias lc2 ON l.id = lc2.libro_id WHERE lc2.categoria_id = c.id) AS valoracion_promedio,
+    (SELECT MAX(l.fecha_subida) FROM libros l JOIN libro_categorias lc3 ON l.id = lc3.libro_id WHERE lc3.categoria_id = c.id) AS ultima_obra,
+    (SELECT l2.portada FROM libros l2 JOIN libro_categorias lc4 ON l2.id = lc4.libro_id WHERE lc4.categoria_id = c.id AND l2.portada IS NOT NULL ORDER BY l2.fecha_subida DESC LIMIT 1) as portada_ejemplo
+FROM categorias c
+LEFT JOIN libro_categorias lc ON lc.categoria_id = c.id
+WHERE c.tipo = 'libro'
+GROUP BY c.id, c.nombre, c.descripcion
+ORDER BY total_obras DESC, c.nombre";
 $result_categorias_libros = $conexion->query($sql_categorias_libros);
 
-// Cómics
-$sql_categorias_comics = "SELECT c.id, c.nombre, c.descripcion, 
-                          COUNT(co.id) as total_obras,
-                          AVG(co.valoracion) as valoracion_promedio,
-                          MAX(co.fecha_subida) as ultima_obra,
-                          (SELECT co2.portada FROM comics co2 WHERE co2.categoria_id = c.id AND co2.portada IS NOT NULL ORDER BY co2.fecha_subida DESC LIMIT 1) as portada_ejemplo,
-                          CASE 
-                              WHEN c.nombre IN ('Cómic', 'Manga', 'Manhwa', 'Manhua') THEN 'tipo'
-                              WHEN c.nombre IN ('Shonen', 'Shojo', 'Seinen', 'Josei') THEN 'demografia'
-                              ELSE 'genero'
-                          END as categoria_tipo
-                          FROM categorias c 
-                          LEFT JOIN comics co ON c.id = co.categoria_id 
-                          WHERE c.tipo = 'comic' 
-                          GROUP BY c.id, c.nombre, c.descripcion 
-                          ORDER BY categoria_tipo, total_obras DESC, c.nombre";
+// Cómics (consulta usando la relación N:M comic_categorias)
+$sql_categorias_comics = "SELECT 
+    c.id, 
+    c.nombre, 
+    c.descripcion, 
+    COUNT(cc.comic_id) AS total_obras,
+    (SELECT AVG(co.valoracion) FROM comics co JOIN comic_categorias cc2 ON co.id = cc2.comic_id WHERE cc2.categoria_id = c.id) AS valoracion_promedio,
+    (SELECT MAX(co.fecha_subida) FROM comics co JOIN comic_categorias cc3 ON co.id = cc3.comic_id WHERE cc3.categoria_id = c.id) AS ultima_obra,
+    (SELECT co2.portada FROM comics co2 JOIN comic_categorias cc4 ON co2.id = cc4.comic_id WHERE cc4.categoria_id = c.id AND co2.portada IS NOT NULL ORDER BY co2.fecha_subida DESC LIMIT 1) as portada_ejemplo,
+    CASE 
+        WHEN c.nombre IN ('Cómic', 'Manga', 'Manhwa', 'Manhua') THEN 'tipo'
+        WHEN c.nombre IN ('Shonen', 'Shojo', 'Seinen', 'Josei') THEN 'demografia'
+        ELSE 'genero'
+    END as categoria_tipo
+FROM categorias c
+LEFT JOIN comic_categorias cc ON cc.categoria_id = c.id
+WHERE c.tipo = 'comic'
+GROUP BY c.id, c.nombre, c.descripcion
+ORDER BY categoria_tipo, total_obras DESC, c.nombre";
 $result_categorias_comics = $conexion->query($sql_categorias_comics);
 
 // Organizar categorías de cómics por tipo
@@ -51,25 +58,25 @@ if ($result_categorias_comics) {
 
 // Estadísticas generales
 $sql_stats = "SELECT 
-              (SELECT COUNT(*) FROM libros) as total_libros,
-              (SELECT COUNT(*) FROM comics) as total_comics,
-              (SELECT COUNT(*) FROM categorias WHERE tipo = 'libro') as total_cat_libros,
-              (SELECT COUNT(*) FROM categorias WHERE tipo = 'comic') as total_cat_comics,
-              (SELECT COUNT(*) FROM usuarios) as total_usuarios,
-              (SELECT COUNT(*) FROM favoritos) as total_favoritos";
+    (SELECT COUNT(*) FROM libros) as total_libros,
+    (SELECT COUNT(*) FROM comics) as total_comics,
+    (SELECT COUNT(*) FROM categorias WHERE tipo = 'libro') as total_cat_libros,
+    (SELECT COUNT(*) FROM categorias WHERE tipo = 'comic') as total_cat_comics,
+    (SELECT COUNT(*) FROM usuarios) as total_usuarios,
+    (SELECT COUNT(*) FROM favoritos) as total_favoritos";
 $result_stats = $conexion->query($sql_stats);
 $stats = $result_stats->fetch_assoc();
 
-// Categorías más populares
+// Categorías más populares (solo en favoritos)
 $sql_populares = "SELECT c.nombre, c.tipo, COUNT(f.id) as total_favoritos
-                  FROM categorias c
-                  LEFT JOIN libros l ON c.id = l.categoria_id AND c.tipo = 'libro'
-                  LEFT JOIN comics co ON c.id = co.categoria_id AND c.tipo = 'comic'
-                  LEFT JOIN favoritos f ON (f.contenido_id = l.id AND f.tipo_contenido = 'libro') OR (f.contenido_id = co.id AND f.tipo_contenido = 'comic')
-                  GROUP BY c.id, c.nombre, c.tipo
-                  HAVING total_favoritos > 0
-                  ORDER BY total_favoritos DESC
-                  LIMIT 6";
+    FROM categorias c
+    LEFT JOIN libros l ON c.id = l.categoria_id AND c.tipo = 'libro'
+    LEFT JOIN comics co ON c.id = co.categoria_id AND c.tipo = 'comic'
+    LEFT JOIN favoritos f ON (f.contenido_id = l.id AND f.tipo_contenido = 'libro') OR (f.contenido_id = co.id AND f.tipo_contenido = 'comic')
+    GROUP BY c.id, c.nombre, c.tipo
+    HAVING total_favoritos > 0
+    ORDER BY total_favoritos DESC
+    LIMIT 6";
 $result_populares = $conexion->query($sql_populares);
 $categorias_populares = [];
 if ($result_populares) {
@@ -79,7 +86,6 @@ if ($result_populares) {
 }
 ?>
 
-<!-- Hero Section Mejorado -->
 <div class="categorias-hero-advanced">
     <div class="hero-background">
         <div class="hero-pattern"></div>
@@ -88,46 +94,44 @@ if ($result_populares) {
     <div class="container">
         <div class="hero-content-grid">
             <div class="hero-text-content">
-            
-                <h1 class="hero-title">Explorar por Categorías</h1>
-                <p class="hero-description">Descubre contenido perfectamente organizado por géneros, temáticas y estilos que se adaptan a tus gustos</p>
-                <!-- Estadísticas mejoradas -->
+                <h1 class="hero-title"><?php echo $TEXTOS['categorias_titulo']; ?></h1>
+                <p class="hero-description"><?php echo $TEXTOS['categorias_subtitulo']; ?></p>
                 <div class="stats-grid-advanced">
                     <div class="stat-card-advanced">
                         <div class="stat-icon"><i class="fas fa-book"></i></div>
                         <div class="stat-content">
                             <div class="stat-number"><?php echo number_format($stats['total_libros']); ?></div>
-                            <div class="stat-label">Libros</div>
+                            <div class="stat-label"><?php echo $TEXTOS['categorias_libros']; ?></div>
                         </div>
                     </div>
                     <div class="stat-card-advanced">
                         <div class="stat-icon"><i class="fas fa-book-open"></i></div>
                         <div class="stat-content">
                             <div class="stat-number"><?php echo number_format($stats['total_comics']); ?></div>
-                            <div class="stat-label">Cómics</div>
+                            <div class="stat-label"><?php echo $TEXTOS['categorias_comics']; ?></div>
                         </div>
                     </div>
                     <div class="stat-card-advanced">
                         <div class="stat-icon"><i class="fas fa-tags"></i></div>
                         <div class="stat-content">
                             <div class="stat-number"><?php echo $stats['total_cat_libros'] + $stats['total_cat_comics']; ?></div>
-                            <div class="stat-label">Categorías</div>
+                            <div class="stat-label"><?php echo $TEXTOS['categorias_categorias']; ?></div>
                         </div>
                     </div>
                     <div class="stat-card-advanced">
                         <div class="stat-icon"><i class="fas fa-users"></i></div>
                         <div class="stat-content">
                             <div class="stat-number"><?php echo number_format($stats['total_usuarios']); ?></div>
-                            <div class="stat-label">Usuarios</div>
+                            <div class="stat-label"><?php echo $TEXTOS['categorias_usuarios']; ?></div>
                         </div>
                     </div>
                 </div>
                 <div class="hero-actions">
                     <a href="#literatura" class="btn btn-primary btn-lg">
-                        <i class="fas fa-book"></i> Explorar Literatura
+                        <i class="fas fa-book"></i> <?php echo $TEXTOS['categorias_explorar_literatura']; ?>
                     </a>
                     <a href="#comics" class="btn btn-outline-white btn-lg">
-                        <i class="fas fa-book-open"></i> Ver Cómics
+                        <i class="fas fa-book-open"></i> <?php echo $TEXTOS['categorias_ver_comics']; ?>
                     </a>
                 </div>
             </div>
@@ -151,34 +155,33 @@ if ($result_populares) {
 </div>
 
 <div class="container">
-    <!-- Navegación rápida -->
     <div class="quick-nav-advanced">
         <a href="#literatura" class="quick-nav-item-advanced literatura">
             <div class="nav-icon"><i class="fas fa-book"></i></div>
             <div class="nav-content">
-                <h3>Literatura</h3>
-                <p><?php echo $stats['total_cat_libros']; ?> categorías</p>
+                <h3><?php echo $TEXTOS['categorias_literatura']; ?></h3>
+                <p><?php echo $stats['total_cat_libros']; ?> <?php echo $TEXTOS['categorias_nav_categorias']; ?></p>
             </div>
         </a>
         <a href="#comics" class="quick-nav-item-advanced comics">
             <div class="nav-icon"><i class="fas fa-book-open"></i></div>
             <div class="nav-content">
-                <h3>Cómics & Manga</h3>
-                <p><?php echo $stats['total_cat_comics']; ?> categorías</p>
+                <h3><?php echo $TEXTOS['categorias_comics_manga']; ?></h3>
+                <p><?php echo $stats['total_cat_comics']; ?> <?php echo $TEXTOS['categorias_nav_categorias']; ?></p>
             </div>
         </a>
         <a href="<?php echo BASE_URL; ?>/public/explorar.php" class="quick-nav-item-advanced explorar">
             <div class="nav-icon"><i class="fas fa-compass"></i></div>
             <div class="nav-content">
-                <h3>Explorar Todo</h3>
-                <p>Descubrir obras</p>
+                <h3><?php echo $TEXTOS['categorias_explorar_todo']; ?></h3>
+                <p><?php echo $TEXTOS['categorias_descubrir_obras']; ?></p>
             </div>
         </a>
         <a href="<?php echo BASE_URL; ?>/public/aleatorio.php" class="quick-nav-item-advanced aleatorio">
             <div class="nav-icon"><i class="fas fa-random"></i></div>
             <div class="nav-content">
-                <h3>Sorpréndeme</h3>
-                <p>Obra aleatoria</p>
+                <h3><?php echo $TEXTOS['categorias_sorprendeme']; ?></h3>
+                <p><?php echo $TEXTOS['categorias_obra_aleatoria']; ?></p>
             </div>
         </a>
     </div>
@@ -188,8 +191,8 @@ if ($result_populares) {
     <section class="populares-section">
         <div class="section-header-advanced">
             <div class="section-title">
-                <h2><i class="fas fa-fire"></i> Categorías Más Populares</h2>
-                <p>Las categorías con más obras favoritas de la comunidad</p>
+                <h2><i class="fas fa-fire"></i> <?php echo $TEXTOS['categorias_mas_populares']; ?></h2>
+                <p><?php echo $TEXTOS['categorias_mas_populares_desc']; ?></p>
             </div>
         </div>
         <div class="populares-grid">
@@ -199,8 +202,8 @@ if ($result_populares) {
                         <i class="fas <?php echo $cat['tipo'] == 'libro' ? 'fa-book' : 'fa-book-open'; ?>"></i>
                     </div>
                     <h4><?php echo htmlspecialchars($cat['nombre']); ?></h4>
-                    <p><?php echo $cat['total_favoritos']; ?> favoritos</p>
-                    <span class="popular-type"><?php echo $cat['tipo'] == 'libro' ? 'Literatura' : 'Cómic'; ?></span>
+                    <p><?php echo $cat['total_favoritos']; ?> <?php echo $TEXTOS['categorias_favoritos']; ?></p>
+                    <span class="popular-type"><?php echo $cat['tipo'] == 'libro' ? $TEXTOS['categorias_literatura'] : $TEXTOS['categorias_comics']; ?></span>
                 </div>
             <?php endforeach; ?>
         </div>
@@ -211,12 +214,12 @@ if ($result_populares) {
     <section id="literatura" class="categorias-section-advanced">
         <div class="section-header-advanced">
             <div class="section-title">
-                <h2><i class="fas fa-book"></i> Literatura</h2>
-                <p>Explora géneros literarios desde poesía hasta ciencia ficción</p>
+                <h2><i class="fas fa-book"></i> <?php echo $TEXTOS['categorias_literatura']; ?></h2>
+                <p><?php echo $TEXTOS['categorias_literatura_desc']; ?></p>
             </div>
             <div class="section-actions">
                 <a href="<?php echo BASE_URL; ?>/public/literatura.php" class="btn btn-primary">
-                    <i class="fas fa-arrow-right"></i> Ver todas las obras
+                    <i class="fas fa-arrow-right"></i> <?php echo $TEXTOS['categorias_ver_todas_literatura']; ?>
                 </a>
             </div>
         </div>
@@ -239,7 +242,9 @@ if ($result_populares) {
                             <?php endif; ?>
                             <div class="categoria-overlay">
                                 <div class="categoria-stats-overlay">
-                                    <span class="obras-count"><?php echo intval($categoria['total_obras']); ?> obras</span>
+                                    <span class="obras-count">
+                                        <?php echo intval($categoria['total_obras']); ?> <?php echo $TEXTOS['categorias_obras']; ?>
+                                    </span>
                                     <?php if ($categoria['valoracion_promedio'] > 0): ?>
                                         <div class="rating-overlay">
                                             <i class="fas fa-star"></i>
@@ -254,17 +259,17 @@ if ($result_populares) {
                                 <h3><?php echo htmlspecialchars($categoria['nombre']); ?></h3>
                                 <?php if (!empty($categoria['ultima_obra'])): ?>
                                     <span class="ultima-actualizacion">
-                                        Actualizado <?php echo date('d/m/Y', strtotime($categoria['ultima_obra'])); ?>
+                                        <?php echo $TEXTOS['categorias_actualizado']; ?> <?php echo date('d/m/Y', strtotime($categoria['ultima_obra'])); ?>
                                     </span>
                                 <?php endif; ?>
                             </div>
                             <p class="categoria-description">
-                                <?php echo !empty($categoria['descripcion']) ? htmlspecialchars($categoria['descripcion']) : 'Explora obras de este fascinante género literario'; ?>
+                                <?php echo !empty($categoria['descripcion']) ? htmlspecialchars($categoria['descripcion']) : $TEXTOS['categorias_sin_desc']; ?>
                             </p>
                             <div class="categoria-stats-grid">
                                 <div class="stat-mini">
                                     <i class="fas fa-book"></i>
-                                    <span><?php echo intval($categoria['total_obras']); ?> obras</span>
+                                    <span><?php echo intval($categoria['total_obras']); ?> <?php echo $TEXTOS['categorias_obras']; ?></span>
                                 </div>
                                 <?php if ($categoria['valoracion_promedio'] > 0): ?>
                                 <div class="stat-mini">
@@ -277,7 +282,7 @@ if ($result_populares) {
                         <div class="categoria-actions-advanced">
                             <a href="<?php echo BASE_URL; ?>/public/categoria.php?categoria_id=<?php echo $categoria['id']; ?>&tipo=libro" 
                                class="btn btn-outline btn-block">
-                                <i class="fas fa-eye"></i> Explorar Categoría
+                                <i class="fas fa-eye"></i> <?php echo $TEXTOS['categorias_explorar_categoria']; ?>
                             </a>
                         </div>
                     </div>
@@ -287,8 +292,8 @@ if ($result_populares) {
                     <div class="no-cat-icon">
                         <i class="fas fa-book"></i>
                     </div>
-                    <h3>No hay categorías de literatura</h3>
-                    <p>Aún no se han creado categorías para libros.</p>
+                    <h3><?php echo $TEXTOS['categorias_no_literatura']; ?></h3>
+                    <p><?php echo $TEXTOS['categorias_no_literatura_desc']; ?></p>
                 </div>
             <?php endif; ?>
         </div>
@@ -298,20 +303,19 @@ if ($result_populares) {
     <section id="comics" class="categorias-section-advanced">
         <div class="section-header-advanced">
             <div class="section-title">
-                <h2><i class="fas fa-book-open"></i> Cómics y Manga</h2>
-                <p>Sumérgete en historias visuales de todo el mundo</p>
+                <h2><i class="fas fa-book-open"></i> <?php echo $TEXTOS['categorias_comics_manga']; ?></h2>
+                <p><?php echo $TEXTOS['categorias_comics_manga_desc']; ?></p>
             </div>
             <div class="section-actions">
                 <a href="<?php echo BASE_URL; ?>/public/comics.php" class="btn btn-primary">
-                    <i class="fas fa-arrow-right"></i> Ver todas las obras
+                    <i class="fas fa-arrow-right"></i> <?php echo $TEXTOS['categorias_ver_todas_comics']; ?>
                 </a>
             </div>
         </div>
-        <!-- Tipos principales de cómics -->
         <?php if (!empty($comics_por_tipo['tipo'])): ?>
         <div class="subsection">
             <h3 class="subsection-title">
-                <i class="fas fa-bookmark"></i> Tipos de Cómics
+                <i class="fas fa-bookmark"></i> <?php echo $TEXTOS['categorias_tipos_comics']; ?>
             </h3>
             <div class="tipos-grid">
                 <?php foreach ($comics_por_tipo['tipo'] as $tipo): ?>
@@ -330,21 +334,19 @@ if ($result_populares) {
                         <h4><?php echo htmlspecialchars($tipo['nombre']); ?></h4>
                         <p><?php echo htmlspecialchars($tipo['descripcion']); ?></p>
                         <div class="tipo-stats">
-                            <span><?php echo intval($tipo['total_obras']); ?> obras</span>
+                            <span><?php echo intval($tipo['total_obras']); ?> <?php echo $TEXTOS['categorias_obras']; ?></span>
                         </div>
                         <a href="<?php echo BASE_URL; ?>/public/categoria.php?categoria_id=<?php echo $tipo['id']; ?>&tipo=comic" 
-                           class="btn btn-sm btn-outline">Explorar</a>
+                           class="btn btn-sm btn-outline"><?php echo $TEXTOS['categorias_explorar']; ?></a>
                     </div>
                 <?php endforeach; ?>
             </div>
         </div>
         <?php endif; ?>
-    
-        <!-- Géneros -->
         <?php if (!empty($comics_por_tipo['genero'])): ?>
         <div class="subsection">
             <h3 class="subsection-title">
-                <i class="fas fa-tags"></i> Géneros y Temáticas
+                <i class="fas fa-tags"></i> <?php echo $TEXTOS['categorias_generos']; ?>
             </h3>
             <div class="categorias-grid-advanced">
                 <?php foreach ($comics_por_tipo['genero'] as $categoria): ?>
@@ -361,7 +363,7 @@ if ($result_populares) {
                             <?php endif; ?>
                             <div class="categoria-overlay">
                                 <div class="categoria-stats-overlay">
-                                    <span class="obras-count"><?php echo intval($categoria['total_obras']); ?> obras</span>
+                                    <span class="obras-count"><?php echo intval($categoria['total_obras']); ?> <?php echo $TEXTOS['categorias_obras']; ?></span>
                                     <?php if ($categoria['valoracion_promedio'] > 0): ?>
                                         <div class="rating-overlay">
                                             <i class="fas fa-star"></i>
@@ -376,17 +378,17 @@ if ($result_populares) {
                                 <h3><?php echo htmlspecialchars($categoria['nombre']); ?></h3>
                                 <?php if (!empty($categoria['ultima_obra'])): ?>
                                     <span class="ultima-actualizacion">
-                                        Actualizado <?php echo date('d/m/Y', strtotime($categoria['ultima_obra'])); ?>
+                                        <?php echo $TEXTOS['categorias_actualizado']; ?> <?php echo date('d/m/Y', strtotime($categoria['ultima_obra'])); ?>
                                     </span>
                                 <?php endif; ?>
                             </div>
                             <p class="categoria-description">
-                                <?php echo !empty($categoria['descripcion']) ? htmlspecialchars($categoria['descripcion']) : 'Explora obras de este género visual'; ?>
+                                <?php echo !empty($categoria['descripcion']) ? htmlspecialchars($categoria['descripcion']) : $TEXTOS['categorias_sin_desc']; ?>
                             </p>
                             <div class="categoria-stats-grid">
                                 <div class="stat-mini">
                                     <i class="fas fa-book-open"></i>
-                                    <span><?php echo intval($categoria['total_obras']); ?> obras</span>
+                                    <span><?php echo intval($categoria['total_obras']); ?> <?php echo $TEXTOS['categorias_obras']; ?></span>
                                 </div>
                                 <?php if ($categoria['valoracion_promedio'] > 0): ?>
                                 <div class="stat-mini">
@@ -399,7 +401,7 @@ if ($result_populares) {
                         <div class="categoria-actions-advanced">
                             <a href="<?php echo BASE_URL; ?>/public/categoria.php?categoria_id=<?php echo $categoria['id']; ?>&tipo=comic" 
                                class="btn btn-outline btn-block">
-                                <i class="fas fa-eye"></i> Explorar Categoría
+                                <i class="fas fa-eye"></i> <?php echo $TEXTOS['categorias_explorar_categoria']; ?>
                             </a>
                         </div>
                     </div>
@@ -407,47 +409,6 @@ if ($result_populares) {
             </div>
         </div>
         <?php endif; ?>
-    </section>
-    <!-- Sección de acciones adicionales -->
-    <section class="additional-actions-advanced">
-        <div class="actions-container">
-            <div class="action-card-advanced" data-aos="fade-up">
-                <div class="action-icon-advanced">
-                    <i class="fas fa-search"></i>
-                </div>
-                <div class="action-content">
-                    <h3>Búsqueda Avanzada</h3>
-                    <p>Encuentra exactamente lo que buscas con filtros detallados por género, autor, fecha y más</p>
-                    <a href="<?php echo BASE_URL; ?>/public/buscar.php" class="btn btn-outline">
-                        <i class="fas fa-search"></i> Buscar Obras
-                    </a>
-                </div>
-            </div>
-            <div class="action-card-advanced" data-aos="fade-up" data-aos-delay="100">
-                <div class="action-icon-advanced">
-                    <i class="fas fa-heart"></i>
-                </div>
-                <div class="action-content">
-                    <h3>Mis Favoritos</h3>
-                    <p>Accede rápidamente a todas las obras que has guardado como favoritas</p>
-                    <a href="<?php echo BASE_URL; ?>/usuario/favoritos.php" class="btn btn-outline">
-                        <i class="fas fa-heart"></i> Ver Favoritos
-                    </a>
-                </div>
-            </div>
-            <div class="action-card-advanced" data-aos="fade-up" data-aos-delay="200">
-                <div class="action-icon-advanced">
-                    <i class="fas fa-plus"></i>
-                </div>
-                <div class="action-content">
-                    <h3>Publicar Obra</h3>
-                    <p>Comparte tu contenido con la comunidad y llega a miles de lectores</p>
-                    <a href="<?php echo BASE_URL; ?>/usuario/nueva_obra.php" class="btn btn-outline">
-                        <i class="fas fa-plus"></i> Subir Obra
-                    </a>
-                </div>
-            </div>
-        </div>
     </section>
 </div>
 

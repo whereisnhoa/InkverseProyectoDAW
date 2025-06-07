@@ -321,11 +321,11 @@ if ($current_script === 'login.php' || $current_script === 'register.php') {
                     </div>
                 </div>
             <?php endif; ?>
-            <button class="dark-mode-toggle icon-btn"
-                    title="<?= htmlspecialchars($TEXTOS['cambiar_modo'] ?? 'Cambiar modo oscuro/claro') ?>"
-                    onclick="toggleTheme()">
-                <i class="fas fa-moon"></i>
-            </button>
+            <!-- MODO OSCURO -->
+        <button class="dark-mode-toggle icon-btn"
+                title="<?= htmlspecialchars($TEXTOS['cambiar_modo'] ?? 'Cambiar modo oscuro/claro') ?>">
+            <i class="fas fa-moon"></i>
+        </button>
             <div class="dropdown user-dropdown">
                 <button class="dropdown-toggle icon-btn user-menu-btn" onclick="return false;">
                     <i class="fas fa-user-circle"></i>

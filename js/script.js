@@ -26,6 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initializeLanguageSelector();
   initializeAuthScripts();
   initializeLazyLoading();
+  initializeUsuarioPage();
 });
 
 // =============================
@@ -33,14 +34,14 @@ document.addEventListener("DOMContentLoaded", () => {
 // =============================
 function initializeTheme() {
   const themeToggle = document.querySelector(".dark-mode-toggle");
-  const body = document.body;
-
-  if (currentTheme === "dark") {
-    body.setAttribute("data-theme", "dark");
-    if (themeToggle) {
-      themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-    }
+  const html = document.documentElement;
+  // Lee preferencia SO si no hay preferencia guardada
+  if (!localStorage.getItem("theme")) {
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    currentTheme = prefersDark ? "dark" : "light";
   }
+
+  setTheme(currentTheme);
 
   if (themeToggle) {
     themeToggle.addEventListener("click", function (e) {
@@ -48,15 +49,26 @@ function initializeTheme() {
       e.stopPropagation();
       if (currentTheme === "light") {
         currentTheme = "dark";
-        body.setAttribute("data-theme", "dark");
-        this.innerHTML = '<i class="fas fa-sun"></i>';
+        setTheme("dark");
       } else {
         currentTheme = "light";
-        body.removeAttribute("data-theme");
-        this.innerHTML = '<i class="fas fa-moon"></i>';
+        setTheme("light");
       }
       localStorage.setItem("theme", currentTheme);
     });
+  }
+
+  function setTheme(theme) {
+    currentTheme = theme;
+    if (theme === "dark") {
+      document.body.setAttribute("data-theme", "dark");
+      html.setAttribute("data-theme", "dark");
+      if (themeToggle) themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+    } else {
+      document.body.removeAttribute("data-theme");
+      html.setAttribute("data-theme", "light");
+      if (themeToggle) themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+    }
   }
 }
 
@@ -455,7 +467,6 @@ function initializeFavoritos() {
 
 function toggleFavorito(obraId, tipo, button = null) {
   if (!obraId || !tipo) {
-    // No mostrar nada
     return;
   }
   fetch("controllers/procesar-favorito.php", {
@@ -476,16 +487,12 @@ function toggleFavorito(obraId, tipo, button = null) {
       } else if (data.mensaje === "No autenticado") {
         showAlert("Debes iniciar sesión para añadir a favoritos", "error");
       }
-      // NO showAlert, NO toast, NO error genérico
     })
-    .catch((error) => {
-      // NO mensaje de error
-    });
+    .catch((error) => {});
 }
 
 function quitarDeFavoritos(obraId, tipo, button = null) {
   if (!obraId || !tipo) {
-    // No mostrar nada
     return;
   }
   fetch("controllers/procesar-favorito.php", {
@@ -515,11 +522,8 @@ function quitarDeFavoritos(obraId, tipo, button = null) {
           updateFavoritoButton(button, false);
         }
       }
-      // NO showAlert, NO toast, NO error
     })
-    .catch((error) => {
-      // NO mensaje de error
-    });
+    .catch((error) => {});
 }
 
 function updateFavoritoButton(button, isFavorito) {
@@ -901,50 +905,6 @@ function initializeUsuarioPage() {
     });
   }
 }
-
-document.addEventListener('DOMContentLoaded', function() {
-  if (
-    document.querySelector('.perfil-container') ||
-    document.querySelector('.editar-perfil-container')
-  ) {
-    initializeUsuarioPage();
-  }
-});
-
-// === 15. Funciones específicas para la página de categorías ===
-
-document.addEventListener('DOMContentLoaded', function() {
-  if (typeof AOS !== "undefined" && AOS.init) {
-    AOS.init({
-      duration: 800,
-      easing: 'ease-out-cubic',
-      once: true,
-      offset: 100
-    });
-  }
-  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-      if (this.hash && document.querySelector(this.hash)) {
-        e.preventDefault();
-        const target = document.querySelector(this.hash);
-        target.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start'
-        });
-      }
-    });
-  });
-
-  window.addEventListener('scroll', function() {
-    const scrolled = window.pageYOffset;
-    const parallax = document.querySelectorAll('.floating-cat');
-    const speed = 0.5;
-    parallax.forEach(element => {
-      const yPos = -(scrolled * speed);
-      element.style.transform = `translateY(${yPos}px)`;
-    });
-  });
-});
 
 // =============================
 // 16. Exportar funciones globales
