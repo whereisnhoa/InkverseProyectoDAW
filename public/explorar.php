@@ -417,8 +417,9 @@ include_once(__DIR__ . '/../includes/header.php');
                             <p><?php echo $categoria['total_obras']; ?> <?php echo $TEXTOS['explorar_obras'] ?? 'obras'; ?></p>
                             <span class="categoria-tipo"><?php echo $categoria['tipo'] === 'comic' ? ($TEXTOS['explorar_badge_comic'] ?? 'Cómic/Manga') : ($TEXTOS['explorar_badge_libro'] ?? 'Literatura'); ?></span>
                         </div>
-                        <a href="<?php echo BASE_URL; ?>/public/categoria.php?id=<?php echo (int)$categoria['id']; ?>" 
-                           class="btn btn-sm btn-primary"><?php echo $TEXTOS['explorar_explorar'] ?? 'Explorar'; ?></a>
+                    
+                        <a href="<?php echo BASE_URL; ?>/public/categoria.php?categoria_id=<?php echo (int)$categoria['id']; ?>&tipo=<?php echo urlencode($categoria['tipo']); ?>" 
+                        class="btn btn-sm btn-primary"><?php echo $TEXTOS['explorar_explorar'] ?? 'Explorar'; ?></a>
                     </div>
                 <?php endwhile; ?>
             </div>
