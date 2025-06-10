@@ -47,6 +47,23 @@ try {
             $stmt_update = $conexion->prepare($sql_update);
             $stmt_update->bind_param("i", $arte_id);
             $stmt_update->execute();
+
+            // NOTIFICACIÓN DE ME GUSTA AL AUTOR DE ARTE
+            if ($arte['autor_id'] != $usuario_id) {
+                // Obtener nombre del usuario que da like
+                $sql_usuario = "SELECT usuario FROM usuarios WHERE id = ?";
+                $stmt_usuario = $conexion->prepare($sql_usuario);
+                $stmt_usuario->bind_param("i", $usuario_id);
+                $stmt_usuario->execute();
+                $nombre_like = $stmt_usuario->get_result()->fetch_assoc()['usuario'];
+
+                $mensaje = "$nombre_like ha dado me gusta a tu arte \"{$arte['titulo']}\"";
+                $url = "/comunidad/ver_arte.php?id=" . $arte_id;
+                $sql_notificacion = "INSERT INTO notificaciones (usuario_id, tipo, mensaje, url) VALUES (?, 'like', ?, ?)";
+                $stmt_notificacion = $conexion->prepare($sql_notificacion);
+                $stmt_notificacion->bind_param("iss", $arte['autor_id'], $mensaje, $url);
+                $stmt_notificacion->execute();
+            }
         }
     } else {
         $sql_delete = "DELETE FROM me_gusta_arte WHERE arte_id = ? AND usuario_id = ?";

@@ -450,6 +450,32 @@ include_once(__DIR__ . '/../includes/header.php');
         .obra-card { width: 97vw; max-width: 320px;}
         .obras-grid { gap: 20px 10px;}
     }
+    .btn {
+        display: inline-block;
+        background: #4361ee;
+        color: white;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 5px;
+        font-size: 0.95rem;
+        font-weight: 500;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.3s;
+    }
+    .btn:hover {
+        background: #3a56d4;
+        transform: translateY(-2px);
+    }
+    .btn-outline {
+        background: transparent;
+        border: 1px solid #4361ee;
+        color: #4361ee;
+    }
+    .btn-outline:hover {
+        background: #4361ee;
+        color: white;
+    }
     </style>
 </head>
 <body>
@@ -472,6 +498,32 @@ include_once(__DIR__ . '/../includes/header.php');
                     &middot; <?= $edad ?> <?= $TEXTOS['anios'] ?>
                 <?php endif; ?>
             </div>
+            <?php
+            // Botón seguir/dejar de seguir SOLO si está logueado y no es su propio perfil
+            if (isset($_SESSION['usuario_id']) && $_SESSION['usuario_id'] != $usuario['id']) {
+                // Comprobar si ya lo sigue
+                $ya_sigue = false;
+                $stmt_follow = $conexion->prepare("SELECT 1 FROM seguidores WHERE usuario_id = ? AND seguido_id = ?");
+                $stmt_follow->bind_param("ii", $_SESSION['usuario_id'], $usuario['id']);
+                $stmt_follow->execute();
+                $stmt_follow->store_result();
+                if ($stmt_follow->num_rows > 0) $ya_sigue = true;
+                $stmt_follow->close();
+                ?>
+                <div style="margin: 15px 0;">
+                    <?php if ($ya_sigue): ?>
+                        <form action="<?= BASE_URL ?>/controllers/dejar-seguir.php" method="POST" style="display:inline;">
+                            <input type="hidden" name="usuario_id" value="<?= $usuario['id'] ?>">
+                            <button type="submit" class="btn btn-outline"><?= $TEXTOS['dejar_de_seguir'] ?? "Dejar de seguir" ?></button>
+                        </form>
+                    <?php else: ?>
+                        <form action="<?= BASE_URL ?>/controllers/seguir-usuario.php" method="POST" style="display:inline;">
+                            <input type="hidden" name="usuario_id" value="<?= $usuario['id'] ?>">
+                            <button type="submit" class="btn"><?= $TEXTOS['seguir'] ?? "Seguir" ?></button>
+                        </form>
+                    <?php endif; ?>
+                </div>
+            <?php } ?>
         </div>
         <div class="perfil-estadisticas-row">
             <div class="estadistica">
