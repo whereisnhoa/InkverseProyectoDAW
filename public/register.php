@@ -33,6 +33,7 @@ if (file_exists($header_file)) include_once($header_file);
 
 <!-- estilo -->
 <link rel="stylesheet" href="<?php echo BASE_URL; ?>/css/auth.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <div class="auth-container">
   <h2>Registrar nuevo usuario</h2>
@@ -53,13 +54,15 @@ if (file_exists($header_file)) include_once($header_file);
       <label for="fecha_nacimiento">Fecha de nacimiento</label>
       <input type="date" name="fecha_nacimiento" id="fecha_nacimiento" required>
     </div>
-    <div class="form-group password-input-container">
+
+      <div class="form-group password-input-container" style="position: relative;">
       <label for="password">Contraseña</label>
       <input type="password" name="password" id="password" required>
-      <button type="button" class="password-toggle" id="togglePassword" tabindex="-1">
+      <button type="button" class="password-toggle" id="togglePassword" tabindex="0" style="position: absolute; right: 16px; top: 47%; transform: translateY(-50%); z-index: 10; background: none; border: none; cursor: pointer;">
         <i class="fas fa-eye"></i>
       </button>
     </div>
+
     <div class="password-strength-container" id="passwordStrengthContainer" style="display: none;">
       <div class="password-strength" id="passwordStrength">
         <div class="password-strength-bar" id="passwordStrengthBar"></div>
@@ -84,20 +87,23 @@ if (file_exists($header_file)) include_once($header_file);
       </button>
       <div class="invalid-feedback" id="password-match-error" style="display:none;">Las contraseñas no coinciden</div>
     </div>
+
     <!-- terminos -->
    <div class="form-group terms-group">
-  <label class="custom-checkbox">
+  <label class="custom-checkbox" for="acepto" style="width: 100%;">
     <input type="checkbox" name="acepto" id="acepto" required>
     <span class="checkmark"></span>
     <span>
       Acepto los
-      <a href="/public/terminos.php" target="_blank"><b>Términos y Condiciones</b></a>
+      <a href="terminos.php" target="_blank"><b>Términos y Condiciones</b></a>
       y la
-      <a href="/public/privacidad.php" target="_blank"><b>Política de Privacidad</b></a>
+      <a href="privacidad.php" target="_blank"><b>Política de Privacidad</b></a>
     </span>
   </label>
 </div>
+
     <button type="submit" class="btn" id="submitBtn">Registrarse</button>
+
   </form>
   <div class="mt-3 text-center">
     <p>¿Ya tienes una cuenta? <a href="<?php echo BASE_URL; ?>/public/login.php">Iniciar sesión</a></p>
@@ -106,27 +112,24 @@ if (file_exists($header_file)) include_once($header_file);
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-  // Mostrar/ocultar contraseñas
+
   const passwordInput = document.getElementById('password');
   const togglePassword = document.getElementById('togglePassword');
   const confirmPasswordInput = document.getElementById('confirm_password');
   const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
-  if(passwordInput && togglePassword) {
-    togglePassword.addEventListener('click', function() {
-      const icon = togglePassword.querySelector('i');
-      if (passwordInput.type === 'password') {
-        passwordInput.type = 'text';
-        icon.classList.remove('fa-eye');
-        icon.classList.add('fa-eye-slash');
-        togglePassword.setAttribute('aria-label', 'Ocultar contraseña');
-      } else {
-        passwordInput.type = 'password';
-        icon.classList.remove('fa-eye-slash');
-        icon.classList.add('fa-eye');
-        togglePassword.setAttribute('aria-label', 'Mostrar contraseña');
-      }
-    });
-  }
+  const passwordStrengthContainer = document.getElementById('passwordStrengthContainer');
+  const passwordStrength = document.getElementById('passwordStrength');
+  const passwordStrengthBar = document.getElementById('passwordStrengthBar');
+  const passwordStrengthText = document.getElementById('passwordStrengthText');
+  const passwordMatchError = document.getElementById('password-match-error');
+  const reqLength = document.getElementById('req-length');
+  const reqUppercase = document.getElementById('req-uppercase');
+  const reqLowercase = document.getElementById('req-lowercase');
+  const reqNumber = document.getElementById('req-number');
+  const reqSpecial = document.getElementById('req-special');
+  const submitBtn = document.getElementById('submitBtn');
+  const form = document.getElementById('registroForm');
+
   if(confirmPasswordInput && toggleConfirmPassword) {
     toggleConfirmPassword.addEventListener('click', function() {
       const icon = toggleConfirmPassword.querySelector('i');
@@ -145,19 +148,6 @@ document.addEventListener("DOMContentLoaded", function() {
   }
 
   // Validación y requisitos de contraseña
-  const passwordStrengthContainer = document.getElementById('passwordStrengthContainer');
-  const passwordStrength = document.getElementById('passwordStrength');
-  const passwordStrengthBar = document.getElementById('passwordStrengthBar');
-  const passwordStrengthText = document.getElementById('passwordStrengthText');
-  const passwordMatchError = document.getElementById('password-match-error');
-  const reqLength = document.getElementById('req-length');
-  const reqUppercase = document.getElementById('req-uppercase');
-  const reqLowercase = document.getElementById('req-lowercase');
-  const reqNumber = document.getElementById('req-number');
-  const reqSpecial = document.getElementById('req-special');
-  const submitBtn = document.getElementById('submitBtn');
-  const form = document.getElementById('registroForm');
-
   function updateRequirement(element, isMet) {
     if (!element) return;
     if (isMet) {
@@ -246,21 +236,27 @@ document.addEventListener("DOMContentLoaded", function() {
   }
 
   if(form) {
-    form.addEventListener('submit', function(e) {
-      const isPasswordValid = checkPasswordStrength(passwordInput.value);
-      const doPasswordsMatch = checkPasswordMatch();
-      if (!isPasswordValid) {
-        e.preventDefault();
-        alert('La contraseña debe cumplir todos los requisitos de seguridad.');
-        return;
-      }
-      if (!doPasswordsMatch) {
-        e.preventDefault();
-        alert('Las contraseñas no coinciden.');
-        return;
-      }
-    });
-  }
+  form.addEventListener('submit', function(e) {
+    const terminos = document.getElementById('acepto');
+    if (terminos && !terminos.checked) {
+      e.preventDefault();
+      alert('Debes aceptar los términos y condiciones para registrarte.');
+      return;
+    }
+    const isPasswordValid = checkPasswordStrength(passwordInput.value);
+    const doPasswordsMatch = checkPasswordMatch();
+    if (!isPasswordValid) {
+      e.preventDefault();
+      alert('La contraseña debe cumplir todos los requisitos de seguridad.');
+      return;
+    }
+    if (!doPasswordsMatch) {
+      e.preventDefault();
+      alert('Las contraseñas no coinciden.');
+      return;
+    }
+  });
+}
 });
 </script>
 

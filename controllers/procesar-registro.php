@@ -62,7 +62,7 @@ if (!preg_match($password_pattern, $password)) {
     header("Location: " . BASE_URL . "/public/register.php");
     exit();
 }
-if (!isset($_POST['acepta_terminos'])) {
+if (!isset($_POST['acepto'])) {
     $_SESSION['mensaje'] = "Debes aceptar los términos y condiciones para registrarte.";
     $_SESSION['tipo_mensaje'] = "error";
     header("Location: " . BASE_URL . "/public/register.php");
