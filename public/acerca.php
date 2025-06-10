@@ -1,98 +1,63 @@
-
 <?php
 /**
- * Página Acerca de Nosotros
- * Información sobre la plataforma InkVerse
+ * Página Acerca de InkVerse (versión proyecto, no empresa)
+ * Información y valores del proyecto InkVerse
  */
-
 require_once(__DIR__ . '/../includes/header.php');
+include_once(__DIR__ . '/../includes/conexion.php');
+
+// Estadísticas dummy (puedes cambiarlas a reales si quieres)
+$stats = [
+    'obras' => 5,
+    'autores' => 1,
+    'lectores' => 5,
+];
 ?>
 
-<!-- Hero Section -->
-<div class="about-hero">
-    <div class="container">
-        <div class="hero-content">
-            <div class="hero-text">
-                <h1><i class="fas fa-info-circle"></i> Acerca de InkVerse</h1>
-                <p class="hero-description">Conectando lectores, autores y creadores en una comunidad global de literatura y arte.</p>
+<!-- Sección superior simple -->
+<section class="about-top-simple">
+    <div class="container about-top-content">
+        <div class="about-icon-title">
+            <span class="about-icon"><i class="fas fa-info-circle"></i></span>
+            <h1><span>Acerca de</span> <span class="about-inkverse">InkVerse</span></h1>
+        </div>
+        <p class="about-subtitle">
+            Donde la <span class="about-gradient">creatividad</span> y la <span class="about-gradient">comunidad</span> conectan.<br>
+            Un proyecto de plataforma para lectores, autores y artistas.
+        </p>
+        <div class="about-stats-row">
+            <div class="about-stat">
+                <span class="about-stat-num"><?php echo $stats['obras']; ?></span>
+                <span class="about-stat-label">Obras publicadas</span>
             </div>
-            
-            <div class="hero-stats">
-                <div class="stat-item">
-                    <div class="stat-number">0</div>
-                    <div class="stat-label">Obras publicadas</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number">1</div>
-                    <div class="stat-label">Autores activos</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number">1</div>
-                    <div class="stat-label">Lectores registrados</div>
-                </div>
+            <div class="about-stat">
+                <span class="about-stat-num"><?php echo $stats['autores']; ?></span>
+                <span class="about-stat-label">Autores activos</span>
+            </div>
+            <div class="about-stat">
+                <span class="about-stat-num"><?php echo $stats['lectores']; ?></span>
+                <span class="about-stat-label">Lectores registrados</span>
             </div>
         </div>
     </div>
-</div>
+</section>
 
 <div class="container">
+
     <!-- Historia -->
     <section class="about-section" data-aos="fade-up">
         <div class="section-content">
             <div class="section-text">
-                <h2><i class="fas fa-book-open"></i> Historia</h2>
-                <p>InkVerse se desarrolló a principios de 2025 como un proyecto para crear un espacio donde la literatura y el arte tuvieran lugar, la plataforma será como el hogar digital de creadores y lectores de todo el mundo.</p>
-                
-                <p>Hoy, InkVerse es mucho más que una plataforma de publicación. Tiene una comunidad vibrante donde se descubren nuevos talentos, se forjan amistades duraderas y se celebra la diversidad de voces que enriquecen el mundo literario.</p>
+                <p>
+                    <strong>InkVerse</strong> es un proyecto académico nacido en 2025, creado como ejercicio práctico de desarrollo web, diseño y creatividad. No somos una empresa real ni una plataforma en producción, sino un espacio experimental donde se exploran ideas de comunidad, lectura y escritura digital.
+                </p>
+                <p>
+                    La meta fue imaginar cómo podría funcionar una red social creativa para lectores y autores, aprendiendo tecnologías modernas y buenas prácticas de diseño. El espíritu detrás del proyecto es la experimentación, el aprendizaje y el amor por los libros, cómics y el arte narrativo.
+                </p>
             </div>
-            
             <div class="section-image">
                 <div class="image-placeholder">
-                    <i class="fas fa-users"></i>
-                    <span>Comunidad</span>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Nuestra Misión -->
-    <section class="about-section reverse" data-aos="fade-up">
-        <div class="section-content">
-            <div class="section-image">
-                <div class="image-placeholder">
-                    <i class="fas fa-target"></i>
-                    <span>Misión</span>
-                </div>
-            </div>
-            
-            <div class="section-text">
-                <h2><i class="fas fa-bullseye"></i>Misión</h2>
-                <p>Permitir el acceso a la literatura y el arte de la misma, proporcionando herramientas y oportunidades para que cualquier persona pueda compartir sus historias con el mundo.</p>
-                
-                <div class="mission-points">
-                    <div class="mission-point">
-                        <i class="fas fa-globe"></i>
-                        <div>
-                            <h4>Acceso Global</h4>
-                            <p>Eliminar las barreras geográficas y económicas que limitan el acceso a la literatura de calidad.</p>
-                        </div>
-                    </div>
-                    
-                    <div class="mission-point">
-                        <i class="fas fa-hands-helping"></i>
-                        <div>
-                            <h4>Apoyo a Creadores</h4>
-                            <p>Proporcionar herramientas y recursos para que los autores puedan desarrollar y promocionar su trabajo.</p>
-                        </div>
-                    </div>
-                    
-                    <div class="mission-point">
-                        <i class="fas fa-heart"></i>
-                        <div>
-                            <h4>Comunidad Inclusiva</h4>
-                            <p>Fomentar un ambiente seguro y acogedor donde todas las voces sean valoradas y respetadas.</p>
-                        </div>
-                    </div>
+                    <img src="<?= BASE_URL; ?>/includes/img/inkverse3.jpg" alt="logo">
                 </div>
             </div>
         </div>
@@ -101,62 +66,50 @@ require_once(__DIR__ . '/../includes/header.php');
     <!-- Nuestros Valores -->
     <section class="values-section" data-aos="fade-up">
         <div class="section-header">
-            <h2><i class="fas fa-gem"></i>Valores</h2>
-            <p>Los principios que guían cada decisión</p>
+            <h2><i class="fas fa-gem"></i> Valores del Proyecto</h2>
+            <p>Principios que guían el desarrollo y el diseño de InkVerse.</p>
         </div>
-        
         <div class="values-grid">
             <div class="value-card" data-aos="fade-up" data-aos-delay="100">
                 <div class="value-icon">
                     <i class="fas fa-lightbulb"></i>
                 </div>
                 <h3>Creatividad</h3>
-                <p>Celebrar la originalidad y la innovación en todas sus formas, desde la narrativa experimental hasta el arte visual revolucionario.</p>
+                <p>Fomentar la originalidad y la experimentación tanto en el diseño como en la funcionalidad.</p>
             </div>
-            
             <div class="value-card" data-aos="fade-up" data-aos-delay="200">
+                <div class="value-icon">
+                    <i class="fas fa-code"></i>
+                </div>
+                <h3>Aprendizaje</h3>
+                <p>Priorizar el proceso de aprendizaje y la mejora continua en cada parte del proyecto.</p>
+            </div>
+            <div class="value-card" data-aos="fade-up" data-aos-delay="300">
                 <div class="value-icon">
                     <i class="fas fa-balance-scale"></i>
                 </div>
-                <h3>Equidad</h3>
-                <p>Creer que todos merecen la oportunidad de ser escuchados, independientemente de su origen, experiencia o recursos.</p>
+                <h3>Accesibilidad</h3>
+                <p>Diseñar pensando en la diversidad de usuarios y dispositivos.</p>
             </div>
             
-            <div class="value-card" data-aos="fade-up" data-aos-delay="300">
-                <div class="value-icon">
-                    <i class="fas fa-shield-alt"></i>
-                </div>
-                <h3>Integridad</h3>
-                <p>Mantener los más altos estándares éticos en todo lo que hacemos, protegiendo tanto a creadores como a lectores.</p>
-            </div>
-            
-            <div class="value-card" data-aos="fade-up" data-aos-delay="400">
-                <div class="value-icon">
-                    <i class="fas fa-rocket"></i>
-                </div>
-                <h3>Innovación</h3>
-                <p>Buscar nuevas formas de mejorar la experiencia de lectura y creación en el mundo digital.</p>
-            </div>
         </div>
     </section>
 
     <!-- Nuestro Equipo -->
     <section class="team-section" data-aos="fade-up">
         <div class="section-header">
-            <h2><i class="fas fa-users"></i>Equipo</h2>
+            <h2><i class="fas fa-users"></i> Quién está detrás</h2>
         </div>
-        
         <div class="team-grid">
             <div class="team-member" data-aos="fade-up" data-aos-delay="100">
                 <div class="member-avatar">
                     <i class="fas fa-user"></i>
                 </div>
                 <h3>Ainhoa Lobato</h3>
-                <p class="member-role">Desarrolladora y Diseñadora</p>
-                <p class="member-bio">Sin mucha experiencia, pero desarrollando y diseñando este proyecto, Inkverse.</p>
+                <p class="member-role">Desarrolladora & Diseñadora</p>
+                <p class="member-bio">Aprendiendo y experimentando con tecnologías web mientras desarrolla InkVerse para su TFG.</p>
                 <div class="member-social">
-                    <a href="https://github.com/whereisnhoa" target="_blank"><i class="fab fa-github"></i> </a>
-                    <a href="#"><i class="fab fa-linkedin"></i></a>
+                    <a href="https://github.com/whereisnhoa" target="_blank"><i class="fab fa-github"></i></a>
                 </div>
             </div>
         </div>
@@ -165,643 +118,287 @@ require_once(__DIR__ . '/../includes/header.php');
     <!-- Futuras mejoras -->
     <section class="achievements-section" data-aos="fade-up">
         <div class="section-header">
-            <h2><i class="fas fa-trophy"></i> Futuras mejoras</h2>
+            <h2><i class="fas fa-trophy"></i> Ideas y Mejoras Futuras</h2>
+            <p>El proyecto está en constante evolución y abierto a nuevas ideas.</p>
         </div>
-        
-        <div class="achievements-timeline">
-            <div class="timeline-item" data-aos="fade-right">
-                <div class="timeline-content">
-                    <h3>Implementación de idiomas</h3>
-                    <p>Hasta ahora solo hay unos pocos, una futura mejora sería añadir más lenguajes.</p>
-                </div>
+        <div class="achievements-timeline" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 30px;">
+            <div class="timeline-content card-futura-mejora" data-aos="fade-up" data-aos-delay="50">
+                <h3><i class="fas fa-language"></i> Más idiomas</h3>
+                <p>Añadir más variedad de lenguajes de traducción a la página web, ya que solo dispone de cuatro lenguajes: español, inglés, catalán y francés.</p>
             </div>
-            
-            <div class="timeline-item" data-aos="fade-left">
-                <div class="timeline-content">
-                    <h3>Chat entre usuarios</h3>
-                    <p>Habilitar un chat entre usuarios para mejorar su comunicación.</p>
-                </div>
+            <div class="timeline-content card-futura-mejora" data-aos="fade-up" data-aos-delay="100">
+                <h3><i class="fas fa-comments"></i> Mensajería interna</h3>
+                <p>Mensajería interna entre usuarios. Actualmente solo pueden comentar y responderse, pero no existe un sistema de mensajería privada.</p>
             </div>
-            
+            <div class="timeline-content card-futura-mejora" data-aos="fade-up" data-aos-delay="150">
+                <h3><i class="fas fa-desktop"></i> App multiplataforma</h3>
+                <p>Hacer de la página web una aplicación de escritorio, móvil y para otros dispositivos, que no sea únicamente esta página web.</p>
+            </div>
+            <div class="timeline-content card-futura-mejora" data-aos="fade-up" data-aos-delay="200">
+                <h3><i class="fas fa-envelope-open-text"></i> Verificación real</h3>
+                <p>Mejorar el método de envío de verificación del correo, usando un método real que envíe mensajes de verificación a los usuarios, no una simulación.</p>
+            </div>
+            <div class="timeline-content card-futura-mejora" data-aos="fade-up" data-aos-delay="250">
+                <h3><i class="fas fa-sign-in-alt"></i> Más métodos de acceso</h3>
+                <p>Agregar más métodos de inicio de sesión y registro, no solo por correo electrónico.</p>
+            </div>
+            <div class="timeline-content card-futura-mejora" data-aos="fade-up" data-aos-delay="300">
+                <h3><i class="fas fa-coins"></i> Pago a autores</h3>
+                <p>Pago a autores por sus obras y su valoración o descargas.</p>
+            </div>
+            <div class="timeline-content card-futura-mejora" data-aos="fade-up" data-aos-delay="350">
+                <h3><i class="fas fa-crown"></i> Plan premium</h3>
+                <p>Crear un plan premium para la página.</p>
+            </div>
+            <div class="timeline-content card-futura-mejora" data-aos="fade-up" data-aos-delay="400">
+                <h3><i class="fab fa-laravel"></i> Mejorar el backend</h3>
+                <p>Uso de frameworks como Laravel o React para mejorar el funcionamiento del backend.</p>
+            </div>
+            <div class="timeline-content card-futura-mejora" data-aos="fade-up" data-aos-delay="450">
+                <h3><i class="fas fa-rocket"></i> Despliegue</h3>
+                <p>Despliegue de la página.</p>
+            </div>
         </div>
     </section>
 
-    <!-- Únete a Nosotros -->
-    <section class="join-section" data-aos="fade-up">
-        <div class="join-content">
-            <h2><i class="fas fa-handshake"></i> Únete</h2>
-            <p>InkVerse es más que una plataforma, es una comunidad. Ya seas escritor, ilustrador, lector o simplemente alguien que ama las buenas historias, hay un lugar para ti aquí.</p>
-            
-            <div class="join-actions">
-                <a href="<?php echo BASE_URL; ?>/public/register.php" class="btn btn-primary btn-lg">
-                    <i class="fas fa-user-plus"></i> Únete como Creador
+    <!-- Únete / Participa -->
+    <section class="join-section join-section-fancy" data-aos="fade-up">
+        <div class="join-content-fancy">
+            <div class="join-title-row">
+                <span class="join-icon"><i class="fas fa-handshake"></i></span>
+                <h2>Participa</h2>
+            </div>
+        <hr><br>
+            <div class="join-actions-fancy">
+                <a href="https://github.com/whereisnhoa/proyecto" class="btn-join btn-join-github" target="_blank">
+                    <i class="fab fa-github"></i> Ver código en GitHub
                 </a>
-                <a href="<?php echo BASE_URL; ?>/public/explorar.php" class="btn btn-outline btn-lg">
-                    <i class="fas fa-compass"></i> Explora Contenido
+                <a href="<?php echo BASE_URL; ?>/public/explorar.php" class="btn-join btn-join-outline">
+                    <i class="fas fa-compass"></i> Explorar el proyecto
                 </a>
-                <a href="<?php echo BASE_URL; ?>/public/contacto.php" class="btn btn-outline btn-lg">
-                    <i class="fas fa-envelope"></i> Contáctanos
+                <a href="<?php echo BASE_URL; ?>/public/contacto.php" class="btn-join btn-join-outline">
+                    <i class="fas fa-envelope"></i> Contacto
                 </a>
             </div>
         </div>
     </section>
 </div>
 
-<!-- Estilos CSS -->
 <style>
-/* Hero Section */
-.about-hero {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 100px 0;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-}
-
-.about-hero::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="about" width="50" height="50" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="2" fill="rgba(255,255,255,0.1)"/><path d="M10,10 L40,10 L40,40 L10,40 Z" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23about)"/></svg>');
-    opacity: 0.3;
-}
-
-.hero-content {
-    position: relative;
-    z-index: 2;
-}
-
-.hero-text h1 {
-    font-size: 48px;
-    font-weight: 700;
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 15px;
-}
-
-.hero-description {
-    font-size: 22px;
-    margin-bottom: 50px;
-    opacity: 0.9;
-    max-width: 800px;
-    margin-left: auto;
-    margin-right: auto;
-    line-height: 1.6;
-}
-
-.hero-stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 40px;
-    max-width: 800px;
-    margin: 0 auto;
-}
-
-.hero-stats .stat-item {
+/* Sección superior simple */
+.about-top-simple {
+    background: linear-gradient(100deg, #6a8dff 0%, #a57ff9 100%);
+    color: #fff;
+    padding: 60px 0 30px 0;
     text-align: center;
 }
-
-.stat-number {
-    font-size: 36px;
-    font-weight: 700;
-    margin-bottom: 8px;
-    display: block;
-}
-
-.stat-label {
-    font-size: 16px;
-    opacity: 0.9;
-    font-weight: 500;
-}
-
-/* Secciones generales */
-.about-section {
-    margin: 80px 0;
-}
-
-.section-content {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 60px;
-    align-items: center;
-}
-
-.about-section.reverse .section-content {
-    direction: rtl;
-}
-
-.about-section.reverse .section-text {
-    direction: ltr;
-}
-
-.section-text h2 {
-    font-size: 36px;
-    color: #333;
-    margin-bottom: 25px;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.section-text h2 i {
-    color: #4361ee;
-}
-
-.section-text p {
-    font-size: 18px;
-    line-height: 1.8;
-    color: #555;
-    margin-bottom: 20px;
-}
-
-.section-image {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.image-placeholder {
-    width: 300px;
-    height: 300px;
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    border-radius: 20px;
+.about-top-content { max-width: 900px; margin: 0 auto; }
+.about-icon-title { display: flex; align-items: center; justify-content: center; gap: 18px; margin-bottom: 18px; }
+.about-icon { background: rgba(255,255,255,0.18); border-radius: 50%; padding: 15px; font-size: 30px; }
+.about-inkverse { color: #ffe082; font-weight: 800; letter-spacing: 1px;}
+.about-subtitle { font-size: 1.25rem; margin-bottom: 40px; }
+.about-gradient { background: linear-gradient(90deg,#ffe082,#81d4fa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;}
+.about-stats-row { display: flex; gap: 50px; justify-content: center; margin-top: 24px; flex-wrap: wrap;}
+.about-stat { min-width: 120px; }
+.about-stat-num { font-size: 2.2rem; font-weight: 700; display: block; margin-bottom: 7px;}
+.about-stat-label { font-size: 1rem; opacity: 0.92; font-weight: 400; }
+/* Secciones generales y cards */
+.about-section { margin: 70px 0; }
+.section-content { display: grid; grid-template-columns: 1fr 1fr; gap: 55px; align-items: center; }
+.about-section.reverse .section-content { direction: rtl; }
+.about-section.reverse .section-text { direction: ltr; }
+.section-text h2 { font-size: 2rem; color: #333; margin-bottom: 20px; display: flex; align-items: center; gap: 13px;}
+.section-text h2 i { color: #4361ee; }
+.section-text p { font-size: 1rem; line-height: 1.8; color: #555; margin-bottom: 15px;}
+.section-image { display: flex; justify-content: center; align-items: center;}
+.image-placeholder { width: 220px; height: 220px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #6c757d; font-size: 1rem; font-weight: 600; border: 2px dashed #dee2e6;}
+.image-placeholder i { font-size: 60px; margin-bottom: 17px; color: #4361ee; }
+.mission-points { margin-top: 20px; }
+.mission-point { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 16px;}
+.mission-point i { font-size: 20px; color: #4361ee; margin-top: 3px; flex-shrink: 0;}
+.mission-point h4 { font-size: 1rem; color: #333; margin-bottom: 4px;}
+.mission-point p { color: #666; line-height: 1.6; margin: 0;}
+.values-section { margin: 60px 0; padding: 55px 0; background: #f8f9fa; border-radius: 20px;}
+.section-header { text-align: center; margin-bottom: 40px;}
+.section-header h2 { font-size: 1.7rem; color: #333; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 10px;}
+.section-header h2 i { color: #4361ee; }
+.section-header p { font-size: 1rem; color: #666; max-width: 550px; margin: 0 auto;}
+.values-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 30px;}
+.value-card { background: white; padding: 28px 20px; border-radius: 15px; text-align: center; box-shadow: 0 8px 30px rgba(0,0,0,0.08); transition: transform 0.3s;}
+.value-card:hover { transform: translateY(-7px);}
+.value-icon { width: 60px; height: 60px; background: linear-gradient(135deg, #4361ee, #3a56d4); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 17px; color: white; font-size: 25px;}
+.value-card h3 { font-size: 1.1rem; color: #333; margin-bottom: 10px;}
+.value-card p { color: #666; line-height: 1.5;}
+.team-section { margin: 60px 0;}
+.team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 27px;}
+.team-member { background: white; padding: 27px 18px; border-radius: 15px; text-align: center; box-shadow: 0 8px 30px rgba(0,0,0,0.08); transition: transform 0.3s;}
+.team-member:hover { transform: translateY(-5px);}
+.member-avatar { width: 65px; height: 65px; background: linear-gradient(135deg, #4361ee, #3a56d4); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; color: white; font-size: 30px;}
+.team-member h3 { font-size: 1rem; color: #333; margin-bottom: 3px;}
+.member-role { color: #4361ee; font-weight: 600; margin-bottom: 7px; font-size: .96rem;}
+.member-bio { color: #666; line-height: 1.6; margin-bottom: 13px; font-size: .93rem;}
+.member-social { display: flex; justify-content: center; gap: 9px;}
+.member-social a { width: 32px; height: 32px; background: #f8f9fa; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #666; transition: all 0.3s;}
+.member-social a:hover { background: #4361ee; color: white; transform: translateY(-1px);}
+.achievements-section { margin: 60px 0;}
+.achievements-timeline { max-width: 700px; margin: 0 auto; position: relative;}
+.card-futura-mejora {
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: 0 8px 30px rgba(105, 70, 255, 0.07);
+    padding: 26px 22px 20px 22px;
+    margin-bottom: 0;
+    text-align: left;
+    transition: transform 0.2s;
+    border-left: 5px solid #7f53ff;
+    min-height: 160px;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    color: #6c757d;
-    font-size: 18px;
-    font-weight: 600;
-    border: 2px dashed #dee2e6;
+    justify-content: flex-start;
 }
-
-.image-placeholder i {
-    font-size: 80px;
-    margin-bottom: 20px;
-    color: #4361ee;
-}
-
-/* Puntos de misión */
-.mission-points {
-    margin-top: 30px;
-}
-
-.mission-point {
-    display: flex;
-    align-items: flex-start;
-    gap: 20px;
-    margin-bottom: 25px;
-}
-
-.mission-point i {
-    font-size: 24px;
-    color: #4361ee;
-    margin-top: 5px;
-    flex-shrink: 0;
-}
-
-.mission-point h4 {
-    font-size: 20px;
-    color: #333;
+.card-futura-mejora h3 {
+    font-size: 1.17rem;
+    color: #363657;
+    font-weight: 700;
     margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 9px;
 }
-
-.mission-point p {
+.card-futura-mejora p {
     color: #666;
-    line-height: 1.6;
+    font-size: 1rem;
+    line-height: 1.5;
     margin: 0;
 }
-
-/* Sección de valores */
-.values-section {
-    margin: 100px 0;
-    padding: 80px 0;
-    background: #f8f9fa;
-    border-radius: 20px;
+.card-futura-mejora i {
+    color: #7f53ff;
+    font-size: 1.2em;
 }
-
-.section-header {
-    text-align: center;
-    margin-bottom: 60px;
+/* Participa/Únete */
+.join-section-fancy {
+    background: #f7f8fa;
+    border-radius: 0 0 42px 42px;
+    margin-top: 60px;
+    box-shadow: 0 8px 40px -16px #7f53ff22;
+    padding: 52px 0 55px 0;
+    position: relative;
 }
-
-.section-header h2 {
-    font-size: 36px;
-    color: #333;
-    margin-bottom: 15px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 15px;
-}
-
-.section-header h2 i {
-    color: #4361ee;
-}
-
-.section-header p {
-    font-size: 18px;
-    color: #666;
-    max-width: 600px;
+.join-content-fancy {
+    max-width: 1100px;
     margin: 0 auto;
+    padding: 0 18px;
 }
-
-.values-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 40px;
-}
-
-.value-card {
-    background: white;
-    padding: 40px 30px;
-    border-radius: 15px;
-    text-align: center;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.1);
-    transition: transform 0.3s ease;
-}
-
-.value-card:hover {
-    transform: translateY(-10px);
-}
-
-.value-icon {
-    width: 80px;
-    height: 80px;
-    background: linear-gradient(135deg, #4361ee, #3a56d4);
-    border-radius: 50%;
+.join-title-row {
     display: flex;
+    gap: 18px;
     align-items: center;
-    justify-content: center;
-    margin: 0 auto 25px;
-    color: white;
-    font-size: 32px;
-}
-
-.value-card h3 {
-    font-size: 24px;
-    color: #333;
-    margin-bottom: 15px;
-}
-
-.value-card p {
-    color: #666;
-    line-height: 1.6;
-}
-
-/* Sección de equipo */
-.team-section {
-    margin: 100px 0;
-}
-
-.team-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 40px;
-}
-
-.team-member {
-    background: white;
-    padding: 40px 30px;
-    border-radius: 15px;
-    text-align: center;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.1);
-    transition: transform 0.3s ease;
-}
-
-.team-member:hover {
-    transform: translateY(-10px);
-}
-
-.member-avatar {
-    width: 100px;
-    height: 100px;
-    background: linear-gradient(135deg, #4361ee, #3a56d4);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 20px;
-    color: white;
-    font-size: 40px;
-}
-
-.team-member h3 {
-    font-size: 22px;
-    color: #333;
-    margin-bottom: 5px;
-}
-
-.member-role {
-    color: #4361ee;
-    font-weight: 600;
-    margin-bottom: 15px;
-    font-size: 16px;
-}
-
-.member-bio {
-    color: #666;
-    line-height: 1.6;
-    margin-bottom: 20px;
-    font-size: 14px;
-}
-
-.member-social {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-}
-
-.member-social a {
-    width: 40px;
-    height: 40px;
-    background: #f8f9fa;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #666;
-    transition: all 0.3s ease;
-}
-
-.member-social a:hover {
-    background: #4361ee;
-    color: white;
-    transform: translateY(-2px);
-}
-
-/* Timeline de logros */
-.achievements-section {
-    margin: 100px 0;
-}
-
-.achievements-timeline {
-    max-width: 800px;
-    margin: 0 auto;
-    position: relative;
-}
-
-.achievements-timeline::before {
-    content: '';
-    position: absolute;
-    left: 50%;
-    top: 0;
-    bottom: 0;
-    width: 2px;
-    background: #4361ee;
-    transform: translateX(-50%);
-}
-
-.timeline-item {
-    display: flex;
-    align-items: center;
-    margin-bottom: 60px;
-    position: relative;
-}
-
-.timeline-item:nth-child(even) {
-    flex-direction: row-reverse;
-}
-
-.timeline-date {
-    width: 100px;
-    height: 100px;
-    background: #4361ee;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-weight: 700;
-    font-size: 18px;
-    position: relative;
-    z-index: 2;
-}
-
-.timeline-content {
-    flex: 1;
-    padding: 30px;
-    background: white;
-    border-radius: 15px;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.1);
-    margin: 0 30px;
-}
-
-.timeline-content h3 {
-    font-size: 22px;
-    color: #333;
     margin-bottom: 10px;
 }
-
-.timeline-content p {
-    color: #666;
-    line-height: 1.6;
-    margin: 0;
-}
-
-/* Sección únete */
-.join-section {
-    margin: 100px 0;
-    padding: 80px 0;
-    background: linear-gradient(135deg, #4361ee 0%, #3a56d4 100%);
-    border-radius: 20px;
-    text-align: center;
-    color: white;
-}
-
-.join-content h2 {
-    font-size: 36px;
-    margin-bottom: 20px;
+.join-icon {
+    background: linear-gradient(135deg, #7f53ff 0%, #5ad6ff 100%);
+    color: #fff;
+    border-radius: 18px;
+    padding: 11px 17px 11px 13px;
+    font-size: 2.1rem;
+    box-shadow: 0 2px 10px #7f53ff22;
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 15px;
 }
-
-.join-content p {
-    font-size: 18px;
-    line-height: 1.8;
-    margin-bottom: 40px;
-    max-width: 800px;
-    margin-left: auto;
-    margin-right: auto;
-    opacity: 0.9;
+.join-section-fancy h2 {
+    font-size: 2.4rem;
+    color: #2d2d50;
+    font-weight: 800;
+    margin: 0;
+    letter-spacing: -1.2px;
 }
-
-.join-actions {
+.join-desc {
+    font-size: 1.22rem;
+    color: #39395c;
+    margin-bottom: 38px;
+    margin-top: 0;
+    max-width: 900px;
+}
+.join-gradient-text {
+    background: linear-gradient(90deg, #7f53ff 0%, #5ad6ff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 600;
+}
+.join-actions-fancy {
     display: flex;
-    gap: 20px;
-    justify-content: center;
+    gap: 22px;
     flex-wrap: wrap;
+    margin-top: 10px;
 }
-
-/* Botones */
-.btn {
+.btn-join {
     display: inline-flex;
     align-items: center;
     gap: 10px;
-    padding: 12px 24px;
-    border-radius: 10px;
+    padding: 18px 38px;
+    border-radius: 16px;
+    font-weight: 700;
+    font-size: 1.15rem;
     text-decoration: none;
-    font-weight: 600;
-    font-size: 16px;
-    transition: all 0.3s ease;
+    transition: all 0.19s cubic-bezier(.44,2,.55,1);
     border: none;
-    cursor: pointer;
-    text-align: center;
-    justify-content: center;
+    box-shadow: 0 2px 16px #7f53ff12;
+    letter-spacing: 0.2px;
 }
-
-.btn-lg {
-    padding: 15px 30px;
-    font-size: 18px;
+.btn-join-github {
+    background: linear-gradient(90deg, #a259ff 0%, #377dff 100%);
+    color: #fff;
+    box-shadow: 0 4px 30px #a259ff44;
 }
-
-.btn-primary {
-    background: white;
-    color: #4361ee;
+.btn-join-github:hover {
+    background: linear-gradient(90deg, #377dff 0%, #a259ff 100%);
+    color: #fff;
+    transform: translateY(-2px) scale(1.04);
 }
-
-.btn-primary:hover {
-    background: #f8f9fa;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(255,255,255,0.3);
+.btn-join-outline {
+    background: #fff;
+    color: #4b4b8f;
+    border: 2.5px solid #e0e2f6;
+    box-shadow: 0 1px 7px #7f53ff08;
 }
-
-.btn-outline {
-    background: transparent;
-    border: 2px solid white;
-    color: white;
+.btn-join-outline:hover {
+    background: #f3f5fa;
+    color: #7f53ff;
+    border-color: #7f53ff;
+    transform: translateY(-2px) scale(1.04);
 }
-
-.btn-outline:hover {
-    background: white;
-    color: #4361ee;
-    transform: translateY(-2px);
+@media (max-width: 900px) {
+    .about-top-simple { padding: 38px 0 15px 0;}
+    .about-stats-row { gap: 26px; }
+    .section-content { grid-template-columns: 1fr;}
+    .about-section.reverse .section-content { direction: ltr;}
+    .team-grid { grid-template-columns: 1fr;}
+    .achievements-timeline { grid-template-columns: 1fr !important; }
+    .join-section-fancy { border-radius: 0 0 22px 22px; padding: 40px 0 36px 0;}
+    .join-section-fancy h2 { font-size: 1.55rem;}
+    .join-actions-fancy { flex-direction: column; gap: 15px;}
+    .btn-join { width: 100%; justify-content: center; font-size: 1rem; }
 }
-
-/* Responsive */
-@media (max-width: 768px) {
-    .about-hero {
-        padding: 80px 0;
-    }
-    
-    .hero-text h1 {
-        font-size: 36px;
-    }
-    
-    .hero-description {
-        font-size: 18px;
-    }
-    
-    .hero-stats {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 30px;
-    }
-    
-    .section-content {
-        grid-template-columns: 1fr;
-        gap: 40px;
-        text-align: center;
-    }
-    
-    .about-section.reverse .section-content {
-        direction: ltr;
-    }
-    
-    .section-text h2 {
-        font-size: 28px;
-        justify-content: center;
-    }
-    
-    .values-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .team-grid {
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    }
-    
-    .achievements-timeline::before {
-        left: 30px;
-    }
-    
-    .timeline-item {
-        flex-direction: row !important;
-        padding-left: 80px;
-    }
-    
-    .timeline-item:nth-child(even) {
-        flex-direction: row !important;
-    }
-    
-    .timeline-date {
-        position: absolute;
-        left: 0;
-        width: 60px;
-        height: 60px;
-        font-size: 14px;
-    }
-    
-    .timeline-content {
-        margin: 0;
-    }
-    
-    .join-actions {
-        flex-direction: column;
-        align-items: center;
-    }
-    
-    .join-actions .btn {
-        width: 100%;
-        max-width: 300px;
-    }
-}
-
-@media (max-width: 480px) {
-    .hero-stats {
-        grid-template-columns: 1fr;
-    }
-    
-    .hero-text h1 {
-        font-size: 28px;
-        flex-direction: column;
-        gap: 10px;
-    }
-    
-    .section-text h2 {
-        font-size: 24px;
-        flex-direction: column;
-        gap: 10px;
-    }
-    
-    .values-section,
-    .join-section {
-        padding: 60px 20px;
-    }
+@media (max-width: 600px) {
+    .about-top-content { padding: 0 10px;}
+    .about-icon-title { flex-direction: column; gap: 8px;}
+    .about-stats-row { flex-direction: column; gap: 10px;}
+    .image-placeholder { width: 140px; height: 140px; font-size: .85rem;}
 }
 </style>
 
 <!-- AOS Animation Library -->
 <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Inicializar AOS
     AOS.init({
-        duration: 800,
+        duration: 900,
         easing: 'ease-out-cubic',
         once: true,
         offset: 100
     });
 });
 </script>
-
 <?php include_once(__DIR__ . '/../includes/footer.php'); ?>
