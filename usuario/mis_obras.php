@@ -9,7 +9,79 @@ if (!isset($_SESSION['usuario_id'])) {
 }
 
 $usuario_id = $_SESSION['usuario_id'];
+$mensaje = "";
 
+// Eliminación de obras
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['eliminar_obra']) && isset($_POST['obra_id']) && isset($_POST['obra_tipo'])) {
+    $obra_id = intval($_POST['obra_id']);
+    $obra_tipo = $_POST['obra_tipo'] === 'libro' ? 'libro' : 'comic';
+
+    // Eliminar dependencias primero (capítulos, comentarios, favoritos)
+    if ($obra_tipo === 'libro') {
+        // Eliminar capítulos del libro
+        $stmt = $conexion->prepare("DELETE FROM capitulos_libro WHERE libro_id = ?");
+        if ($stmt) {
+            $stmt->bind_param("i", $obra_id);
+            $stmt->execute();
+            $stmt->close();
+        }
+        // Eliminar comentarios y favoritos
+        $stmt = $conexion->prepare("DELETE FROM comentarios WHERE contenido_id = ? AND tipo_contenido = 'libro'");
+        if ($stmt) {
+            $stmt->bind_param("i", $obra_id);
+            $stmt->execute();
+            $stmt->close();
+        }
+        $stmt = $conexion->prepare("DELETE FROM favoritos WHERE contenido_id = ? AND tipo_contenido = 'libro'");
+        if ($stmt) {
+            $stmt->bind_param("i", $obra_id);
+            $stmt->execute();
+            $stmt->close();
+        }
+        // Ahora sí, eliminar el libro
+        $stmt = $conexion->prepare("DELETE FROM libros WHERE id = ? AND usuario_id = ?");
+        if ($stmt) {
+            $stmt->bind_param("ii", $obra_id, $usuario_id);
+            if ($stmt->execute()) {
+                $mensaje = '<div class="alert-exito">Obra eliminada correctamente.</div>';
+            } else {
+                $mensaje = '<div class="alert-error">No se pudo eliminar la obra.</div>';
+            }
+            $stmt->close();
+        } else {
+            $mensaje = '<div class="alert-error">Error interno al preparar la consulta.</div>';
+        }
+    } else {
+        // Puedes agregar aquí lógica similar para comics (por ejemplo, capítulos_comic)
+        $stmt = $conexion->prepare("DELETE FROM comentarios WHERE contenido_id = ? AND tipo_contenido = 'comic'");
+        if ($stmt) {
+            $stmt->bind_param("i", $obra_id);
+            $stmt->execute();
+            $stmt->close();
+        }
+        $stmt = $conexion->prepare("DELETE FROM favoritos WHERE contenido_id = ? AND tipo_contenido = 'comic'");
+        if ($stmt) {
+            $stmt->bind_param("i", $obra_id);
+            $stmt->execute();
+            $stmt->close();
+        }
+        // Eliminar el cómic
+        $stmt = $conexion->prepare("DELETE FROM comics WHERE id = ? AND usuario_id = ?");
+        if ($stmt) {
+            $stmt->bind_param("ii", $obra_id, $usuario_id);
+            if ($stmt->execute()) {
+                $mensaje = '<div class="alert-exito">Obra eliminada correctamente.</div>';
+            } else {
+                $mensaje = '<div class="alert-error">No se pudo eliminar la obra.</div>';
+            }
+            $stmt->close();
+        } else {
+            $mensaje = '<div class="alert-error">Error interno al preparar la consulta.</div>';
+        }
+    }
+}
+
+// Recarga obras tras eliminar
 $sql_libros = "SELECT id, titulo, portada, descripcion, categoria_id, publico_adulto, fecha_subida 
                FROM libros 
                WHERE usuario_id = ? 
@@ -47,6 +119,7 @@ $comics = $stmt_comics->get_result();
                 <i class="fas fa-plus"></i> <?= htmlspecialchars($TEXTOS['publicar_nueva_obra'] ?? 'Publicar nueva obra') ?>
             </a>
         </div>
+        <?= $mensaje ?>
     </header>
 
     <!-- LIBROS -->
@@ -56,7 +129,7 @@ $comics = $stmt_comics->get_result();
             <?php while ($libro = $libros->fetch_assoc()): ?>
                 <article class="obra-item">
                     <?php if (!empty($libro['portada'])): ?>
-                        <img class="obra-portada-img" src="<?= BASE_URL ?>/uploads/portadas/<?= htmlspecialchars($libro['portada']); ?>" alt="<?= htmlspecialchars($TEXTOS['portada_de'] ?? 'Portada de') . ' ' . htmlspecialchars($libro['titulo']); ?>">
+                        <img class="obra-portada-img" src="<?= BASE_URL ?>/uploads/portadas/<?= htmlspecialchars($libro['portada']); ?>" alt="<?= htmlspecialchars($TEXTOS['portada_de'] ?? 'Portada de', ENT_QUOTES) . ' ' . htmlspecialchars($libro['titulo'], ENT_QUOTES); ?>">
                     <?php else: ?>
                         <div class="obra-portada-placeholder"><i class="fas fa-book"></i></div>
                     <?php endif; ?>
@@ -76,6 +149,13 @@ $comics = $stmt_comics->get_result();
                             <i class="fas fa-edit"></i> <?= htmlspecialchars($TEXTOS['editar'] ?? 'Editar') ?>
                         </a>
                         -->
+                        <form method="POST" onsubmit="return confirm('¿Seguro que quieres eliminar este libro?');" style="display:inline;">
+                            <input type="hidden" name="obra_id" value="<?= $libro['id'] ?>">
+                            <input type="hidden" name="obra_tipo" value="libro">
+                            <button type="submit" name="eliminar_obra" class="obra-link btn-eliminar">
+                                <i class="fas fa-trash-alt"></i> <?= htmlspecialchars($TEXTOS['eliminar'] ?? 'Eliminar') ?>
+                            </button>
+                        </form>
                     </div>
                 </article>
             <?php endwhile; ?>
@@ -94,7 +174,7 @@ $comics = $stmt_comics->get_result();
             <?php while ($comic = $comics->fetch_assoc()): ?>
                 <article class="obra-item">
                     <?php if (!empty($comic['portada'])): ?>
-                        <img class="obra-portada-img" src="<?= BASE_URL ?>/uploads/portadas/<?= htmlspecialchars($comic['portada']); ?>" alt="<?= htmlspecialchars($TEXTOS['portada_de'] ?? 'Portada de') . ' ' . htmlspecialchars($comic['titulo']); ?>">
+                        <img class="obra-portada-img" src="<?= BASE_URL ?>/uploads/portadas/<?= htmlspecialchars($comic['portada']); ?>" alt="<?= htmlspecialchars($TEXTOS['portada_de'] ?? 'Portada de', ENT_QUOTES) . ' ' . htmlspecialchars($comic['titulo'], ENT_QUOTES); ?>">
                     <?php else: ?>
                         <div class="obra-portada-placeholder"><i class="fas fa-book"></i></div>
                     <?php endif; ?>
@@ -114,6 +194,13 @@ $comics = $stmt_comics->get_result();
                             <i class="fas fa-edit"></i> <?= htmlspecialchars($TEXTOS['editar'] ?? 'Editar') ?>
                         </a>
                         -->
+                        <form method="POST" onsubmit="return confirm('¿Seguro que quieres eliminar este cómic?');" style="display:inline;">
+                            <input type="hidden" name="obra_id" value="<?= $comic['id'] ?>">
+                            <input type="hidden" name="obra_tipo" value="comic">
+                            <button type="submit" name="eliminar_obra" class="obra-link btn-eliminar">
+                                <i class="fas fa-trash-alt"></i> <?= htmlspecialchars($TEXTOS['eliminar'] ?? 'Eliminar') ?>
+                            </button>
+                        </form>
                     </div>
                 </article>
             <?php endwhile; ?>
@@ -126,3 +213,10 @@ $comics = $stmt_comics->get_result();
     </section>
 </div>
 <?php include '../includes/footer.php'; ?>
+
+<style>
+.alert-exito { background:#e9ffe4; border-left:5px solid #56d364; color:#277a3d; padding:10px 24px; border-radius:7px; margin:0 auto 22px auto; max-width:420px; font-weight:600; }
+.alert-error { background:#ffeaea; border-left:5px solid #ff6565; color:#a83a3a; padding:10px 24px; border-radius:7px; margin:0 auto 22px auto; max-width:420px; font-weight:600; }
+.btn-eliminar { background:#ffeaea; color:#a83a3a; border:none; margin-left:7px; padding:6px 18px; border-radius:6px; font-weight:600; cursor:pointer; transition:background 0.2s; }
+.btn-eliminar:hover { background:#ff6565; color:#fff; }
+</style>
